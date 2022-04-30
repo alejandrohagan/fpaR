@@ -11,4 +11,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Imports: 
     dplyr,
-    magrittr
+    ggplot2,
+    magrittr,
+    scales
