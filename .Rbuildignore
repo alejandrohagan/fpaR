@@ -4,3 +4,4 @@
 ^fpaR.*\.tar\.gz$
 ^fpaR.*\.tgz$
 ^LICENSE\.md$
+^README\.Rmd$
