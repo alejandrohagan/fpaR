@@ -2,3 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+fpaR.Rcheck/
+fpaR*.tar.gz
+fpaR*.tgz
