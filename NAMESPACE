@@ -3,3 +3,4 @@
 export(abc)
 export(abc_graph)
 export(count_plus)
+export(new_vs_returning)

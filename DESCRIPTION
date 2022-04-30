@@ -12,5 +12,6 @@ RoxygenNote: 7.1.2
 Imports: 
     dplyr,
     ggplot2,
+    lubridate,
     magrittr,
     scales
