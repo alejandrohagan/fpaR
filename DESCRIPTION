@@ -15,3 +15,4 @@ Imports:
     lubridate,
     magrittr,
     scales
+LazyData: true
