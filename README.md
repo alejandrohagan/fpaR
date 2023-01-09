@@ -6,6 +6,16 @@ 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
 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
 
 
+SELECT
+    CASE
+        WHEN COLUMN_NAME LIKE '%DATE%' AND value = '1900-01-01' THEN NULL
+        ELSE value
+    END AS value,
+    ...
+FROM yourTable
+
+
+
 
 
 
