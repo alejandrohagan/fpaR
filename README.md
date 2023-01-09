@@ -1,6 +1,8 @@
 f the business to these metrics.
 The $50M value estimate is associated with nominal working capital, which we can clarify in a future meeting. The main factor affecting the range is the responsiveness of the business to value capture opportunities, as well as product prices. We will have initial results from the F&L pilot by the end of the month, which will serve as a roadmap for WCI. If operations are located in the hub, WCI's ability to capture value can be accelerated. This can be achieved by harmonizing data elements across receivables and payables, integrating WCI objectives throughout operational KPIs and management reports, prioritizing and incentivizing staff and management towards WCI objectives, and leveraging existing integration and interfaces with procurement, sales, and the supply chain to present and execute value-capturing workflows. Without these advantages, I estimate that it will delay the full value capture by 2 years, as other priorities such as MSP work migrations will consume management attention and capacity. Key enablers of value capture, regardless of operations, include the successful implementation of Hiradius (which harmonizes the receivables data set and provides visibility into invoice status) and the Snowflake implementation of the chemicals and procurement dataset. The piece that is missing without operations is the interface and interaction with value chains, which should be achieved through EPOs and their existing stewardship points, GBS KPIs, and the Business Enable Control Tower concept that brings visibility to value capture opportunities and the action or inaction of the business on these metrics.
 
+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
+
 
 
 
