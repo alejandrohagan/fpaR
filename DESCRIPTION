@@ -14,5 +14,7 @@ Imports:
     ggplot2,
     lubridate,
     magrittr,
-    scales
+    scales,
+    stats,
+    umap
 LazyData: true
