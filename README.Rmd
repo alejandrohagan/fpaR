@@ -37,7 +37,7 @@ devtools::install_github("alejandrohagan/fpaR")
 
 This is correctly under development and is in early stages!
 
-Current functions
+Current functions:
 
-make_segmentation() will use kmeans and umap to create a segmentation
-count_plus will replicate the handy dplyr::count() function
+**make_segmentation()** will use kmeans and umap to create a segmentation
+**count_plus** will replicate the handy dplyr::count() function
