@@ -19,9 +19,6 @@ new_vs_returning(df, group, date, new_label, returning_label, date_unit)
 
 \item{date_unit}{data dimension}
 }
-\value{
-
-}
 \description{
 new vs. returning variable analysis
 }

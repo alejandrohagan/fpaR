@@ -19,9 +19,6 @@ abc_graph(df, group_label, dim_label, size, shape, ...)
 
 \item{...}{}
 }
-\value{
-
-}
 \description{
 Produces ABC graph based on abc() function
 }

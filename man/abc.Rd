@@ -21,9 +21,6 @@ abc(df, group, dim, a = 0.7, b = 0.26, c = 0.04, na.rm = TRUE)
 
 \item{na.rm}{to remove na values}
 }
-\value{
-
-}
 \description{
 ABC classification
 }

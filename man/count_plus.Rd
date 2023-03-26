@@ -17,9 +17,6 @@ count_plus(df, dim, wt = NULL, sort = TRUE, round = 3)
 
 \item{round}{digits to round by}
 }
-\value{
-
-}
 \description{
 Dplyr's count() function but with cumulative totals
 }
