@@ -96,7 +96,7 @@ base::all
   }
 
   #make tbl grid to iterate through different centers options
-  tbl_grid <- tibble::tibble(centers_input=base::centers_grid_range) %>%
+  tbl_grid <- tibble::tibble(centers_input=centers_grid_range) %>%
     dplyr::mutate(kmeans_models=purrr::map(.x=centers_input,
                                            ~mapper_kmeans(kmeans_centers=.x),
                                            .progress = TRUE),
@@ -136,7 +136,7 @@ base::all
 tbl_kmeans <-   tbl_grid %>%
   dplyr::filter(centers_input=={{kmeans_centers_init}}) %>%
   dplyr::pull(kmeans_models) %>%
-  dplyr::pluck(1) %>%
+  purrr::pluck(1) %>%
   broom::augment(df) %>%
   dplyr::select({{id_col}},.cluster)
 
