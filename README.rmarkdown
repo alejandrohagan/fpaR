@@ -3,6 +3,7 @@ title: "README"
 format: gfm
 ---
 
+
     # Introduction to fpaR
 
 This is a collection of business intelligence tools and patterns to help with common data queries and insights. This is based on numerous blogs, books, post and work experience in what I have seen as most frequent analysis /work effort
@@ -31,6 +32,7 @@ The package functions can be split between three focus areas:
 
 You can install the development version of fpaR from [GitHub](https://github.com/) with:
 
+
 ```{r}
 #| message: false
 #| warning: false
@@ -42,6 +44,7 @@ devtools::install_github("alejandrohagan/fpaR")
 
 library(tidyverse)
 ```
+
 
 ## Package Components
 
@@ -82,6 +85,7 @@ This package is heavily inspired by the DAX Patterns for the time intelligence f
 -   Microsoft's Contoso Dataset to help with practice with transaction data
 
 
+
 ```{r}
 #| echo: false
 tibble::tribble(
@@ -115,11 +119,4 @@ tibble::tribble(
 
 
 ```
-
-
-
-
-
-
-
 
