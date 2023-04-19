@@ -3,7 +3,7 @@ title: "README"
 format: gfm
 ---
 
-# fpaR
+    # Introduction to fpaR
 
 This is a collection of business intelligence tools and patterns to help with common data queries and insights. This is based on numerous blogs, books, post and work experience in what I have seen as most frequent analysis /work effort
 
@@ -43,36 +43,46 @@ devtools::install_github("alejandrohagan/fpaR")
 library(tidyverse)
 ```
 
+## Package Components
+
 This is correctly under development and is in early stages!
 
 This package is heavily inspired by the DAX Patterns for the time intelligence functions
 
-Segmentation helpers:
+**Segmentation helpers:**
 
 -   **make_segmentation()** will use kmeans and umap to create a segmentation
 -   **abc_segmentation()**
--   new vs. returning customers
+-   Turnover customers
 
-Calculation Helpers
+**Calculation Helpers**
 
--   **count_plus()** will replicate the handy dplyr::count() function
+-   **count_plus()** will replicate the handy dplyr::count() function but augments with cumsum
 
--   **show_excel()** will show interim tranformation steps in excell
+-   **show_excel()** will show interim transformation steps in excel
 
 -   **divide** will give an alternative results to dividing by zero that isn't `Inf`
 
--   standard time intelligence functions
+**Time Intelligence Functions**
 
--   non-standard time intelligence functions
+-   Standard time intelligence functions^[See table below]
 
--   Transition metrics
+    -   These are time intelligence fucntions that are consistent with a standard calendar (eg. the calendar on your computer or your phone)
+-   Non-standard time intelligence functions
+    
+    -   These are calendars that maybe more common in the retail business (Eg. 5-4-5 quarter calcualtion)
+    -   These calendars aim to control for weekends as that may be larger driver of sales
+
+**Variation Analysis**
 
 -   variance / factor analysis
 
--   Practice datasets
+**Practice Datasets**
+
+-   Microsoft's Contoso Dataset to help with practice with transaction data
+
 
 ```{r}
-
 tibble::tribble(
   ~"Short Name",~"Description",
   "YTD", 	"Year-to-date",	 
@@ -98,7 +108,8 @@ tibble::tribble(
 "YTDOPY", 	"Year-to-date-over-previous-year", 			
 "QTDOPQ", 	"Quarter-to-date-over-previous-quarter", 	
   
-)
+) %>% 
+  gt::gt()
 
 
 
