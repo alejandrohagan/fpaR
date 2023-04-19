@@ -2,28 +2,29 @@
 title: "README"
 format: gfm
 ---
+
 # fpaR
 
-
-This is a collection of business intelligence tools and patterns to help with common data queries and insights. 
-This is based on numerous blogs, books, post and work experience in what I have seen as most frequent analysis /work effort
+This is a collection of business intelligence tools and patterns to help with common data queries and insights. This is based on numerous blogs, books, post and work experience in what I have seen as most frequent analysis /work effort
 
 The package functions can be split between three focus areas:
 
-1) Segmentation strategies
-    
+1)  Segmentation strategies
+
     -   UMAP
     -   Kmeans
     -   ABC
-2) Time intelligence functions
+
+2)  Time intelligence functions
 
     -   List of standard time intelligence functions such as month-to-date, year over year for standard and non-standard calendars
     -   See table before complete list
-3) Variance analysis strategies
-    
+
+3)  Variance analysis strategies
+
     -   Applied statsitical techniques to underestand variance analysis including graphing techniques
         -   quantile regression
-        -   anova 
+        -   anova
     -   Like for like comparison
 
 ## Installation
@@ -31,35 +32,48 @@ The package functions can be split between three focus areas:
 You can install the development version of fpaR from [GitHub](https://github.com/) with:
 
 ```{r}
+#| message: false
+#| warning: false
+#| error: false
+
+
 # install.packages("devtools")
 devtools::install_github("alejandrohagan/fpaR")
+
+library(tidyverse)
 ```
 
 This is correctly under development and is in early stages!
 
 This package is heavily inspired by the DAX Patterns for the time intelligence functions
 
-
 Segmentation helpers:
+
 -   **make_segmentation()** will use kmeans and umap to create a segmentation
--   ***abc_segmentation()***
+-   **abc_segmentation()**
 -   new vs. returning customers
 
 Calculation Helpers
+
 -   **count_plus()** will replicate the handy dplyr::count() function
+
 -   **show_excel()** will show interim tranformation steps in excell
+
 -   **divide** will give an alternative results to dividing by zero that isn't `Inf`
 
-
 -   standard time intelligence functions
+
 -   non-standard time intelligence functions
+
 -   Transition metrics
+
 -   variance / factor analysis
+
 -   Practice datasets
 
 ```{r}
 
-measurement_descriptions <- tibble::tribble(
+tibble::tribble(
   ~"Short Name",~"Description",
   "YTD", 	"Year-to-date",	 
 "QTD", 	"Quarter-to-date",	  		 
@@ -86,46 +100,6 @@ measurement_descriptions <- tibble::tribble(
   
 )
 
-measurement_descriptions %>% 
-  gt::gt() %>% 
-  gt::tab_style(
-    location=gt::cells_column_labels(),
-    style=gt::cell_fill("blue",alpha=.3)
-    )
-
-```
-
-		
-
-
-
-```{r}
-x=100/0
-divide <- function(numerator,denominator,alternative_result){
- 
-  result <- return(numerator/denominator) 
-  
-  if(is.infinite(x)){
-  NA_integer_
-}else{
-  print(x)
-}
-}
-
-
-
-df <- data.frame(ID = 1:5,
-                 Name = c("John", "Jane", "Michael", "Samantha", "Tom"),
-                 Age = c(25, 30, 35, 22, 27),
-                 stringsAsFactors = FALSE)
-
-# Split the dataframe by columns
-df_list <- split(df, f = seq_along(df))
-
-
-
 
 
 ```
-
-
