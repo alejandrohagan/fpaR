@@ -44,7 +44,7 @@ devtools::install_github("alejandrohagan/fpaR")
     Error in readRDS(file) : error reading from connection
 
     ── R CMD build ─────────────────────────────────────────────────────────────────
-    * checking for file ‘/tmp/RtmpufIXDe/remotes4759237b75c07/alejandrohagan-fpaR-6b5d4ad/DESCRIPTION’ ... OK
+    * checking for file ‘/tmp/RtmpBHFLDL/remotes4860968d7cf1f/alejandrohagan-fpaR-ae8fe05/DESCRIPTION’ ... OK
     * preparing ‘fpaR’:
     * checking DESCRIPTION meta-information ... OK
     * checking for LF line-endings in source and make files and shell scripts
@@ -112,42 +112,12 @@ intelligence functions
 - Microsoft’s Contoso Dataset to help with practice with transaction
   data
 
-``` r
-tibble::tribble(
-  ~"Short Name",~"Description",
-  "YTD",    "Year-to-date",  
-"QTD",  "Quarter-to-date",           
-"MAT",  "Moving annual total",           
-"PY",   "Previous year",             
-"PQ",   "Previous quarter",              
-"PM",   "Previous month",            
-"PYC",  "Previous year complete",            
-"PQC",  "Previous quarter complete",             
-"PMC",  "Previous month complete",           
-"PP",   "Previous period; automatically selects year, quarter, or month" ,   
-"PYMAT",    "Previous year moving annual total" ,            
-"YOY",  "Year-over-year",           
-"QOQ",  "Quarter-over-quarter",             
-"MOM",  "Month-over-month",         
-"MATG",     "Moving annual total growth",           
-"POP",  "Period-over-period; automatically selects year, quarter, or month",            
-"PYTD",     "Previous year-to-date",             
-"PQTD", "Previous quarter-to-date",              
-"YOYTD",    "Year-over-year-to-date" ,          
-"QOQTD", "  Quarter-over-quarter-to-date",          
-"YTDOPY",   "Year-to-date-over-previous-year",          
-"QTDOPQ",   "Quarter-to-date-over-previous-quarter",    
-  
-) %>% 
-  gt::gt()
-```
-
-<div id="rjmuhxxrfz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="topqovtkxm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#rjmuhxxrfz .gt_table {
+#topqovtkxm .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -172,7 +142,7 @@ tibble::tribble(
   border-left-color: #D3D3D3;
 }
 
-#rjmuhxxrfz .gt_heading {
+#topqovtkxm .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -184,12 +154,12 @@ tibble::tribble(
   border-right-color: #D3D3D3;
 }
 
-#rjmuhxxrfz .gt_caption {
+#topqovtkxm .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#rjmuhxxrfz .gt_title {
+#topqovtkxm .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -201,7 +171,7 @@ tibble::tribble(
   border-bottom-width: 0;
 }
 
-#rjmuhxxrfz .gt_subtitle {
+#topqovtkxm .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -213,13 +183,13 @@ tibble::tribble(
   border-top-width: 0;
 }
 
-#rjmuhxxrfz .gt_bottom_border {
+#topqovtkxm .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#rjmuhxxrfz .gt_col_headings {
+#topqovtkxm .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -234,7 +204,7 @@ tibble::tribble(
   border-right-color: #D3D3D3;
 }
 
-#rjmuhxxrfz .gt_col_heading {
+#topqovtkxm .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -254,7 +224,7 @@ tibble::tribble(
   overflow-x: hidden;
 }
 
-#rjmuhxxrfz .gt_column_spanner_outer {
+#topqovtkxm .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -266,15 +236,15 @@ tibble::tribble(
   padding-right: 4px;
 }
 
-#rjmuhxxrfz .gt_column_spanner_outer:first-child {
+#topqovtkxm .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#rjmuhxxrfz .gt_column_spanner_outer:last-child {
+#topqovtkxm .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#rjmuhxxrfz .gt_column_spanner {
+#topqovtkxm .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -286,7 +256,7 @@ tibble::tribble(
   width: 100%;
 }
 
-#rjmuhxxrfz .gt_group_heading {
+#topqovtkxm .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -312,7 +282,7 @@ tibble::tribble(
   text-align: left;
 }
 
-#rjmuhxxrfz .gt_empty_group_heading {
+#topqovtkxm .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -327,15 +297,15 @@ tibble::tribble(
   vertical-align: middle;
 }
 
-#rjmuhxxrfz .gt_from_md > :first-child {
+#topqovtkxm .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#rjmuhxxrfz .gt_from_md > :last-child {
+#topqovtkxm .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#rjmuhxxrfz .gt_row {
+#topqovtkxm .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -354,7 +324,7 @@ tibble::tribble(
   overflow-x: hidden;
 }
 
-#rjmuhxxrfz .gt_stub {
+#topqovtkxm .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -367,7 +337,7 @@ tibble::tribble(
   padding-right: 5px;
 }
 
-#rjmuhxxrfz .gt_stub_row_group {
+#topqovtkxm .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -381,11 +351,11 @@ tibble::tribble(
   vertical-align: top;
 }
 
-#rjmuhxxrfz .gt_row_group_first td {
+#topqovtkxm .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#rjmuhxxrfz .gt_summary_row {
+#topqovtkxm .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -395,16 +365,16 @@ tibble::tribble(
   padding-right: 5px;
 }
 
-#rjmuhxxrfz .gt_first_summary_row {
+#topqovtkxm .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#rjmuhxxrfz .gt_first_summary_row.thick {
+#topqovtkxm .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#rjmuhxxrfz .gt_last_summary_row {
+#topqovtkxm .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -414,7 +384,7 @@ tibble::tribble(
   border-bottom-color: #D3D3D3;
 }
 
-#rjmuhxxrfz .gt_grand_summary_row {
+#topqovtkxm .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -424,7 +394,7 @@ tibble::tribble(
   padding-right: 5px;
 }
 
-#rjmuhxxrfz .gt_first_grand_summary_row {
+#topqovtkxm .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -434,11 +404,11 @@ tibble::tribble(
   border-top-color: #D3D3D3;
 }
 
-#rjmuhxxrfz .gt_striped {
+#topqovtkxm .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#rjmuhxxrfz .gt_table_body {
+#topqovtkxm .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -447,7 +417,7 @@ tibble::tribble(
   border-bottom-color: #D3D3D3;
 }
 
-#rjmuhxxrfz .gt_footnotes {
+#topqovtkxm .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -461,7 +431,7 @@ tibble::tribble(
   border-right-color: #D3D3D3;
 }
 
-#rjmuhxxrfz .gt_footnote {
+#topqovtkxm .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -470,7 +440,7 @@ tibble::tribble(
   padding-right: 5px;
 }
 
-#rjmuhxxrfz .gt_sourcenotes {
+#topqovtkxm .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -484,7 +454,7 @@ tibble::tribble(
   border-right-color: #D3D3D3;
 }
 
-#rjmuhxxrfz .gt_sourcenote {
+#topqovtkxm .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -492,64 +462,64 @@ tibble::tribble(
   padding-right: 5px;
 }
 
-#rjmuhxxrfz .gt_left {
+#topqovtkxm .gt_left {
   text-align: left;
 }
 
-#rjmuhxxrfz .gt_center {
+#topqovtkxm .gt_center {
   text-align: center;
 }
 
-#rjmuhxxrfz .gt_right {
+#topqovtkxm .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#rjmuhxxrfz .gt_font_normal {
+#topqovtkxm .gt_font_normal {
   font-weight: normal;
 }
 
-#rjmuhxxrfz .gt_font_bold {
+#topqovtkxm .gt_font_bold {
   font-weight: bold;
 }
 
-#rjmuhxxrfz .gt_font_italic {
+#topqovtkxm .gt_font_italic {
   font-style: italic;
 }
 
-#rjmuhxxrfz .gt_super {
+#topqovtkxm .gt_super {
   font-size: 65%;
 }
 
-#rjmuhxxrfz .gt_footnote_marks {
+#topqovtkxm .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#rjmuhxxrfz .gt_asterisk {
+#topqovtkxm .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#rjmuhxxrfz .gt_indent_1 {
+#topqovtkxm .gt_indent_1 {
   text-indent: 5px;
 }
 
-#rjmuhxxrfz .gt_indent_2 {
+#topqovtkxm .gt_indent_2 {
   text-indent: 10px;
 }
 
-#rjmuhxxrfz .gt_indent_3 {
+#topqovtkxm .gt_indent_3 {
   text-indent: 15px;
 }
 
-#rjmuhxxrfz .gt_indent_4 {
+#topqovtkxm .gt_indent_4 {
   text-indent: 20px;
 }
 
-#rjmuhxxrfz .gt_indent_5 {
+#topqovtkxm .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
