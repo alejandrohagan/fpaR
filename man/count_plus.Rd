@@ -2,21 +2,25 @@
 % Please edit documentation in R/count_plus.R
 \name{count_plus}
 \alias{count_plus}
-\title{Dplyr's count() function but with cumulative totals}
+\title{Proportion and Cumsum Portion}
 \usage{
-count_plus(df, dim, wt = NULL, sort = TRUE, round = 3)
+count_plus(.data, ..., .wt = FALSE, .sort = 1)
 }
 \arguments{
-\item{df}{dataframe}
+\item{.data}{dataframe}
 
-\item{dim}{dimension to count}
+\item{...}{columns you want to groupby}
 
-\item{wt}{weighting dimension}
+\item{.wt}{if you want to weight it by a variable}
 
-\item{sort}{sort results}
-
-\item{round}{digits to round by}
+\item{.sort}{if you want to sort from largest (1), reverse(-1) or nothing 0}
+}
+\value{
+a tibble of values
 }
 \description{
-Dplyr's count() function but with cumulative totals
+Proportion and Cumsum Portion
+}
+\examples{
+ggplot2::diamonds \%>\% count_plus(color,cut,.wt=price)
 }
