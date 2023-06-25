@@ -55,25 +55,6 @@ You can install the development version of fpaR from
 devtools::install_github("alejandrohagan/fpaR")
 ```
 
-
-    ── R CMD build ─────────────────────────────────────────────────────────────────
-    * checking for file ‘/tmp/Rtmp0ft9Zl/remotes54122fb95d/alejandrohagan-fpaR-1b32a6f/DESCRIPTION’ ... OK
-    * preparing ‘fpaR’:
-    * checking DESCRIPTION meta-information ... OK
-    * checking for LF line-endings in source and make files and shell scripts
-    * checking for empty or unneeded directories
-      NB: this package now depends on R (>= 3.5.0)
-      WARNING: Added dependency on R >= 3.5.0 because serialized objects in
-      serialize/load version 3 cannot be read in older versions of R.
-      File(s) containing such objects:
-        ‘fpaR/data/contoso_dim_channel.RData’
-        ‘fpaR/data/contoso_dim_date.RData’
-        ‘fpaR/data/contoso_dim_product.RData’
-        ‘fpaR/data/contoso_dim_product_subcategory.RData’
-        ‘fpaR/data/contoso_dim_promotion.RData’
-        ‘fpaR/data/contoso_fact_sales.RData’
-    * building ‘fpaR_0.0.0.9000.tar.gz’
-
 ## Package Components
 
 This is correctly under development and is in early stages!

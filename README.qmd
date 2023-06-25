@@ -44,6 +44,7 @@ You can install the development version of fpaR from [GitHub](https://github.com
 #| message: false
 #| warning: false
 #| error: false
+#| eval: false
 
 
 # install.packages("devtools")
