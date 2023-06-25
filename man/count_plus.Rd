@@ -2,16 +2,16 @@
 % Please edit documentation in R/count_plus.R
 \name{count_plus}
 \alias{count_plus}
-\title{Proportion and Cumsum Portion}
+\title{Augments count funiton to give proportion and cumlative proportion and sorting options (dplyr,sparklyr friendly)}
 \usage{
-count_plus(.data, ..., .wt = FALSE, .sort = 1)
+count_plus(.data, ..., wt, .sort = 1)
 }
 \arguments{
 \item{.data}{dataframe}
 
 \item{...}{columns you want to groupby}
 
-\item{.wt}{if you want to weight it by a variable}
+\item{wt}{if you want to weight the count (eg. value or price)}
 
 \item{.sort}{if you want to sort from largest (1), reverse(-1) or nothing 0}
 }
@@ -19,8 +19,8 @@ count_plus(.data, ..., .wt = FALSE, .sort = 1)
 a tibble of values
 }
 \description{
-Proportion and Cumsum Portion
+Augments count funiton to give proportion and cumlative proportion and sorting options (dplyr,sparklyr friendly)
 }
 \examples{
-ggplot2::diamonds \%>\% count_plus(color,cut,.wt=price)
+ggplot2::diamonds \%>\% count_plus(color,cut,wt=price)
 }
