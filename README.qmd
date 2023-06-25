@@ -3,6 +3,10 @@ title: "README"
 format: gfm
 ---
 
+# Status
+
+-   Package is still in development mode -- not ready for installation
+
 # Introduction to fpaR
 
 This is a collection of business intelligence tools and patterns to help with common data queries and insights. This is based on numerous blogs, books, post and work experience in what I have seen as most frequent analysis /work effort

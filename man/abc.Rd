@@ -2,14 +2,23 @@
 % Please edit documentation in R/abc.R
 \name{abc}
 \alias{abc}
-\title{ABC classification}
+\title{Classify a group by proportion of a variable (A,B,C)}
 \usage{
-abc(df, group, dim, a = 0.7, b = 0.26, c = 0.04, na.rm = TRUE)
+abc(
+  .data,
+  ...,
+  dim,
+  a = 0.7,
+  b = 0.26,
+  c = 0.04,
+  na.rm = TRUE,
+  order_by = c("sum")
+)
 }
 \arguments{
-\item{df}{dataframe}
+\item{.data}{data frame or tibble}
 
-\item{group}{grouping variable to classify}
+\item{...}{groups columns  to group by}
 
 \item{dim}{dimension to classify by (should be additive and positive)}
 
@@ -20,11 +29,16 @@ abc(df, group, dim, a = 0.7, b = 0.26, c = 0.04, na.rm = TRUE)
 \item{c}{final segment threshold expressed as a percentage}
 
 \item{na.rm}{to remove na values}
+
+\item{order_by}{aggregate function to order by such as sum, mean, n, sd, mad, aad, etc}
+}
+\value{
+a tibble or obj
 }
 \description{
-ABC classification
+Classify a group by proportion of a variable (A,B,C)
 }
 \examples{
 
-customer_abc <- abc(contoso,customer_key,margin,a=.7,b=.2,c=.1)
+customer_abc <- abc(contoso,customer_key,dim=margin,a=.7,b=.2,c=.1)
 }
