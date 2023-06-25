@@ -23,13 +23,13 @@ abc <- function(df,group,dim,a=.7,b=.26,c=.04,na.rm=TRUE){
   ##declare variable outside of stopfunction for context transition
   dim_check <- df %>% pull({{dim}})
 
-  stopifnot("a,b,c must sum to 1, please try again"=a+b+c==1,
-            "dim must be numeric"=is.numeric(dim_check),
-            "please change dim to positive value"= sum(dim_check)>0)
+
+  assertthat::assert_that(a+b+c==1,msg = "A, B, and C must sum to 1")
+  assertthat::assert_that(is.numeric(dim_check,msg = "dim must be a numeric column")
 
   df %>% #passes the dataframe through
 
-    group_by({{group}}) %>% #group's the dataframe by the input gruop column
+    group_by(pick({{group}})) %>% #group's the dataframe by the input gruop column
 
     #creates a bunch of columns
     summarize(
