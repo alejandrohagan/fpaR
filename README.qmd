@@ -123,8 +123,7 @@ tibble::tribble(
 "YTDOPY", 	"Year-to-date-over-previous-year", 			
 "QTDOPQ", 	"Quarter-to-date-over-previous-quarter", 	
   
-) %>% 
-  gt::gt()
+)
 
 
 
