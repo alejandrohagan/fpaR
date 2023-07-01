@@ -3,6 +3,7 @@
 export("%>%")
 export(abc)
 export(abc_graph)
+export(clean_file_names)
 export(count_plus)
 export(divide)
 export(make_segmentation)

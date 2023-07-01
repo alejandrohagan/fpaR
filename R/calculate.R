@@ -14,28 +14,28 @@ calculate <- function(.data,.fn,var,rows,cols,filter){
 
 }
 
-
-calculate(diamonds,.fn=min,var=price,rows=cut,cols=color,filter(.,color=="D",cut=="Fair"))
-
-## way to have list or argument get seperately expressed and evaluated
-
-test <- list(cut=="Fair",color=="D") %>% map(.,rlang::expr)
-
-pluck(test,1)(1:10)
-
-map(test,~pluck(.x)(500:1000))
-
-eval(out)(1:10)
-
-arg <- 'color=="D"'
-
-diamonds %>%
-  filter(eval(expr(color=="D"&cut=="Fair")))
-
-
-
-
-full_out <- expr(filter(.,color=="D",cut=="Fair"))
-
-diamonds %>%
-eval(envir = .,full_out)
+#
+# calculate(diamonds,.fn=min,var=price,rows=cut,cols=color,filter(.,color=="D",cut=="Fair"))
+#
+# ## way to have list or argument get seperately expressed and evaluated
+#
+# test <- list(cut=="Fair",color=="D") %>% map(.,rlang::expr)
+#
+# pluck(test,1)(1:10)
+#
+# map(test,~pluck(.x)(500:1000))
+#
+# eval(out)(1:10)
+#
+# arg <- 'color=="D"'
+#
+# diamonds %>%
+#   filter(eval(expr(color=="D"&cut=="Fair")))
+#
+#
+#
+#
+# full_out <- expr(filter(.,color=="D",cut=="Fair"))
+#
+# diamonds %>%
+# eval(envir = .,full_out)
