@@ -9,6 +9,7 @@
 #' @export
 #'
 #' @examples
+#' divide(100,0,"error")
 divide <- function(numerator,denominator,alternative_result=NA_integer_){
 
 
@@ -25,4 +26,3 @@ divide <- function(numerator,denominator,alternative_result=NA_integer_){
   return(temp)
 
 }
-

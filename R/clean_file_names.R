@@ -24,10 +24,8 @@ fp <- file.path
   new_names <-  paste0(fp,"/",base,extensions)
 
   fs::file_move(old_names,new_names)
-  print("works1")
   files_impacted <- length(old_names)
   terminal_files <- crayon::green$bold(files_impacted)
-  print("works2")
   fp_output <- crayon::yellow$bold(fp)
 
 
