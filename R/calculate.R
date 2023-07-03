@@ -25,18 +25,27 @@ calculate <- function(.data,.fn,rows,cols,filter){
 
 
 }
-library(tidyverse)
-
-calculate <- function(.data,.fn,rows,cols,filter){
-
-  expr_fn=rlang::parse_expr(.fn)
-  filter_exp <- rlang::parse_expr(filter)
-
-  .data %>%
-    filter(eval(filter_exp)) %>%
-    group_by(pick({{rows}}),pick({{cols}}))%>%
-    summarise(out=base::eval(expr_fn))%>%
-    pivot_wider(names_from={{cols}},values_from = out)
-
-}
-
+# library(tidyverse)
+#
+# calculate <- function(.data,.fn,rows,cols,filter){
+#
+#   expr_fn=rlang::parse_expr(.fn)
+#   filter_exp <- rlang::parse_expr(filter)
+#
+#   .data %>%
+#     filter(eval(filter_exp)) %>%
+#     group_by(pick({{rows}}),pick({{cols}}))%>%
+#     summarise(out=base::eval(expr_fn))%>%
+#     pivot_wider(names_from={{cols}},values_from = out)
+# }
+#
+# test <- sum(diamonds$price[diamonds$color=="D"])
+#
+# function(row,col,var,fn.,row=(color,color==D))
+# diamonds %>%
+#   group_by(color,cut) %>%
+#   summarise(
+#     sum=sum(price)
+#     ,opt=sum(diamonds$price[diamonds$color=="D"])
+#
+#     )
