@@ -26,3 +26,5 @@ divide <- function(numerator,denominator,alternative_result=NA_integer_){
   return(temp)
 
 }
+
+

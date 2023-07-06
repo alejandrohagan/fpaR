@@ -129,3 +129,18 @@ library(tidyverse)
 #
 #   )
 
+
+# library(tidyverse,echarts4r)
+#
+# diamonds %>%
+#   group_by(cut) %>%
+#   echarts4r::e_charts(x=price) %>%
+#   echarts4r::e_scatter(carat
+#                        # ,symbol = "arrow"
+#                        ,legendHoverLink =TRUE
+#                        ,large=TRUE
+#                        ,symoblSize=100
+#                        ) %>%
+#   echarts4r::e_tooltip(trigger="axis") %>%
+#   echarts4r::e_facet(rows=3,cols = 3) %>%
+#   echarts4r::e_color(c("red","blue","firebrick","grey","grey10"))
