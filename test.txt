@@ -1,0 +1,42 @@
+43eaec3 HEAD@{0}: commit: new totalytd function
+65f1c3c HEAD@{1}: commit: divide and count plus
+8cc5f6c HEAD@{2}: commit: join logic
+db82118 HEAD@{3}: commit: new row level context framework
+4a40884 HEAD@{4}: commit: updated calculate
+92c884f HEAD@{5}: commit: fixed calculate, added examples
+2a65098 HEAD@{6}: commit: fixed clean file function
+29a1164 HEAD@{7}: commit: updated filter logic
+60f491b HEAD@{8}: commit: path forward on filter criteria
+8abb0c3 HEAD@{9}: commit: initial calculate draft
+d2c63ce HEAD@{10}: commit: updated description
+57a8009 HEAD@{11}: commit: csv files
+2c7d359 HEAD@{12}: commit: test csv
+c9ad6fb HEAD@{13}: commit: update man pages and readme
+6141cf2 HEAD@{14}: commit: delete corr script
+0805f82 HEAD@{15}: commit: add quarto readme
+6702815 HEAD@{16}: commit: add quarto readme
+1b32a6f HEAD@{17}: commit: deleted markdown readme
+5b82695 HEAD@{18}: commit: add new divide function and updated documention
+2137e7e HEAD@{19}: commit: updated abc formula, added util pipe and wip on correlatoin tbl
+d598300 HEAD@{20}: commit: initial edits
+c54367f HEAD@{21}: commit: fixed errors, added cli and updated manual pages
+84851b4 HEAD@{22}: commit: update namespace and manual pages
+04b1919 HEAD@{23}: commit: updated cli and included assertthat args
+6c7bf11 HEAD@{24}: commit: cli capabilities and general clean up
+2c9968c HEAD@{25}: commit: wip
+f98f83c HEAD@{26}: commit: clean up table
+ae8fe05 HEAD@{27}: commit: wip
+6b5d4ad HEAD@{28}: commit: wip
+73e0def HEAD@{29}: commit: cleaned up readme quarto
+a6b1001 HEAD@{30}: commit: delete rmarkdown
+13d2408 HEAD@{31}: commit: replace with quarto markdown
+c38958e HEAD@{32}: pull: Fast-forward
+a1dac13 HEAD@{33}: checkout: moving from branch1 to main
+53fa132 HEAD@{34}: commit: updated readme
+5821c5d HEAD@{35}: commit: fixed wrong namespace and other typos
+508e5ef HEAD@{36}: commit: minor edits
+a1dac13 HEAD@{37}: checkout: moving from main to branch1
+a1dac13 HEAD@{38}: commit: add new imports and description
+c53b56f HEAD@{39}: commit: delte segmentation
+e5bc3ad HEAD@{40}: commit: made new function of customer segmentation
+7d4dc7f HEAD@{41}: clone: from https://github.com/alejandrohagan/fpaR.git

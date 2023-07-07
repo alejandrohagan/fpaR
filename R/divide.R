@@ -28,3 +28,14 @@ divide <- function(numerator,denominator,alternative_result=NA_integer_){
 }
 
 
+test <- "optimise(f=function(x) x*2,interval =c(.5,10),maximum = FALSE,lower = 0) %>% pluck(1)"
+
+eval(rlang::parse_expr(test))
+
+df <- tibble(test2=1:10) %>%
+  rowwise() %>%
+  mutate(func=test
+         ,thing=list(eval(rlang::parse_expr(func)))
+  ) %>%
+  ungroup() %>% unnest(thing)
+
