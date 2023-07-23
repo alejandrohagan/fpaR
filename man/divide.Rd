@@ -16,3 +16,6 @@ divide(numerator, denominator, alternative_result = NA_integer_)
 \description{
 Divide function with error handling for divide by zero or NA
 }
+\examples{
+divide(100,0,"error")
+}

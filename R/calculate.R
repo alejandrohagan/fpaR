@@ -49,3 +49,17 @@ calculate <- function(.data,.fn,rows,cols,filter){
 #     ,opt=sum(diamonds$price[diamonds$color=="D"])
 #
 #     )
+
+
+
+#
+# summary <- function(.data,x) {
+#
+#   funs <- c("mean"=mean, "median"=median, "sd"=sd, "mad"=mad, "IQR"=IQR)
+#   map(funs, function(f) f(.data[[x]], na.rm = TRUE))
+# }
+#
+# mtcars %>%
+#   summary("mpg")
+# enframe() %>%
+#   unnest(value)
