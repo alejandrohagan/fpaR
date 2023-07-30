@@ -50,7 +50,7 @@ calculate <- function(.data,.fn,rows,cols,filter){
 #
 #     )
 
-
+usethis::use_r("wci")
 
 #
 # summary <- function(.data,x) {
@@ -63,3 +63,45 @@ calculate <- function(.data,.fn,rows,cols,filter){
 #   summary("mpg")
 # enframe() %>%
 #   unnest(value)
+library(tidyverse)
+sales <- fpaR::contoso_fact_sales %>%
+  janitor::clean_names() %>%
+
+  mutate(date_key=mdy(date_key))
+
+## month over month
+mom <- function(.data,var,fn,n=1){
+
+ .data <-  .data  %>%
+    mutate(
+      month=lubridate::floor_date(date_key,unit="month")
+    ) %>%
+    group_by(month)
+
+var <-  enquo(var)
+var <- rlang::as_label(var)
+
+fn <- enquo(fn)
+fn <- rlang::as_label(fn)
+
+fn_var_raw <- paste0(fn,"(",var,",na.rm=TRUE)")
+
+fn_var <-  rlang::parse_expr(fn_var_raw)
+
+    .data %>%
+    summarise(
+      fn_var=eval(fn_var)
+      ,.groups = "drop"
+    ) %>%
+    mutate(
+      lag_var=lag(fn_var,n={{n}})
+      ,delta=fn_var-lag_var
+    ) %>%
+    select(month,delta)
+
+
+}
+
+mom(sales,var=sales_quantity,fn=sum)
+
+## year over year
