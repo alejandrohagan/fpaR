@@ -70,38 +70,57 @@ sales <- fpaR::contoso_fact_sales %>%
   mutate(date_key=mdy(date_key))
 
 ## month over month
-mom <- function(.data,var,fn,n=1){
+pop <- function(.data,date_var,var,fn=c("sum","mean","min","max","quantile"),period=c("day","week","month","bimonth","quarter","halfyear","year"),n=1,na.rm=TRUE,probs=.5){
+
+  # data check
+
+date_var <- dplyr::enquo(date_var)
+
+
+lubridate::is.Date(.data[[rlang::as_label(date_var)]])
+
+
+
+# match args of period
+ period <- match.arg(period)
 
  .data <-  .data  %>%
     mutate(
-      month=lubridate::floor_date(date_key,unit="month")
+      period=lubridate::floor_date(!!date_var,unit=period)
     ) %>%
-    group_by(month)
+    group_by(dplyr::pick(period),.add = TRUE)
 
-var <-  enquo(var)
-var <- rlang::as_label(var)
+# match args
+fn <- match.arg(fn)
 
-fn <- enquo(fn)
-fn <- rlang::as_label(fn)
+var <- enquo(var)
 
-fn_var_raw <- paste0(fn,"(",var,",na.rm=TRUE)")
 
-fn_var <-  rlang::parse_expr(fn_var_raw)
 
+# match functions
+fn_exec <- switch(
+  fn
+  ,sum=sum
+  ,mean=mean
+  ,min=min
+  ,max=max
+  ,quantile=quantile
+)
+
+fn <- rlang::sym(fn)
     .data %>%
     summarise(
-      fn_var=eval(fn_var)
+      "{{fn}}_{{var}}":=eval(fn_exec({{var}},na.rm=na.rm,probs=probs))
       ,.groups = "drop"
-    ) %>%
-    mutate(
-      lag_var=lag(fn_var,n={{n}})
-      ,delta=fn_var-lag_var
-    ) %>%
-    select(month,delta)
+    )
+    # mutate(
+    #   lag_var=lag(fn_var,n={{n}})
+    #   ,delta=.data[["fn_var"]]-lag_var
+    # ) %>%
+    # select(period,lag_var,fn_var,delta)
 
 
 }
 
-mom(sales,var=sales_quantity,fn=sum)
 
-## year over year
+pop(sales,date_var = date_key,var = unit_price,fn = "quantile",period = "month",n = 1,na.rm = TRUE,probs = .99)
