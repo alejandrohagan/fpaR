@@ -69,7 +69,7 @@ sales <- fpaR::contoso_fact_sales %>%
 
   mutate(date_key=mdy(date_key))
 
-## month over month
+
 pop <- function(.data,date_var,var,fn=c("sum","mean","min","max","quantile"),period=c("day","week","month","bimonth","quarter","halfyear","year"),n=1,na.rm=TRUE,probs=.5){
 
   # data check
@@ -112,15 +112,89 @@ fn <- rlang::sym(fn)
     summarise(
       "{{fn}}_{{var}}":=eval(fn_exec({{var}},na.rm=na.rm,probs=probs))
       ,.groups = "drop"
-    )
-    # mutate(
-    #   lag_var=lag(fn_var,n={{n}})
-    #   ,delta=.data[["fn_var"]]-lag_var
-    # ) %>%
-    # select(period,lag_var,fn_var,delta)
+    ) %>%
+    mutate(
+      lag_var=lag(.data[[rlang::englue("{{fn}}_{{var}}")]],n={{n}})
+      ,delta=.data[[rlang::englue("{{fn}}_{{var}}")]]-lag_var
+    ) %>%
+    select(period,lag_var,delta,.data[[rlang::englue("{{fn}}_{{var}}")]])
 
 
 }
 
 
-pop(sales,date_var = date_key,var = unit_price,fn = "quantile",period = "month",n = 1,na.rm = TRUE,probs = .99)
+
+
+pp <- function(.data,date_var,var,fn=c("sum","mean","min","max","quantile"),period=c("day","week","month","bimonth","quarter","halfyear","year"),n=1,na.rm=TRUE,probs=.5){
+
+  # data check
+
+  date_var <- dplyr::enquo(date_var)
+
+
+  lubridate::is.Date(.data[[rlang::as_label(date_var)]])
+
+
+
+  # match args of period
+  period <- match.arg(period)
+
+  .data <-  .data  %>%
+    mutate(
+      period=lubridate::floor_date(!!date_var,unit=period)
+    ) %>%
+    group_by(dplyr::pick(period),.add = TRUE)
+
+  # match args
+  fn <- match.arg(fn)
+
+  var <- enquo(var)
+
+
+
+  # match functions
+  fn_exec <- switch(
+    fn
+    ,sum=sum
+    ,mean=mean
+    ,min=min
+    ,max=max
+    ,quantile=quantile
+  )
+
+  fn <- rlang::sym(fn)
+  .data %>%
+    summarise(
+      "{{fn}}_{{var}}":=eval(fn_exec({{var}},na.rm=na.rm,probs=probs))
+      ,.groups = "drop"
+    ) %>%
+    mutate(
+      lag_var=lag(.data[[rlang::englue("{{fn}}_{{var}}")]],n={{n}})
+    ) %>%
+    select(period,lag_var)
+
+
+}
+
+
+
+# note add comments and weiting
+pop(sales,date_var = date_key,var = unit_price,fn = "sum",period = "quarter",n = 1,na.rm = TRUE,probs = .99)
+
+# note add comments and weiting
+pp(sales,date_var = date_key,var = unit_price,fn = "sum",period = "quarter",n = 1,na.rm = TRUE,probs = .99)
+
+
+sales %>%
+  group_by(date_key) %>%
+  summarise(
+    qnty=sum(sales_quantity)
+    ,.groups="drop"
+  ) %>%
+  group_by(year=lubridate::week(date_key)) %>%
+  mutate(
+    ytd=cumsum(qnty)
+  )
+
+# make utilities that make
+
