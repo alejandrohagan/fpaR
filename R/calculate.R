@@ -50,7 +50,6 @@ calculate <- function(.data,.fn,rows,cols,filter){
 #
 #     )
 
-usethis::use_r("wci")
 
 #
 # summary <- function(.data,x) {
