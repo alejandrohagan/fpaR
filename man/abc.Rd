@@ -30,7 +30,7 @@ abc(
 
 \item{na.rm}{to remove na values}
 
-\item{order_by}{aggregate function to order by such as sum, mean, n, sd, mad, aad, etc}
+\item{order_by}{aggregate function to order by such as "sum","n","sd","mean","mad","aad","prop05","prop25","prop_50","prop_75","prop95"}
 }
 \value{
 a tibble or obj

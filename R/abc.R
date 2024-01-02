@@ -8,7 +8,7 @@
 #' @param na.rm to remove na values
 #' @param .data data frame or tibble
 #' @param ... groups columns  to group by
-#' @param order_by aggregate function to order by such as sum, mean, n, sd, mad, aad, etc
+#' @param order_by aggregate function to order by such as "sum","n","sd","mean","mad","aad","prop05","prop25","prop_50","prop_75","prop95"
 #'
 #' @return a tibble or obj
 #' @export
@@ -52,15 +52,17 @@ temp1 <-   .data %>% #passes the dataframe through
     dplyr::ungroup()
 
 
+# order_by <- "sum"
+
 order_by_value <- base::match.arg(arg = order_by,choices = c("sum","n","sd","mean","mad","aad","prop05","prop25","prop_50","prop_75","prop95"),)
 
 final_tbl <- temp1 %>%
 
     dplyr::arrange(dplyr::desc(dplyr::pick(order_by_value))) %>% # assuming positive values, descends highest to lowest
 
-    dplyr::mutate(cum_sum=base::cumsum(sum), #cumlative value, if ratio, need some sort of check - need specify
+    dplyr::mutate(cum_sum=base::cumsum(pick(order_by_value)), #cumlative value, if ratio, need some sort of check - need specify
 
-           prop_total=sum/max(cum_sum), #assumes positive values, need check
+           prop_total=pick(order_by)/max(cum_sum), #assumes positive values, need check
 
            cum_prop_total=base::cumsum(prop_total), #cumsum percent of total
 
