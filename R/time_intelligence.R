@@ -36,7 +36,7 @@ augment_time_attributes <- function(.data,date_var){
       ,semester_year=lubridate::semester(!!date_var,with_year=TRUE)
       ,year_month=paste0(year,"_",month_number)
       ,year_month_padded=paste0(year,"_",month_number_padded)
-      ,year_wk=base::paste0(year,"_",lubridate::week(!!date_var))
+      ,year_wk=base::paste0(year,"_",1)
       ,year_quarter=lubridate::quarter(!!date_var,with_year = TRUE)
       ,quarter_year_full=base::paste0(quarter,"Q",year)
       ,quarter_year_abb=base::paste0(quarter,"Q",year_abb)
@@ -45,11 +45,6 @@ augment_time_attributes <- function(.data,date_var){
 return(.data)
 
 }
-
-contoso_sales_spk %>%
-  augment_time_attributes(DateKey)
-
-
 
 
 #' create 554 calendar

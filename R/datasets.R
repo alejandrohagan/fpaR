@@ -7,7 +7,8 @@
 #' @examples
 create_duckdb_data <- function(){
 
-sales_tbl <- fpaR::contoso_fact_sales
+sales_tbl <- fpaR::contoso_fact_sales %>%
+  mutate(DateKey=lubridate::mdy(DateKey))
 
 dates_tbl <- fpaR::contoso_dim_date
 
@@ -37,14 +38,13 @@ purrr::map2(.x=list_tbls,.y=tbl_names, ~duckdb::duckdb_register(con,.y,.x,overwr
 
 objects_db <- purrr::map(.x=tbl_names,~dplyr::tbl(con,.x))
 
-contoso_sales_db <- objects_db[1]
 
-contoso_sales_db <<- objects_db[1]
-contoso_dates_db <<- objects_db[2]
-contoso_channel_db <<- objects_db[3]
-contoso_product_db <<- objects_db[4]
-contoso_subcategory_db <<- objects_db[5]
-contoso_promotion_db <<- objects_db[6]
+contoso_sales_db <<- objects_db[1] %>% pluck(1)
+contoso_dates_db <<- objects_db[2]%>% pluck(1)
+contoso_channel_db <<- objects_db[3]%>% pluck(1)
+contoso_product_db <<- objects_db[4]%>% pluck(1)
+contoso_subcategory_db <<- objects_db[5]%>% pluck(1)
+contoso_promotion_db <<- objects_db[6]%>% pluck(1)
 
   # return(contoso_sales_db)
   # return(contoso_dates_db)

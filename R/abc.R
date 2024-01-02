@@ -78,6 +78,6 @@ final_tbl <- temp1 %>%
     ) %>%
     dplyr::select(-c(prop_total,cum_sum)) %>%  #removes unused columns
     dplyr::relocate(dim_threshold,group_classification_by_dim,cum_prop_total,cum_unit_prop) #orders columns
-
+# need to double check this
 return(final_tbl)
 }
