@@ -2,9 +2,9 @@
 % Please edit documentation in R/count_plus.R
 \name{count_plus}
 \alias{count_plus}
-\title{Augments count funiton to give proportion and cumlative proportion and sorting options (dplyr,sparklyr friendly)}
+\title{Augments count functionto give proportion and cumulative proportion and sorting options (dplyr,sparklyr friendly)}
 \usage{
-count_plus(.data, ..., wt, .sort = 1)
+count_plus(.data, ..., wt, .sort = 1, na.rm = TRUE)
 }
 \arguments{
 \item{.data}{dataframe}
@@ -19,7 +19,7 @@ count_plus(.data, ..., wt, .sort = 1)
 a tibble of values
 }
 \description{
-Augments count funiton to give proportion and cumlative proportion and sorting options (dplyr,sparklyr friendly)
+Augments count functionto give proportion and cumulative proportion and sorting options (dplyr,sparklyr friendly)
 }
 \examples{
 ggplot2::diamonds \%>\% count_plus(color,cut,wt=price)
