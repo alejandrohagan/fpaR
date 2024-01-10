@@ -19,6 +19,7 @@ The package functions can be split between three focus areas:
     -   Kmeans
     -   ABC
     -   New vs. Returning Customers/ Vendors
+    
 2)  Time intelligence functions
 
     -   List of standard time intelligence functions such as month-to-date, year over year for standard and non-standard calendars
@@ -104,33 +105,31 @@ This package is heavily inspired by the DAX Patterns for the time intelligence f
 #| error: false
 
 tibble::tribble(
-  ~"Short Name",~"Description",
-  "YTD", 	"Year-to-date",	 
-"QTD", 	"Quarter-to-date",	  		 
-"MAT", 	"Moving annual total", 	  		 
-"PYC", 	"Previous year complete", 		  	 
-"PQC", 	"Previous quarter complete", 		  	 
-"PMC", 	"Previous month complete", 		  	 
-"PP", 	"Previous period; automatically selects year, quarter, or month" , 	 
-"PYMAT", 	"Previous year moving annual total" ,			 
-"MATG", 	"Moving annual total growth", 			
-"POP", 	"Period-over-period; automatically selects year, quarter, or month", 	  	  	
-"PYTD", 	"Previous year-to-date", 			 
-"PQTD",	"Previous quarter-to-date", 			 
-"YOYTD", 	"Year-over-year-to-date" ,			
-"QOQTD", "	Quarter-over-quarter-to-date", 			
-"YTDOPY", 	"Year-to-date-over-previous-year", 			
-"QTDOPQ", 	"Quarter-to-date-over-previous-quarter", 	
-  
-)
-
-
-
+   ~"Short Name",~"Description",
+    "YTD", 	"Year-to-date",	 
+    "QTD", 	"Quarter-to-date",	  		 
+    "MAT", 	"Moving annual total", 	  		 
+    "PYC", 	"Previous year complete", 		  	 
+    "PQC", 	"Previous quarter complete", 		  	 
+    "PMC", 	"Previous month complete", 		  	 
+    "PP", 	"Previous period; automatically selects year, quarter, or month" , 	 
+    "PYMAT", 	"Previous year moving annual total" ,			 
+    "MATG", 	"Moving annual total growth", 			
+    "POP", 	"Period-over-period; automatically selects year, quarter, or month", 	  	  	
+    "PYTD", 	"Previous year-to-date", 			 
+    "PQTD",	"Previous quarter-to-date", 			 
+    "YOYTD", 	"Year-over-year-to-date" ,			
+    "QOQTD", "	Quarter-over-quarter-to-date", 			
+    "YTDOPY", 	"Year-to-date-over-previous-year", 			
+    "QTDOPQ", 	"Quarter-to-date-over-previous-quarter", 	
+      
+  )
 ```
 
 Like-for-like comparison
 ABC categories
-
+factor analysis
+lm decomposition
 
 
 
