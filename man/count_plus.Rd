@@ -2,14 +2,14 @@
 % Please edit documentation in R/count_plus.R
 \name{count_plus}
 \alias{count_plus}
-\title{Augments count functionto give proportion and cumulative proportion and sorting options (dplyr,sparklyr friendly)}
+\title{Augments count function give proportion and cumulative proportion and sorting options (dplyr and dbplyr friendly)}
 \usage{
 count_plus(.data, ..., wt, .sort = 1, na.rm = TRUE)
 }
 \arguments{
-\item{.data}{dataframe}
+\item{.data}{data frame or DBI object}
 
-\item{...}{columns you want to groupby}
+\item{...}{columns you want to group by}
 
 \item{wt}{if you want to weight the count (eg. value or price)}
 
@@ -19,7 +19,7 @@ count_plus(.data, ..., wt, .sort = 1, na.rm = TRUE)
 a tibble of values
 }
 \description{
-Augments count functionto give proportion and cumulative proportion and sorting options (dplyr,sparklyr friendly)
+Augments count function give proportion and cumulative proportion and sorting options (dplyr and dbplyr friendly)
 }
 \examples{
 ggplot2::diamonds \%>\% count_plus(color,cut,wt=price)

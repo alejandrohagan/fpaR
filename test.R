@@ -1,10 +1,22 @@
-devtools::document()
-devtools::load_all()
 library(tidyverse)
+devtools::load_all()
+devtools::document()
 
 
+dat |>
+  group_by(
+    date_key
+  )
 
+dat <- fpaR::contoso_fact_sales |>
+  mutate(
+    DateKey=mdy(DateKey)
+  ) |>
+  janitor::clean_names()
 
+fpaR::calculate(dat,.fn = "sum",rows = "store_key",cols ="sales_quantity")
+
+fpaR::calculate(ggplot2::diamonds,.fn="min(price)",rows=cut,cols=color,filter='color=="D"&cut=="Fair"')
 
 
 compare <- function(.groups){

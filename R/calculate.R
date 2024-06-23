@@ -1,9 +1,9 @@
 #' Calculate to filter, summarize and pivot data
 #'
 #' @param .data dataframe or tibble
-#' @param .fn quote aggregation funtion
+#' @param .fn quote aggregation function
 #' @param rows category in rows
-#' @param cols cateogry in cols
+#' @param cols category in cols
 #' @param filter filter category, use & instead of ,
 #'
 #' @return
@@ -15,6 +15,7 @@
 calculate <- function(.data,.fn,rows,cols,filter){
 
   expr_fn=rlang::expr(.fn)
+
  filter_exp <- rlang::expr(filter)
 
 .data %>%
