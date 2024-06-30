@@ -1,5 +1,4 @@
 
-library(tidyverse)
 ytd <- function(.data,date_var,value){
 
   # .data <- dat
@@ -41,24 +40,6 @@ yoy <- function(.data,date_var,value){
 
     select(-tmp_year)
 }
-
-dat |>
-  arrange(date_key) |>
-  timetk::pad_by_time(date_key,.pad_value = 0)
-  mutate(
-    unit_cost_lag1=lag(unit_cost,365)
-    ,date_key_lag1=lag(date_key,365)
-  ) |>
-  relocate(contains("unit_cost"),contains("date_key")) |>
-  tail()
-
-
-dat |>
-  ytd(date_var=date_key,value=sales_quantity) |>
-  relocate(last_col()) |> tail()
-
-
-
 
 
 

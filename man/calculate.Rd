@@ -9,11 +9,11 @@ calculate(.data, .fn, rows, cols, filter)
 \arguments{
 \item{.data}{dataframe or tibble}
 
-\item{.fn}{quote aggregation funtion}
+\item{.fn}{quote aggregation function}
 
 \item{rows}{category in rows}
 
-\item{cols}{cateogry in cols}
+\item{cols}{category in cols}
 
 \item{filter}{filter category, use & instead of ,}
 }

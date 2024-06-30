@@ -5,13 +5,22 @@ devtools::document()
 drv <- duckdb::duckdb(dbdir="data/duckdb.db")
 
 con <- DBI::dbConnect(drv)
+DBI::dbListTables(con)
 
-DBI::dbWriteTable(con,"diamonds.db",diamonds)
+diamonds_db <- tbl(con,"diamonds.db")
 
-diamonds_db <- DBI::dbReadTable(con,"diamonds.db")
+diamonds_db |> class()
 
-fpaR::
+fpaR::count_plus(diamonds_db,cut,.wt = price,.sort = 0)
 
+fpaR::count_plus(diamonds,cut,.wt = price)
+
+
+diamonds_db |>
+  fpaR::abc(cut,clarity,dim = price)
+
+diamonds_db |>
+  fpaR::
 dat |>
   group_by(
     date_ke
@@ -96,16 +105,15 @@ diamonds %>%
 
   )
 
-con <- DBI::dbConnect(duckdb::duckdb())
-
-duckdb::duckdb_register(con,"diamonds",diamonds)
-
-diamonds_db <-
-  dplyr::tbl(con,"diamonds")
-
-diamonds_db |>
-  count_plus(cut,wt=price)
 
 diamonds |>
-  count_plus(cut,wt=price)
+  arrange(cut,color) |>
+  count_plus(cut,color,.sort = 0)
 
+for (i in seq_along(colnames(diamonds_db))){
+ print(
+
+   tibble(x=nth(diamonds_db[i+1],i),y=(i+1))
+
+   )
+}

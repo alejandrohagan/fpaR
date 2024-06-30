@@ -4,16 +4,18 @@
 \alias{count_plus}
 \title{Augments count function give proportion and cumulative proportion and sorting options (dplyr and dbplyr friendly)}
 \usage{
-count_plus(.data, ..., wt, .sort = 1, na.rm = TRUE)
+count_plus(.data, ..., .wt, .sort = 1, na.rm = TRUE)
 }
 \arguments{
 \item{.data}{data frame or DBI object}
 
 \item{...}{columns you want to group by}
 
-\item{wt}{if you want to weight the count (eg. value or price)}
+\item{.wt}{if you want to weight the count (eg. value or price)}
 
 \item{.sort}{if you want to sort from largest (1), reverse(-1) or nothing 0}
+
+\item{na.rm}{if you want na values to be missing}
 }
 \value{
 a tibble of values
