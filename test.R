@@ -2,10 +2,19 @@ library(tidyverse)
 devtools::load_all()
 devtools::document()
 
+drv <- duckdb::duckdb(dbdir="data/duckdb.db")
+
+con <- DBI::dbConnect(drv)
+
+DBI::dbWriteTable(con,"diamonds.db",diamonds)
+
+diamonds_db <- DBI::dbReadTable(con,"diamonds.db")
+
+fpaR::
 
 dat |>
   group_by(
-    date_key
+    date_ke
   )
 
 dat <- fpaR::contoso_fact_sales |>
