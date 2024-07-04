@@ -14,9 +14,12 @@
 
 calculate <- function(.data,.fn,rows,cols,filter){
 
-  expr_fn=rlang::expr(.fn)
+  # capture funcitons
 
- filter_exp <- rlang::expr(filter)
+  expr_fn <- rlang::expr(.fn)
+
+  # capture filter args
+  filter_exp <- rlang::expr(filter)
 
 .data %>%
     eval(filter_exp) %>%

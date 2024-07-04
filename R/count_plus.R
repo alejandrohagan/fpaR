@@ -4,14 +4,14 @@
 #' @param .data data frame or DBI object
 #' @param ... columns you want to group by
 #' @param .sort if you want to sort from largest (1), reverse(-1) or nothing 0
-#' @param .wt if you want to weight the count (eg. value or price)
+#' @param .wt if you want to weight the count by a numeric value
 #' @param na.rm if you want na values to be missing
 #'
 #' @return a tibble of values
 #' @export
 #'
 #' @examples
-#' ggplot2::diamonds %>% count_plus(color,cut,wt=price)
+#' ggplot2::diamonds %>% count_plus(color,cut,.wt=price)
 count_plus <- function(.data,...,.wt,.sort=1,na.rm=TRUE){
 
 

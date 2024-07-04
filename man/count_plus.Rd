@@ -11,7 +11,7 @@ count_plus(.data, ..., .wt, .sort = 1, na.rm = TRUE)
 
 \item{...}{columns you want to group by}
 
-\item{.wt}{if you want to weight the count (eg. value or price)}
+\item{.wt}{if you want to weight the count by a numeric value}
 
 \item{.sort}{if you want to sort from largest (1), reverse(-1) or nothing 0}
 
@@ -24,5 +24,5 @@ a tibble of values
 Augments count function give proportion and cumulative proportion and sorting options (dplyr and dbplyr friendly)
 }
 \examples{
-ggplot2::diamonds \%>\% count_plus(color,cut,wt=price)
+ggplot2::diamonds \%>\% count_plus(color,cut,.wt=price)
 }
