@@ -22,7 +22,18 @@ divide <- function(numerator,denominator,alternative_result=NA_integer_){
   }
 
 
+
+  # result <- your_table %>%
+  #   mutate(
+  #     result = case_when(
+  #       column2 == 0 | is.null(column2) ~ "Alternative Result",  # Handle division by zero or NULL
+  #       TRUE ~ column1 / column2                                 # Regular division
+  #     )
+  #   )
+
+
   temp <- base::replace(temp,inf_vec,alternative_result)
+
   return(temp)
 
 }

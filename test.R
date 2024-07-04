@@ -13,14 +13,20 @@ contoso_fact_sales_db <- tbl(con,"contoso_fact_sales")
 contoso_fact_sales_db |> pluck("src") |> pluck("con")
 
 
-
+usethis::use_package(c("cli"))
 
 contoso_fact_sales_db |>
+  mutate(
+    test=SalesKey/2
+  ) |>
+  relocate(test) |> show_query()
   make_cohort_tbl(id_var="StoreKey",date = "DateKey",time_unit = "month",period_label = FALSE)
 
-library(cohorts)
-enc2utf8("test")
 
+vec <- c("one.md","two.md","three.md")
+
+dir.create("test")
+fpaR::clean_file_names("teset")
 online_cohorts %>%
   cohort_table_month(CustomerID, InvoiceDate)
 

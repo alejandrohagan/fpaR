@@ -24,12 +24,16 @@ fp <- file.path
   new_names <-  paste0(fp,"/",base,extensions)
 
   fs::file_move(old_names,new_names)
+
   files_impacted <- length(old_names)
+
   terminal_files <- crayon::green$bold(files_impacted)
+
   fp_output <- crayon::yellow$bold(fp)
 
 
   cli::cli_alert_success("{terminal_files} files named  at {fp_output}")
+
 }
 
 
