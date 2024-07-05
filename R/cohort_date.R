@@ -3,104 +3,105 @@
 #'
 #' @param .data
 #' @param id_var
-#' @param date
 #' @param time_unit
+#' @param date_var
+#' @param period_label
 #'
 #' @return
 #' @export
 #'
 #' @examples
-make_cohort_tbl <- function(.data,id_var,date,time_unit="month",period_label=FALSE){
+make_cohort_tbl <- function(.data,id_var,date_var,time_unit="month",period_label=FALSE){
 
 
-
-  ## object Test
-
-  ### SQL
-  id_var_vec <- substitute(id_var)
-  time_unit_vec <- as.character(time_unit)
-  date_vec <- substitute(date)
-  .data <- "contoso_fact_sales"
-
-  id_var_vec <- "StoreKey"
-  time_unit_vec <- "month"
-  date_vec <- "DateKey"
+  db_flag <- any(str_detect(class(.data),"dbi"))
 
 
-  print(id_var_vec)
-  print(date_vec)
-  print(time_unit_vec)
+## sql base
+
+if(db_flag){
+  summary_tbl <- .data |>
+
+    dplyr::group_by({{id_var}}) |>
+
+    dplyr::mutate(
+        date    = lubridate::floor_date({{date_var}},unit='month')
+       ,cohort  = min(date,na.rm=TRUE)
+    ) |>
+
+    dplyr::group_by(cohort, date) |>
+
+    dplyr::summarise(
+      users = dplyr::n_distinct(StoreKey)
+    ) |>
+
+    mutate(period_id=dplyr::sql("DENSE_RANK() OVER (ORDER BY cohort)")) |>
+    dbplyr::window_order(date)
+
+} else{
+
+## tibble base
 
 
-  cohort_sql <- glue::glue_sql(
+  summary_tbl <- .data |>
 
-    "WITH date_var_calculated AS (
-  SELECT
-        {`id_var_vec`}
-        ,DATE_TRUNC({time_unit_vec}, {`date_vec`}) AS date_var
-        ,MIN(DATE_TRUNC({time_unit_vec}, {`date_vec`})) OVER (PARTITION BY {`id_var_vec`}) AS cohort
+    dplyr::group_by({{id_var}}) |>
 
-    FROM  {`.data`}),
+    dplyr::mutate(
+       date   = lubridate::floor_date({{date_var}},unit=time_unit)
+      ,cohort = min(date,na.rm=TRUE)
+      ) |>
 
-summary_calculated AS (
-    SELECT
-        cohort
-        ,date_var
-        ,COUNT(DISTINCT {`id_var_vec`}) AS users
+    dplyr::group_by(cohort, date) |>
 
-    FROM
-        date_var_calculated
+    dplyr::summarise(
+      users = dplyr::n_distinct({{id_var}})
+      ,.groups = "keep"
+      ) |>
 
-    GROUP BY
-        cohort
-        ,date_var)
+   mutate(
+     period_id= dplyr::cur_group_id()
+   ) |>
+    dbplyr::window_order(date)
 
-SELECT
-    *,
-    DENSE_RANK() OVER (ORDER BY cohort, date_var) AS group_id
-FROM
-    summary_calculated;"
-,.con=con
-  )
+}
 
-  print(cohort_sql)
-#
-  out_db <- DBI::dbGetQuery(con,cohort_sql)
-
-
-  return(out_db)
-
-
-  ###
 
 
   #
-  # contoso_fact_sales_db |>
-  #   dplyr::group_by(StoreKey) |>
-  #   dplyr::mutate(date_var = lubridate::floor_date(DateKey,unit="month")) |>
-  #   dplyr::mutate(cohort = min(date_var)) |>
-  #   dplyr::group_by(cohort, date_var) |>
-  #   dplyr::summarise(
-  #     users = dplyr::n_distinct(StoreKey)
-  #   ) |>
-  #   dplyr::cur_group_id()
   #
   #
-  #
-  #
-  # summary_tbl <- .data %>%
-  #   dplyr::group_by({{id_var}}) |>
-  #   dplyr::mutate(date_var = lubridate::floor_date({{date}},unit=time_unit)) |>
-  #   dplyr::mutate(cohort = min(date_var)) |>
-  #   dplyr::group_by(cohort, date_var) |>
-  #   dplyr::summarise(
-  #     users = dplyr::n_distinct({{id_var}})
-  #     ) |>
-  #   dplyr::cur_group_id()
-  #
-  # if(period_label){
+  if(period_label==FALSE & db_flag==TRUE){
+
+
+  out <- summary_tbl |>
+    select(-period_id) |>
+    tidyr::pivot_wider(names_from=date,values_from=users,values_fill = 0) |>
+    dplyr::ungroup() |>
+    dplyr::mutate(cohort_id = row_number()) |>
+    relocate(cohort_id)
+
+  return(out)
+
+  }else if(period_label==TRUE & db_flag==TRUE){
+
+    out <- summary_tbl |>
+      select(-date) |>
+      tidyr::pivot_wider(names_from=period_id,values_from=users,values_fill = 0,names_prefix = "period_") |>
+      dplyr::ungroup() |>
+      dplyr::mutate(cohort_id = row_number()) |>
+      relocate(cohort_id,num_range(prefix="period_",range=1:100))
+
+    return(out)
+
+
+  } else {
+
+    return(summary_tbl)
+  }
+
   #  out <-  summary_tbl |>
-  #     select(-date_var)
+  #     select(-date) |>
   #     tidyr::pivot_wider(names_from=period_label,values_from=users) |>
   #     dplyr::ungroup() |>
   #     dplyr::mutate(cohort = 1:dplyr::n_distinct(cohort))
@@ -113,7 +114,7 @@ FROM
   #
   #
   # } else{
-  #   out <-  summary_tbl |>
+  #   out <-  summary_db |>
   #   select(-period_label)
   #   tidyr::pivot_wider(names_from=date_var,values_from=users) |>
   #     dplyr::ungroup() |>
@@ -127,7 +128,12 @@ FROM
   #
   # }
 
-
+  # test_db |>
+  #   select(-group_id) |>
+  #   tidyr::pivot_wider(names_from=date,values_from=users) |>
+  #     dplyr::ungroup() |>
+  #     dplyr::mutate(cohort_id = row_number()) |>
+  #   relocate(cohort_id)
 
 
 }

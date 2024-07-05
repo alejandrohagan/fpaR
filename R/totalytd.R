@@ -14,7 +14,7 @@
 #' @export
 #'
 #' @examples
-totalytd <- function(.data,dim,date,fn,date_aggregation,start_date,end_date){
+totalytd <- function(.data,dim,date,fn,time_unit){
 
 
 
@@ -22,8 +22,11 @@ totalytd <- function(.data,dim,date,fn,date_aggregation,start_date,end_date){
   if(missing(start_date)&missing(end_date)){
 
     .data <- .data
+
     cli::cli_h1("Info:")
+
     cli::cli_alert_info("No filtering of data")
+
   } else if(missing(start_date)){
 
 
