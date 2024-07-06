@@ -1,14 +1,12 @@
 #' Create table of dates in sql
 #' @description
-#' Create a sql table of dates
+#' Create a sql script of date table range for use in downstream queries
 #'
-#' @param .data
-#' @param start_date
-#' @param end_date
-#' @param time_unit
+#' @param .data dbi object
+#' @param start_date start date of date table range
+#' @param end_date end date of date table range
 #'
-#' @return
-#' @export
+#' @return a sql query
 #'
 #' @examples
 create_date_sql <- function(.data,start_date,end_date){
@@ -69,7 +67,7 @@ create_date_sql <- function(.data,start_date,end_date){
      FROM generate_date
 
     "
- ,.con = con
+ ,.con = .data$src[[1]]
 
  )
 

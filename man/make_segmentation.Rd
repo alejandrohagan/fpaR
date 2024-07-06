@@ -5,7 +5,7 @@
 \title{Uses Kmeans & UMAP to create segmentation}
 \usage{
 make_segmentation(
-  df,
+  .data,
   id_col,
   kmeans_centers_init = 3,
   kmeans_nstart = 100,
@@ -15,8 +15,6 @@ make_segmentation(
 )
 }
 \arguments{
-\item{df}{is dataframe with the id column and grid-like numeric columns.}
-
 \item{id_col}{is the unique id column that you want to segment by.}
 
 \item{kmeans_centers_init}{is the kmeans center.}
@@ -28,6 +26,8 @@ make_segmentation(
 \item{centers_grid_range}{is the grid range you want the centers to iterate though, as grid range eg 1:15}
 
 \item{...}{additional arguments for umap, kmeans, or ggrepel as named arguments}
+
+\item{df}{is dataframe with the id column and grid-like numeric columns.}
 }
 \value{
 a list of graphs and tbls

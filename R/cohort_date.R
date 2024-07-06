@@ -1,42 +1,72 @@
 
 #' Make Cohort Table
+#' @description
+#' A database remake of 'https://github.com/PeerChristensen/cohorts' cohort package combining
+#' chort_table_month, cohort_table_year, cohort_table_day into a single package.
+#' Re-written to be database friendly tested against snowflake and duckdb databases
 #'
-#' @param .data
-#' @param id_var
-#' @param time_unit
-#' @param date_var
-#' @param period_label
+#' @param .data Either a database or tibble object
+#' @param id_var The variable that you want to track over time
+#' @param time_unit The time unit as character eg('day','week','month',etc) to round the transaction date passed to lubridate::floor_date()
+#' @param date_var  The date column representing the transaction date
+#' @param period_label Logical value if you want the represent the dates as periods or Dates
 #'
-#' @return
+#' @return tibble or DBI object
 #' @export
 #'
 #' @examples
+#' fpaR::contoso_fact_sales |>  make_cohort_tbl(id_var=ProductKey,date_var=DateKey,time_unit = 'week',period_label =TRUE)
+#'
+#'
 make_cohort_tbl <- function(.data,id_var,date_var,time_unit="month",period_label=FALSE){
 
 
-  db_flag <- any(str_detect(class(.data),"dbi"))
+## validation tests
 
+  assertthat::assert_that(
+    .data |> pull({{date_var}}) |> assertthat::is.date()
+    ,msg = "Please ensure date_var column is in Date format"
+  )
+
+  assertthat::assert_that(
+    assertthat::is.flag(period_label)
+    ,msg = "Please ensure period_label is TRUE or FALSE"
+  )
+
+  assertthat::assert_that(
+    base::any(time_unit %in% c("day","week","month","year","halfyear","quarter","second","minute","hour","bimonth","season"))
+    ,msg = "Please time_unit matches 'day','week','month','year','halfyear','quarter','second','minute','hour','bimonth','season'"
+  )
+
+  # create flags
+
+  db_flag <- base::any(
+
+      stringr::str_detect(
+        stringr::str_to_lower(
+          base::class(.data)
+          )
+        ,"dbi"
+        )
+      )
 
 ## sql base
 
 if(db_flag){
+
   summary_tbl <- .data |>
 
     dplyr::group_by({{id_var}}) |>
-
-    dplyr::mutate(
-        date    = lubridate::floor_date({{date_var}},unit='month')
-       ,cohort  = min(date,na.rm=TRUE)
-    ) |>
-
+    dplyr::mutate(date = lubridate::floor_date({{date_var}},unit="week")) |>
+    dplyr::mutate(cohort = base::min(date,na.rm=TRUE)) |>
+    dbplyr::window_order(date) |>
     dplyr::group_by(cohort, date) |>
-
     dplyr::summarise(
-      users = dplyr::n_distinct(StoreKey)
+      users = dplyr::n_distinct({{id_var}})
+      ,.groups = "drop"
     ) |>
-
-    mutate(period_id=dplyr::sql("DENSE_RANK() OVER (ORDER BY cohort)")) |>
-    dbplyr::window_order(date)
+    dplyr::mutate(period_id=dplyr::sql("DENSE_RANK() OVER (ORDER BY date)")) |>
+    dplyr::arrange(date)
 
 } else{
 
@@ -49,91 +79,50 @@ if(db_flag){
 
     dplyr::mutate(
        date   = lubridate::floor_date({{date_var}},unit=time_unit)
-      ,cohort = min(date,na.rm=TRUE)
+      ,cohort = base::min(date,na.rm=TRUE)
       ) |>
-
     dplyr::group_by(cohort, date) |>
-
     dplyr::summarise(
       users = dplyr::n_distinct({{id_var}})
-      ,.groups = "keep"
       ) |>
+    dplyr::group_by(date) |>
 
-   mutate(
+    dplyr::mutate(
      period_id= dplyr::cur_group_id()
    ) |>
-    dbplyr::window_order(date)
+    dplyr::ungroup()
 
 }
 
-
-
-  #
-  #
-  #
-  if(period_label==FALSE & db_flag==TRUE){
-
+  if(period_label==FALSE){
 
   out <- summary_tbl |>
-    select(-period_id) |>
-    tidyr::pivot_wider(names_from=date,values_from=users,values_fill = 0) |>
+    dplyr::select(-period_id) |>
+    tidyr::pivot_wider(names_from=date,values_from=users) |>
     dplyr::ungroup() |>
-    dplyr::mutate(cohort_id = row_number()) |>
-    relocate(cohort_id)
+    dplyr::arrange(cohort) |>
+    dplyr::mutate(
+      cohort_id = dplyr::row_number()
+    ) |>
+    dplyr::relocate(cohort_id)
 
-  return(out)
-
-  }else if(period_label==TRUE & db_flag==TRUE){
+  }else{
 
     out <- summary_tbl |>
       select(-date) |>
-      tidyr::pivot_wider(names_from=period_id,values_from=users,values_fill = 0,names_prefix = "period_") |>
+      tidyr::pivot_wider(names_from=period_id,values_from=users,names_prefix = "p_") |>
       dplyr::ungroup() |>
-      dplyr::mutate(cohort_id = row_number()) |>
-      relocate(cohort_id,num_range(prefix="period_",range=1:100))
+      dplyr::arrange(cohort) |>
+      dplyr::mutate(cohort_id = dplyr::row_number()) |>
+      relocate(cohort_id)
 
-    return(out)
 
-
-  } else {
-
-    return(summary_tbl)
   }
 
-  #  out <-  summary_tbl |>
-  #     select(-date) |>
-  #     tidyr::pivot_wider(names_from=period_label,values_from=users) |>
-  #     dplyr::ungroup() |>
-  #     dplyr::mutate(cohort = 1:dplyr::n_distinct(cohort))
-  #
-  #     obj_class <-  stringr::str_flatten_comma(base::class(out),last = " or ")
-  #
-  #     cli::cli_alert_info("Returning obj of '{obj_class}' class")
-  #
-  #   return(out)
-  #
-  #
-  # } else{
-  #   out <-  summary_db |>
-  #   select(-period_label)
-  #   tidyr::pivot_wider(names_from=date_var,values_from=users) |>
-  #     dplyr::ungroup() |>
-  #     dplyr::mutate(cohort = 1:dplyr::n_distinct(cohort))
-  #
-  #   obj_class <-  stringr::str_flatten_comma(base::class(out),last = " or ")
-  #
-  #   cli::cli_alert_info("Returning obj of '{obj_class}' class")
-  #
-  #   return(out)
-  #
-  # }
+    obj_class <-  stringr::str_flatten_comma(base::class(out),last = " or ")
 
-  # test_db |>
-  #   select(-group_id) |>
-  #   tidyr::pivot_wider(names_from=date,values_from=users) |>
-  #     dplyr::ungroup() |>
-  #     dplyr::mutate(cohort_id = row_number()) |>
-  #   relocate(cohort_id)
+    cli::cli_alert_info("Returning obj of '{obj_class}' class")
 
+    return(out)
 
 }

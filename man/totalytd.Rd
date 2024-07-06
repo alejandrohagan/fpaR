@@ -4,7 +4,7 @@
 \alias{totalytd}
 \title{Title}
 \usage{
-totalytd(.data, dim, date, fn, date_aggregation, start_date, end_date)
+totalytd(.data, dim, date, fn, time_unit)
 }
 \arguments{
 \item{end_date}{}

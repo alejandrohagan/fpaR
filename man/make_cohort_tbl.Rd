@@ -4,11 +4,35 @@
 \alias{make_cohort_tbl}
 \title{Make Cohort Table}
 \usage{
-make_cohort_tbl(.data, id_var, date, time_unit = "month", period_label = FALSE)
+make_cohort_tbl(
+  .data,
+  id_var,
+  date_var,
+  time_unit = "month",
+  period_label = FALSE
+)
 }
 \arguments{
-\item{time_unit}{}
+\item{.data}{Either a database or tibble object}
+
+\item{id_var}{The variable that you want to track over time}
+
+\item{date_var}{The date column representing the transaction date}
+
+\item{time_unit}{The time unit as character eg('day','week','month',etc) to round the transaction date passed to lubridate::floor_date()}
+
+\item{period_label}{Logical value if you want the represent the dates as periods or Dates}
+}
+\value{
+tibble or DBI object
 }
 \description{
-Make Cohort Table
+A database remake of 'https://github.com/PeerChristensen/cohorts' cohort package combining
+chort_table_month, cohort_table_year, cohort_table_day into a single package.
+Re-written to be database friendly tested against snowflake and duckdb databases
+}
+\examples{
+fpaR::contoso_fact_sales |>  make_cohort_tbl(id_var=ProductKey,date_var=DateKey,time_unit = 'week',period_label =TRUE)
+
+
 }

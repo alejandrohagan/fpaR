@@ -4,18 +4,32 @@
 \alias{divide}
 \title{Divide function with error handling for divide by zero or NA}
 \usage{
-divide(numerator, denominator, alternative_result = NA_integer_)
+divide(
+  .data,
+  col_name,
+  numerator,
+  denominator,
+  alternative_result = NA_integer_
+)
 }
 \arguments{
-\item{numerator}{numeric numerator}
+\item{.data}{a tibble or DBI object}
 
-\item{denominator}{numeric denominator}
+\item{col_name}{new column name for result}
 
-\item{alternative_result}{alternative results if divide by 0 can by numeric or character but beware of class coercion}
+\item{numerator}{column for numerator}
+
+\item{denominator}{column for denominator}
+
+\item{alternative_result}{alternative results if divide results are inf or NA, must be numeric}
+}
+\value{
+tibble or dbi object
 }
 \description{
-Divide function with error handling for divide by zero or NA
+A safe divide function that will catch info or NA values and return an alternative result
+This is tibble or DBI friendly and will return same class as input
 }
 \examples{
-divide(100,0,"error")
+divide(mtcars,div_col,mpg,0,10)
 }

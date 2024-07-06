@@ -1,39 +1,29 @@
 
 #' Divide function with error handling for divide by zero or NA
+#' @description
+#' A safe divide function that will catch info or NA values and return an alternative result
+#' This is tibble or DBI friendly and will return same class as input
 #'
-#' @param numerator numeric numerator
-#' @param denominator numeric denominator
-#' @param alternative_result alternative results if divide by 0 can by numeric or character but beware of class coercion
+#' @param .data a tibble or DBI object
+#' @param col_name new column name for result
+#' @param numerator column for numerator
+#' @param denominator column for denominator
+#' @param alternative_result alternative results if divide results are inf or NA, must be numeric
 #'
-#' @return
+#' @return tibble or dbi object
 #' @export
 #'
 #' @examples
-#' divide(100,0,"error")
-divide <- function(numerator,denominator,alternative_result=NA_integer_){
-
-
-  temp <- `/`(numerator,denominator)
-
-  inf_vec <- base::which(is.infinite(temp)|is.na(temp))
-
-  if(base::sum(inf_vec,na.rm=TRUE)>0){
-    cli::cli_alert_info("FYI: Inf or NA values detected")
-  }
+#' divide(mtcars,div_col,mpg,0,10)
+divide <- function(.data,col_name,numerator,denominator,alternative_result=NA_integer_){
 
 
 
-  # result <- your_table %>%
-  #   mutate(
-  #     result = case_when(
-  #       column2 == 0 | is.null(column2) ~ "Alternative Result",  # Handle division by zero or NULL
-  #       TRUE ~ column1 / column2                                 # Regular division
-  #     )
-  #   )
+  out <- .data |>
+    dplyr::mutate(
+      "{{col_name}}":=dplyr::if_else(base::is.na({{numerator}}/{{denominator}})|base::is.infinite({{numerator}}/{{denominator}}),alternative_result,{{numerator}}/{{denominator}})
+    )
 
-
-  temp <- base::replace(temp,inf_vec,alternative_result)
-
-  return(temp)
+  return(out)
 
 }
