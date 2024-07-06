@@ -13,122 +13,88 @@ con <- DBI::dbConnect(drv)
 contoso_fact_sales_db <- tbl(con,"contoso_fact_sales")
 
 
-## sd
+## lm
 
-diamonds |>
-  summarise(
-  overall_sd=sd(price)
-  )
-
-
-diamonds |>
-  filter(
-    cut=="Fair"
-  ) |>
-  summarise(
-    overall_sd=sd(price)
-  )
-
-diamonds |>
-  filter(
-    cut %in% c("Fair","Good")
-  ) |>
-  summarise(
-    overall_sd=sd(price)
-  )
-
-diamonds |>
-  filter(
-    cut %in% c("Fair","Good","Ideal")
-  ) |>
-  summarise(
-    overall_sd=sd(price)
-  )
-
-diamonds |>
-  filter(
-    cut %in% c("Fair","Good","Ideal","Very Good")
-  ) |>
-  summarise(
-    overall_sd=sd(price)
-  )
-
-diamonds |>
-  summarise(
-    overall_sd=sd(price)
-  )
+  y <- iris$Sepal.Length - mean(iris$Sepal.Length)
+x1 <- iris$Petal.Length - mean(iris$Petal.Length)
+x2 <- iris$Sepal.Width - mean(iris$Sepal.Width)
 
 
+resx2x1 <- resid(lm(x2 ~0+ x1))
+resyx1 <- resid(lm(y ~0+ x1))
+coef_x2 <- coef(lm(resyx1 ~0+ resx2x1))[["resx2x1"]]
 
-diamonds |>
-  group_by(cut) |>
-  summarize(
-    individual_sd=sd(price)
-    ) |>
-  arrange(individual_sd)
+resx1x2 <- resid(lm(x1 ~0+ x2))
+resyx2 <- resid(lm(y ~0+ x2))
+coef_x1 <- coef(lm(resyx2 ~ 0+resx1x2))[["resx1x2"]]
 
-
-## abs revamp
-
-test_db <- contoso_fact_sales_db |> glimpse()
-
-test_db |> glimpse() |> pluck(1)
-
-ts <- glimpse(mtcars)
-
-contoso_fact_sales_db |>
-  summarise(
-    # test2=dplyr::sql("MEDIAN(UnitCost)")
-    # test3=mad(UnitCost)
-    # ,median_vec=UnitCost-median(UnitCost)
-    test=dplyr::sql("quantile_cont(UnitCost,.5)")
-  )
+all.equal(c(coef_x1, coef_x2),
+          coef(lm(y ~0+ x1 + x2))[c("x1", "x2")],
+          check.attributes = FALSE)
 
 
-mtcars |>
-  as_tibble() |>
-  mutate(
-    test=median(abs(median(mpg)-mpg))
-    ,test2=mad(mpg,constant = 1)
-  )
-DBI::dbListTables(con)
-# Define start and end dates
-start_date <- as.Date("2023-01-01")
-end_date <- as.Date("2023-12-31")
+y  <- "price"
+x1 <- "x"
+x2 <- "carat"
+.data <- "diamonds.db"
 
-# Generate the date sequence
-date_seq <- seq.Date(start_date, end_date, by = "day")
+test_lm <- glue::glue_sql("
+-- Step 1: Create a table to hold the iris dataset
 
-# Create the data frame
-date_df <- data.frame(
-  date_key = date_seq,
-  day_of_year = yday(date_seq),
-  week_key = format(date_seq, "%Y%U"),  # ISO week
-  week_of_year = isoweek(date_seq),
-  day_of_week = wday(date_seq),
-  iso_day_of_week = wday(date_seq, week_start = 1),
-  day_name = weekdays(date_seq),
-  first_day_of_week = floor_date(date_seq, "week"),
-  last_day_of_week = ceiling_date(date_seq, "week") - days(1),
-  month_key = format(date_seq, "%Y%m"),
-  month_of_year = month(date_seq),
-  day_of_month = mday(date_seq),
-  month_name_short = substr(month(date_seq, label = TRUE, abbr = TRUE), 1, 3),
-  month_name = month(date_seq, label = TRUE),
-  first_day_of_month = floor_date(date_seq, "month"),
-  last_day_of_month = ceiling_date(date_seq, "month") - days(1),
-  quarter_key = paste0(year(date_seq), quarter(date_seq)),
-  quarter_of_year = quarter(date_seq),
-  day_of_quarter = date_seq - floor_date(date_seq, "quarter") + 1,
-  quarter_desc_short = paste0("Q", quarter(date_seq)),
-  quarter_desc = paste0("Quarter ", quarter(date_seq)),
-  first_day_of_quarter = floor_date(date_seq, "quarter"),
-  last_day_of_quarter = ceiling_date(date_seq + months(2), "quarter") - days(1),
-  year_key = year(date_seq),
-  first_day_of_year = floor_date(date_seq, "year"),
-  last_day_of_year = ceiling_date(date_seq, "year") - days(1),
-  ordinal_weekday_of_month = ave(date_seq, year(date_seq), month(date_seq), wday(date_seq), FUN = seq_along)
+-- Step 2: Calculate the mean of each column
+WITH means AS (
+    SELECT
+        AVG({`y`}) AS mean_y,
+        AVG({`x1`}) AS mean_x1,
+        AVG({`x2`}) AS mean_x2
+    FROM {`.data`}
+
 )
+
+-- Step 3: Compute the centered values for Sepal.Length, Petal.Length, and Sepal.Width
+, centered AS (
+    SELECT
+        {`y`} - means.mean_y AS y,
+        {`x1`} - means.mean_x1 AS x1,
+        {`x2`} - means.mean_x2 AS x2
+    FROM
+        {`.data`}, means
+)
+
+-- Step 4: Compute the residuals of the linear models using REGR_SLOPE
+, res_x2_x1 AS (
+    SELECT
+        x2 - (x1 * REGR_SLOPE(x2, x1) OVER()) AS resx2x1
+    FROM centered
+)
+, res_y_x1 AS (
+    SELECT
+        y - (x1 * REGR_SLOPE(y, x1) OVER()) AS resyx1
+    FROM centered
+)
+, res_x1_x2 AS (
+    SELECT
+        x1 - (x2 * REGR_SLOPE(x1, x2) OVER()) AS resx1x2
+    FROM centered
+)
+, res_y_x2 AS (
+    SELECT
+        y - (x2 * REGR_SLOPE(y, x2) OVER()) AS resyx2
+    FROM centered
+)
+
+-- Step 5: Compute the coefficients from the residuals
+SELECT
+    REGR_SLOPE(resyx1, resx2x1) AS coef_x2,
+    REGR_SLOPE(resyx2, resx1x2) AS coef_x1
+FROM
+    res_y_x1, res_x2_x1, res_y_x2, res_x1_x2;
+",
+.con=con)
+
+DBI::dbListTables(con)
+
+DBI::dbGetQuery(con,test_lm)
 
 ## practice sql functions
 dbplyr::remote_con(contoso_fact_sales_db)
