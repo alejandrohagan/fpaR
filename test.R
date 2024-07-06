@@ -13,6 +13,7 @@ con <- DBI::dbConnect(drv)
 contoso_fact_sales_db <- tbl(con,"contoso_fact_sales")
 
 
+DBI::dbListTables(con)
 ## lm
 
   y <- iris$Sepal.Length - mean(iris$Sepal.Length)
@@ -65,21 +66,25 @@ WITH means AS (
 , res_x2_x1 AS (
     SELECT
         x2 - (x1 * REGR_SLOPE(x2, x1) OVER()) AS resx2x1
+,ROW_NUMBER() OVER () AS row_num
     FROM centered
 )
 , res_y_x1 AS (
     SELECT
         y - (x1 * REGR_SLOPE(y, x1) OVER()) AS resyx1
+,ROW_NUMBER() OVER () AS row_num
     FROM centered
 )
 , res_x1_x2 AS (
     SELECT
         x1 - (x2 * REGR_SLOPE(x1, x2) OVER()) AS resx1x2
+,ROW_NUMBER() OVER () AS row_num
     FROM centered
 )
 , res_y_x2 AS (
     SELECT
         y - (x2 * REGR_SLOPE(y, x2) OVER()) AS resyx2
+,ROW_NUMBER() OVER () AS row_num
     FROM centered
 )
 
@@ -92,9 +97,87 @@ FROM
 ",
 .con=con)
 
-DBI::dbListTables(con)
 
-DBI::dbGetQuery(con,test_lm)
+
+test_lm <- glue::glue_sql("
+-- Step 1: Create a table to hold the iris dataset
+
+-- Step 2: Calculate the mean of each column
+WITH means AS (
+    SELECT
+        AVG({`y`}) AS mean_y,
+        AVG({`x1`}) AS mean_x1,
+        AVG({`x2`}) AS mean_x2
+    FROM {`.data`}
+
+)
+
+-- Step 3: Compute the centered values for Sepal.Length, Petal.Length, and Sepal.Width
+, centered AS (
+    SELECT
+        {`y`} - means.mean_y AS y,
+        {`x1`} - means.mean_x1 AS x1,
+        {`x2`} - means.mean_x2 AS x2
+    FROM
+        {`.data`}, means
+)
+, res_x2_x1 AS (
+    SELECT
+        x2 - (x1 * REGR_SLOPE(x2, x1) OVER()) AS resx2x1
+,ROW_NUMBER() OVER () AS row_num
+    FROM centered
+)
+, res_y_x1 AS (
+    SELECT
+        y - (x1 * REGR_SLOPE(y, x1) OVER()) AS resyx1
+,ROW_NUMBER() OVER () AS row_num
+    FROM centered
+)
+, res_x1_x2 AS (
+    SELECT
+        x1 - (x2 * REGR_SLOPE(x1, x2) OVER()) AS resx1x2
+,ROW_NUMBER() OVER () AS row_num
+    FROM centered
+)
+, res_y_x2 AS (
+    SELECT
+        y - (x2 * REGR_SLOPE(y, x2) OVER()) AS resyx2
+,ROW_NUMBER() OVER () AS row_num
+    FROM centered
+),
+
+full_tbl as (
+
+SELECT
+    res_x2_x1.row_num
+    ,res_x2_x1.resx2x1
+    ,res_y_x1.resyx1
+    ,res_x1_x2.resx1x2
+    ,res_y_x2.resyx2
+
+FROM
+    res_x2_x1
+
+JOIN
+    res_y_x1 ON res_x2_x1.row_num = res_y_x1.row_num
+JOIN
+    res_x1_x2 ON res_x2_x1.row_num = res_x1_x2.row_num
+JOIN
+    res_y_x2 ON res_x2_x1.row_num = res_y_x2.row_num
+)
+
+select
+    REGR_SLOPE(resyx1, resx2x1) AS coef_x2
+    ,REGR_SLOPE(resyx2, resx1x2) AS coef_x1
+
+from full_tbl
+
+",
+.con=con)
+
+DBI::dbGetQuery(con,test_lm) |> as_tibble()
+
+lm(price~0+x+carat,data=diamonds)
 
 ## practice sql functions
 dbplyr::remote_con(contoso_fact_sales_db)
@@ -266,3 +349,107 @@ sql3 <- sql("SELECT column2, column3 FROM table3")
 
 
 combined_sql <- sql(paste(sql1, sql2, sql3, sep = "; "))
+
+mtcars %>% glue::glue_data("{rownames(.)} has {hp} hp")
+
+
+x <- mtcars$hp
+inherits(x = ymd("2021-13-30"),what = "Date",)
+y <- rownames(mtcars)
+
+glue::glue("{y} has {x} hp")
+
+
+generate_445_calendar <- function(start_date, year) {
+  # Convert start_date to Date format if it's not already
+  if (!inherits(start_date, "Date")) {
+    start_date <- as.Date(start_date)
+  }
+
+  # Initialize vectors to hold month and week information
+  months <- c("January", "February", "March", "April", "May", "June",
+              "July", "August", "September", "October", "November", "December")
+  weeks <- c(4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5)  # 4-4-5 pattern
+
+  # Create a data frame to store the calendar
+  calendar <- data.frame(
+    Month = character(length(months)),
+    Week = integer(length(months)),
+    Days = integer(length(months)),
+    Start_Date = as.Date(character(length(months)))
+  )
+
+  # Initialize the start date
+  current_date <- start_date
+
+  # Fill in the calendar data frame
+  for (i in seq_along(months)) {
+    calendar$Month[i] <- months[i]
+    calendar$Week[i] <- weeks[i]
+    calendar$Days[i] <- weeks[i] * 7  # Calculate total days based on weeks
+    calendar$Start_Date[i] <- current_date
+    current_date <- current_date + calendar$Days[i]  # Move to the next month's start date
+  }
+
+  return(calendar)
+}
+start_date <- "2024-01-01"
+year <- 2024
+calendar_2024 <- generate_445_calendar(start_date, year)
+print(calendar_2024)
+
+
+generate_445_calendar <- function(start_date, year) {
+  # Convert start_date to Date format if it's not already
+  if (!inherits(start_date, "Date")) {
+    start_date <- as.Date(start_date)
+  }
+
+  # Initialize vectors to hold month and week information
+  months <- c("January", "February", "March", "April", "May", "June",
+              "July", "August", "September", "October", "November", "December")
+  weeks <- c(4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5)  # 4-4-5 pattern
+
+  # Create a data frame to store the calendar
+  calendar <- data.frame(
+    Date = as.Date(character(0)),
+    Month = character(0),
+    Week = integer(0),
+    Start_Date = as.Date(character(0))
+  )
+
+  # Initialize the start date
+  current_date <- start_date
+
+  # Fill in the calendar data frame
+  for (i in seq_along(months)) {
+    month_days <- weeks[i] * 7  # Calculate total days based on weeks
+
+    # Generate dates for the month
+    month_dates <- seq(current_date, by = "day", length.out = month_days)
+
+    # Append to the calendar data frame
+    calendar <- rbind(calendar, data.frame(
+      Date = month_dates,
+      Month = rep(months[i], month_days),
+      Week = rep(1:weeks[i], each = 7)[1:month_days],  # Assign week numbers
+      Start_Date = rep(current_date, month_days)
+    ))
+
+    current_date <- current_date + month_days  # Move to the next month's start date
+  }
+
+  return(calendar)
+}
+
+# Example usage:
+start_date <- "2024-01-01"
+year <- 2024
+calendar_2024 <- generate_445_calendar(start_date, year)
+print(head(calendar_2024, 20))  # Print the first 20 rows as an example
+
+
+mtcars |>
+  group_by(vs,gear) |>
+  gt::gt() |>
+  gt::opt_interactive()
