@@ -10,7 +10,7 @@ drv <- duckdb::duckdb(dbdir="data/duckdb.db")
 
 con <- DBI::dbConnect(drv)
 
-contoso_fact_sales_db <- tbl(con,"contoso_fact_sales")
+diamonds_db <- tbl(con,"diamonds.db")
 
 
 DBI::dbListTables(con)
@@ -100,7 +100,7 @@ FROM
 
 
 test_lm <- glue::glue_sql("
--- Step 1: Create a table to hold the iris dataset
+
 
 -- Step 2: Calculate the mean of each column
 WITH means AS (
@@ -441,15 +441,3 @@ generate_445_calendar <- function(start_date, year) {
 
   return(calendar)
 }
-
-# Example usage:
-start_date <- "2024-01-01"
-year <- 2024
-calendar_2024 <- generate_445_calendar(start_date, year)
-print(head(calendar_2024, 20))  # Print the first 20 rows as an example
-
-
-mtcars |>
-  group_by(vs,gear) |>
-  gt::gt() |>
-  gt::opt_interactive()
