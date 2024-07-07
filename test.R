@@ -13,6 +13,57 @@ con <- DBI::dbConnect(drv)
 diamonds_db <- tbl(con,"diamonds.db")
 
 
+
+diamonds_db |>
+  summarise(
+    test=dplyr::sql("regr_avgx(carat, price)")
+  )
+
+## sql practice
+
+y  <- "price"
+x1 <- "x"
+x2 <- "carat"
+.data <- "diamonds.db"
+
+var_1 <- list(c(y="price",x1="x",x2="carat",.data="diamonds"))
+library(glue)
+sql <-"
+WITH means AS (
+  SELECT
+  AVG({`y`}) AS mean_y,
+  AVG({`x1`}) AS mean_x1,
+  AVG({`x2`}) AS mean_x2
+  FROM {`.data`}
+
+)"
+
+glue_sql("
+WITH means AS (
+  SELECT
+  AVG({`y`}) AS mean_y,
+  AVG({`x1`}) AS mean_x1,
+  AVG({`x2`}) AS mean_x2
+  FROM {`.data`})"
+,y="price"
+,x1="x"
+,x2="carat"
+,.data="diamonds"
+,.con=con)
+
+map2(
+  .x=sql
+  ,.y=var_1
+  ,\(x,y) glue::glue_sql(x,y,.con=con)
+)
+
+tibble(
+  x=
+)
+
+
+rm(list=ls())
+
 DBI::dbListTables(con)
 ## lm
 
@@ -441,3 +492,43 @@ generate_445_calendar <- function(start_date, year) {
 
   return(calendar)
 }
+
+"-- Step 1: Create a table to hold the iris dataset
+-- Assuming the dataset is already available in a table called `iris_data`
+
+-- Step 2: Calculate the mean of each column
+WITH means AS (
+    SELECT
+        AVG(y) AS mean_y,
+        AVG(x1) AS mean_x1,
+        AVG(x2) AS mean_x2
+    FROM iris_data
+),
+
+-- Step 3: Compute the centered values for y, x1, and x2
+centered AS (
+    SELECT
+        y - means.mean_y AS y_centered,
+        x1 - means.mean_x1 AS x1_centered,
+        x2 - means.mean_x2 AS x2_centered
+    FROM
+        iris_data, means
+),
+
+-- Step 4: Compute the residuals of the linear models using REGR_SLOPE
+residuals AS (
+    SELECT
+        x2_centered - (x1_centered * REGR_SLOPE(x2_centered, x1_centered) OVER()) AS res_x2_x1,
+        y_centered - (x1_centered * REGR_SLOPE(y_centered, x1_centered) OVER()) AS res_y_x1,
+        x1_centered - (x2_centered * REGR_SLOPE(x1_centered, x2_centered) OVER()) AS res_x1_x2,
+        y_centered - (x2_centered * REGR_SLOPE(y_centered, x2_centered) OVER()) AS res_y_x2,
+        ROW_NUMBER() OVER () AS row_num
+    FROM centered
+)
+
+-- Step 5: Compute the coefficients from the residuals
+SELECT
+    REGR_SLOPE(res_y_x1, res_x2_x1) AS coef_x2,
+    REGR_SLOPE(res_y_x2, res_x1_x2) AS coef_x1
+FROM residuals;
+"
