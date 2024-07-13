@@ -1,15 +1,18 @@
 
 #' Classify a group by proportion of a variable (A,B,C)
+#' @description
+#' This returns a table that will segment your data into A,B or C segments based on custom
+#' thresholds
 #'
+#' @param .data tibble or DBI object
 #' @param dim dimension to classify by (should be additive and positive)
 #' @param a initial segment threshold expressed as a percentage eg .7
 #' @param b incremental segment threshold expressed as a percentage eg .26
 #' @param c final segment threshold expressed as a percentage eg .04
-#' @param .data data frame or tibble
 #' @param func either "sum" or "n"; sum to sum your dim or n for row count
 #' @param ... columns  to group by
 #'
-#' @return a tibble or DBI obj
+#' @return a tibble or DBI object
 #' @export
 #'
 #' @examples

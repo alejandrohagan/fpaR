@@ -7,7 +7,7 @@
 abc(.data, ..., dim, a = 0.7, b = 0.26, c = 0.04, func = c("sum"))
 }
 \arguments{
-\item{.data}{data frame or tibble}
+\item{.data}{tibble or DBI object}
 
 \item{...}{columns  to group by}
 
@@ -22,10 +22,11 @@ abc(.data, ..., dim, a = 0.7, b = 0.26, c = 0.04, func = c("sum"))
 \item{func}{either "sum" or "n"; sum to sum your dim or n for row count}
 }
 \value{
-a tibble or DBI obj
+a tibble or DBI object
 }
 \description{
-Classify a group by proportion of a variable (A,B,C)
+This returns a table that will segment your data into A,B or C segments based on custom
+thresholds
 }
 \examples{
 

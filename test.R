@@ -753,4 +753,8 @@ square <- function(n) {
   }
 }
 
+devtools::check()
+devtools::document()
+devtools::build()
+
 devtools::test()

@@ -2,6 +2,9 @@
 
 ## create tests
 
+library(dplyr)
+library(testthat)
+
 test_that("Tibble input returns tibble output", {
 
   testthat::expect_s3_class(
@@ -45,4 +48,5 @@ test_that("Period label validation", {
 
   )
 })
+
 
