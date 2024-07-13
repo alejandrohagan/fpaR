@@ -12,3 +12,6 @@ clean_file_names(file.path, ...)
 \description{
 Rename file names witih janitor convention
 }
+\examples{
+clean_file_names()
+}

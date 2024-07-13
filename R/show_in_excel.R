@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-#' ggplot2::diamonds %>% show_in_excel()
+#' ggplot2::diamonds |>  show_in_excel()
 show_in_excel <- function(.data){
 
 # supporting arguments

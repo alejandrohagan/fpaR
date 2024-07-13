@@ -4,36 +4,25 @@
 \alias{abc}
 \title{Classify a group by proportion of a variable (A,B,C)}
 \usage{
-abc(
-  .data,
-  ...,
-  dim,
-  a = 0.7,
-  b = 0.26,
-  c = 0.04,
-  na.rm = TRUE,
-  order_by = c("sum")
-)
+abc(.data, ..., dim, a = 0.7, b = 0.26, c = 0.04, func = c("sum"))
 }
 \arguments{
 \item{.data}{data frame or tibble}
 
-\item{...}{groups columns  to group by}
+\item{...}{columns  to group by}
 
 \item{dim}{dimension to classify by (should be additive and positive)}
 
-\item{a}{initial segment threshold expressed as a percentage}
+\item{a}{initial segment threshold expressed as a percentage eg .7}
 
-\item{b}{incremental segment threshold expressed as a percentage}
+\item{b}{incremental segment threshold expressed as a percentage eg .26}
 
-\item{c}{final segment threshold expressed as a percentage}
+\item{c}{final segment threshold expressed as a percentage eg .04}
 
-\item{na.rm}{to remove na values}
-
-\item{order_by}{aggregate function to order by such as "sum","n","sd","mean","mad","aad","prop05","prop25","prop_50","prop_75","prop95"}
+\item{func}{either "sum" or "n"; sum to sum your dim or n for row count}
 }
 \value{
-a tibble or obj
+a tibble or DBI obj
 }
 \description{
 Classify a group by proportion of a variable (A,B,C)

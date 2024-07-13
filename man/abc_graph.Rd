@@ -4,7 +4,7 @@
 \alias{abc_graph}
 \title{Produces ABC graph based on abc() function}
 \usage{
-abc_graph(df, group_label, dim_label, size, shape, ...)
+abc_graph(.data)
 }
 \arguments{
 \item{df}{data frame}

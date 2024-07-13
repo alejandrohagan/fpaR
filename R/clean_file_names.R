@@ -9,6 +9,7 @@
 #' @export
 #'
 #' @examples
+#' clean_file_names()
 clean_file_names <- function(file.path,...){
 
 fp <- file.path

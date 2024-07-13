@@ -12,12 +12,32 @@ con <- DBI::dbConnect(drv)
 
 diamonds_db <- tbl(con,"diamonds.db")
 
+library(pointblank)
+
+diamonds_db |> fpaR::abc(cut,clarity,dim = price) |> abc_graph(group_label = "test",dim_label = "dim",size = 2)+theme_classic()
+
+diamonds |>  fpaR::abc(cut,clarity,dim = price)
+
+annotate()
+
+devtools::load_all()
+
+diamonds_db |>
+  summarise(
+    slope=regr_slope(price,carat)
+    ,intercept=regr_intercept(price,carat)
+    ,histogram(price)
+  )
 
 
 diamonds_db |>
   summarise(
-    test=dplyr::sql("regr_avgx(carat, price)")
-  )
+    hist=histogram(price)
+  ) |>
+  collect() |>
+  unnest(hist)
+
+diamonds |> lm(price~carat,data=_)
 
 ## sql practice
 
@@ -532,3 +552,178 @@ SELECT
     REGR_SLOPE(res_y_x2, res_x1_x2) AS coef_x1
 FROM residuals;
 "
+library(DBI)
+
+dbExecute(con, ".help;") |> as_tibble() |> print(n=100)
+
+dbGetQuery(con
+                      ,
+           "
+           SELECT generate_series(2, 5);
+           "
+                      )
+  as_tibble() |>
+  print(n=100)
+
+DBI::dbListTables(con)
+
+ext_tbl |> pull(install_path)
+
+
+
+x <- mtcars
+
+
+accumulate(.x=1:10,.f=\(prev,.next) mtcars |> mutate(test=prev+1) |> as_tibble() |> relocate(last_col()),.init=1)
+
+mf <- memdb_frame(g = c(1, 1, 2, 2, 2), x = 1:5, y = 5:1)
+mf
+
+mf <-  ?memdb_frame(g = diamonds$price,c=diamonds$carat)
+
+library(dbplyr)
+
+mf |>
+  summarise(
+    test=dplyr::sql("regr_intercept(g,c)")
+  )
+
+
+lazy_frame(x = diamonds$price,y=diamonds$cut, con = simulate_snowflake()) |>
+  summarise(x=mean(x))
+
+translate_sql(?str_pad(x,"left",10), con = simulate_oracle())
+translate_sql(substr(x, 1, 2), con = simulate_sqlite())
+
+
+xs = range(1,11)
+xs == [1,2,3,4,5,6,7,8,9,10]
+
+library(duckplyr)
+mtcars |>
+  duckplyr::as_duckplyr_df() |>
+  duckplyr::add_tally(vs) |> explain()
+
+
+
+library(tidyverse)
+
+
+dates_vec <- seq.Date(from=ymd("2023-01-01"),to=ymd("2023-12=31"),by = "day")
+
+
+
+
+calendar_tbl <- tibble(
+  dates=dates_vec
+) |>
+  mutate(
+    quarter=lubridate::quarter(dates)
+    ,quarter_start_date=floor_date(dates,unit="quarter")
+    ,quarter_end_date=ceiling_date(dates,unit="quarter")
+  )
+
+sales_tbl <- tibble(
+  row_id=1:100
+) |>
+  rowwise() |>
+  mutate(
+    posting_date=sample(dates_vec,1,replace = TRUE)
+    ,days_clear=sample(c(1:30),1,replace=TRUE)
+) |>
+  ungroup() |>
+  mutate(
+    clearing_date=posting_date+days_clear
+  )
+
+decrease <- calendar_tbl |>
+  left_join(
+    sales_tbl
+    ,by=
+      join_by(
+        quarter_start_date>posting_date
+        ,quarter_end_date >clearing_date
+      )
+  ) |>
+  drop_na() |>
+  group_by(
+    quarter
+  ) |>
+  summarise(
+    decrease=n()
+  )
+
+
+### ABC cateogry
+
+var_vec=="sum"
+
+if(var_vec=="sum"){
+ temp1 <- diamonds_db |>  #passes the dataframe through
+
+  dplyr::group_by(cut,clarity) |>  #group's the dataframe by the input group column
+
+  #creates a bunch of columns
+  dplyr::summarize(
+    var=sum(price)
+    ,.groups="drop"
+  ) |>
+    dbplyr::window_order(desc(var),.by_group = FALSE)
+
+} else{
+
+  temp1 <- diamonds |>  #passes the dataframe through
+
+    dplyr::group_by(cut,clarity) |>  #group's the dataframe by the input group column
+
+    #creates a bunch of columns
+    dplyr::summarize(
+      var=dplyr::n()
+      ,.groups="drop"
+    ) |>
+    arrange(desc(var),.by_group = FALSE)
+
+
+
+}
+
+
+
+a <- .7
+b <- .25
+c <- .05
+
+order_by <- "sum"
+
+order_by_value <- base::match.arg(arg = order_by,choices = c("sum","n"))
+
+diamonds_db |>
+
+  dplyr::group_by(cut,clarity) |>
+  dplyr::summarize(
+    var=sum(price)
+    ,.groups="drop"
+  ) |>
+  arrange(var) |>
+  dplyr::mutate(
+    cum_sum=base::cumsum(var)
+    ,prop_total=var/max(cum_sum)
+    ,cum_prop_total=base::cumsum(prop_total)
+    ,row_id=dplyr::row_number()
+    ,max_row_id=max(row_id)
+    ,id_prop_total=row_id/max_row_id
+    ,group_classification_by_dim=
+      dplyr::case_when(
+        cum_prop_total  <=a      ~  "A"
+        ,cum_prop_total <=(a+b)  ~  "B"
+        ,.default                = "C"
+        ),
+    dim_threshold=
+      dplyr::case_when(
+        group_classification_by_dim=="A"~a
+        ,group_classification_by_dim=="B"~(a+b)
+        ,.default                        = c
+        )
+    ) |>
+  dplyr::select(-c(prop_total,cum_sum,max_row_id,))
+

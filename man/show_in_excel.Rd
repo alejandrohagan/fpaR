@@ -16,5 +16,5 @@ a csv file
 Converts dataframe to csv file and opens up in excel
 }
 \examples{
-ggplot2::diamonds \%>\% show_in_excel()
+ggplot2::diamonds |>  show_in_excel()
 }
