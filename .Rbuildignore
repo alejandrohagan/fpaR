@@ -5,3 +5,4 @@
 ^fpaR.*\.tgz$
 ^LICENSE\.md$
 ^README\.Rmd$
+^\.github$
