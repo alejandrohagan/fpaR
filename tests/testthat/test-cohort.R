@@ -3,6 +3,7 @@
 ## create tests
 
 test_that("Tibble input returns tibble output", {
+
   testthat::expect_s3_class(
 
     fpaR::contoso_fact_sales |>

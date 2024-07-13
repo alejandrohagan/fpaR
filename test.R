@@ -727,3 +727,30 @@ diamonds_db |>
     ) |>
   dplyr::select(-c(prop_total,cum_sum,max_row_id,))
 
+usethis::use_github_action()
+
+quare <- function(n) {
+  k <- 1
+  while(TRUE) {
+    if (k == n*n) {
+      print(k)
+      return(TRUE)
+    } else {
+      k <- k + 1
+    }
+  }
+}
+square(-20)
+
+
+square <- function(n) {
+  k <- 1
+  while (k <= n * n) {
+    if (k == n * n) {
+      return(k)
+    }
+    k <- k + 1
+  }
+}
+
+devtools::test()
