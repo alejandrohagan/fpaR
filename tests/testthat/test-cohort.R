@@ -2,9 +2,6 @@
 
 ## create tests
 
-library(tidyverse)
-library(testthat)
-library(lubridate)
 
 # test data set
 dat <- crossing(
