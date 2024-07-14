@@ -13,6 +13,7 @@ abc_graph <- function(.data){
 
 
   abc_coordinates <- .data |>
+
     dplyr::group_by(dim_category) |>
     dplyr::summarize(first_cum_per_of_total=dplyr::first(cum_prop_total),
               last_cum_per_of_total=dplyr::last(cum_prop_total),
@@ -23,7 +24,7 @@ abc_graph <- function(.data){
     ) |> dplyr::collect()
 
 
-  .data |>
+  abc_plt <- .data |>
     ggplot2::ggplot(ggplot2::aes(x=cum_unit_prop,
                y=cum_prop_total))+
     ggplot2::geom_point()+
@@ -57,5 +58,17 @@ abc_graph <- function(.data){
     #format scales---------------------------------------------------------------------------------------------
   ggplot2::scale_x_continuous(labels = scales::percent_format())+
     ggplot2::scale_y_continuous(labels = scales::percent_format())
+
+
+  abc_lst <- list()
+
+
+  abc_lst$plt_abc_graph <- abc_plt
+  abc_lst$abc_coordinates <- abc_coordinates
+  abc_lst$abc_tbl <- .data
+
+  return(abc_lst)
+
+
 }
 
