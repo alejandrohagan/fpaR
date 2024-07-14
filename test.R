@@ -6,11 +6,12 @@ devtools::load_all()
 devtools::test()
 # load table
 
-drv <- duckdb::duckdb(dbdir="data/duckdb.db")
+drv <- duckdb::duckdb(dbdir="/home/hagan/database.duckdb")
 
 con <- DBI::dbConnect(drv)
+DBI::dbListTables(con)
 
-diamonds_db <- tbl(con,"diamonds.db")
+diamonds_db <- tbl(con,"mtcars_dbi")
 
 library(pointblank)
 
@@ -753,8 +754,5 @@ square <- function(n) {
   }
 }
 
-devtools::check()
-devtools::document()
-devtools::build()
 
-devtools::test()
+

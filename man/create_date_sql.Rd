@@ -19,3 +19,6 @@ a sql query
 \description{
 Create a sql script of date table range for use in downstream queries
 }
+\examples{
+create_date_sql(mtcars_dbi,start_date="2021-01-01",end_date="2022-01-01")
+}

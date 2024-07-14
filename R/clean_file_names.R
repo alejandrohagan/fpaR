@@ -2,17 +2,17 @@
 
 #' Rename file names witih janitor convention
 #'
-#' @param file.path
+#' @param file_path file path with files you want to rename
 #' @param ... additional args for janitor::make_clean_names()
 #'
-#' @return
+#' @return invisible
 #' @export
 #'
 #' @examples
 #' clean_file_names()
-clean_file_names <- function(file.path,...){
+clean_file_names <- function(file_path,...){
 
-fp <- file.path
+fp <- file_path
 
   old_names <- list.files(fp,full.names = TRUE)
 

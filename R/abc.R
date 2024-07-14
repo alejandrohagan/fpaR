@@ -27,9 +27,10 @@ abc <- function(.data,...,dim,a=.7,b=.26,c=.04,func=c("sum")){
     ,choices = c("sum","n")
   )
 
+
   # input validation
 
-  assertthat::assert_that(a+b+c==1,msg = "A, B, and C must sum to 1")
+  assertthat::assert_that(assertthat::are_equal(x=c(a+b+c),1),msg = "A, B, and C must sum to 1")
 
   # numeric dim validation check
 

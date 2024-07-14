@@ -2,51 +2,40 @@
 
 ## create tests
 
-library(dplyr)
+library(tidyverse)
 library(testthat)
+library(lubridate)
+
+# test data set
+dat <- crossing(
+  date = seq.Date(from = ymd("2020-01-01"), to = ymd("2024-01-01"), by = "day"),
+  customer = rep(letters[1:17], 86)
+) |>
+  mutate(purchases = runif(24854))
 
 test_that("Tibble input returns tibble output", {
-
   testthat::expect_s3_class(
-
-    fpaR::contoso_fact_sales |>
-      mutate(DateKey=lubridate::mdy(DateKey)) |>
-      make_cohort_tbl(id_var=ProductKey,date_var=DateKey,time_unit = 'week',period_label =TRUE)
-
-
-    ,"data.frame")
+    dat |> make_cohort_tbl(id_var = customer, date_var = date, time_unit = "week", period_label = TRUE),
+    "data.frame"
+  )
 })
 
 
 test_that("time_unit validate", {
   testthat::expect_error(
-
-    fpaR::contoso_fact_sales |>
-      dplyr::mutate(DateKey=lubridate::mdy(DateKey)) |>
-      fpaR::make_cohort_tbl(id_var=ProductKey,date_var=DateKey,time_unit = 'weekly',period_label =TRUE)
-
+    dat |> fpaR::make_cohort_tbl(id_var = customer, date_var = date, time_unit = "weekly", period_label = TRUE)
   )
 })
 
 
 test_that("date_var validation", {
   testthat::expect_error(
-
-    fpaR::contoso_fact_sales |>
-      dplyr::mutate(DateKey=lubridate::mdy(DateKey)) |>
-      fpaR::make_cohort_tbl(id_var=ProductKey,date_var=SalesKey,time_unit = 'week',period_label =TRUE)
-
+    dat |> fpaR::make_cohort_tbl(id_var = customer, date_var = purchases, time_unit = "week", period_label = TRUE)
   )
 })
 
 test_that("Period label validation", {
   testthat::expect_error(
-
-    fpaR::contoso_fact_sales |>
-      dplyr::mutate(DateKey=lubridate::mdy(DateKey)) |>
-      fpaR::make_cohort_tbl(id_var=ProductKey,date_var=SalesKey,time_unit = 'week',period_label ="0")
-
+    dat |> fpaR::make_cohort_tbl(id_var = customer, date_var = date, time_unit = "week", period_label = 0)
   )
 })
-
-

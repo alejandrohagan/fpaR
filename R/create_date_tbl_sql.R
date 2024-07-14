@@ -9,6 +9,7 @@
 #' @return a sql query
 #'
 #' @examples
+#' create_date_sql(mtcars_dbi,start_date="2021-01-01",end_date="2022-01-01")
 create_date_sql <- function(.data,start_date,end_date){
 
   ## create validation tests

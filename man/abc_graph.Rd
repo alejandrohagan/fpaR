@@ -7,18 +7,14 @@
 abc_graph(.data)
 }
 \arguments{
-\item{df}{data frame}
-
-\item{group_label}{label for grouping variable}
-
-\item{dim_label}{label for dimension variable}
-
-\item{size}{ggplot size}
-
-\item{shape}{ggplot shape}
-
-\item{...}{}
+\item{.data}{a tibble or DBI object producteed by abc() function}
+}
+\value{
+ggplot
 }
 \description{
 Produces ABC graph based on abc() function
+}
+\examples{
+abc(ggplot2::diamonds,cut,dim=price,func="n") |> abc_graph()
 }
