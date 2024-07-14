@@ -2,12 +2,12 @@
 % Please edit documentation in R/make_segmentation.R
 \name{make_segmentation}
 \alias{make_segmentation}
-\title{Uses Kmeans & UMAP to create segmentation}
+\title{Title}
 \usage{
 make_segmentation(
   .data,
   id_col,
-  kmeans_centers_init = 3,
+  kmeans_centers_init,
   kmeans_nstart = 100,
   kmeans_iter.max = 100,
   centers_grid_range = 1:15,
@@ -15,33 +15,18 @@ make_segmentation(
 )
 }
 \arguments{
-\item{id_col}{is the unique id column that you want to segment by.}
-
-\item{kmeans_centers_init}{is the kmeans center.}
-
-\item{kmeans_nstart}{is the kmeans nstart arg.}
-
-\item{kmeans_iter.max}{is the kmenas inter.max arg.}
-
-\item{centers_grid_range}{is the grid range you want the centers to iterate though, as grid range eg 1:15}
-
-\item{...}{additional arguments for umap, kmeans, or ggrepel as named arguments}
-
-\item{df}{is dataframe with the id column and grid-like numeric columns.}
-}
-\value{
-a list of graphs and tbls
+\item{kmeans_centers_init}{}
 }
 \description{
-Uses Kmeans & UMAP to create segmentation
+Title
 }
 \examples{
-brand_segmentation <-make_segmentation(
-df=mtcars \%>\%
-tibble::rownames_to_column(var="column 1"),
-id_col="column 1",
-kmeans_centers_init = 3,
-kmeans_nstart = 100,
+make_segmentation(
+.data =mtcars |>
+tibble::rownames_to_column(var="column1"),
+id_col=column1,
+kmeans_nstart = 10,
+kmeans_centers_init = 5,
 kmeans_iter.max = 100,
 centers_grid_range = 1:15)
 }

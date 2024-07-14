@@ -1,11 +1,11 @@
 library(tidyverse)
 
 devtools::document()
-
+rm(list = c("make_segmentation"))
 devtools::load_all()
 devtools::test()
 # load table
-
+rm(list = c("make_segmentation"))
 drv <- duckdb::duckdb(dbdir="/home/hagan/database.duckdb")
 
 con <- DBI::dbConnect(drv)
@@ -13,32 +13,17 @@ DBI::dbListTables(con)
 
 diamonds_db <- tbl(con,"mtcars_dbi")
 
-library(pointblank)
+mtcars_kmeans <- mtcars |>
+  tibble::rownames_to_column(var="column1")
 
-diamonds_db |> fpaR::abc(cut,clarity,dim = price) |> abc_graph(group_label = "test",dim_label = "dim",size = 2)+theme_classic()
+make_segmentation(
+  .data =mtcars_kmeans ,
+id_col="column1",
+kmeans_nstart = 10,
+kmeans_centers_init = 5,
+kmeans_iter.max = 100,
+centers_grid_range = 1:15)
 
-diamonds |>  fpaR::abc(cut,clarity,dim = price)
-
-annotate()
-
-devtools::load_all()
-
-diamonds_db |>
-  summarise(
-    slope=regr_slope(price,carat)
-    ,intercept=regr_intercept(price,carat)
-    ,histogram(price)
-  )
-
-
-diamonds_db |>
-  summarise(
-    hist=histogram(price)
-  ) |>
-  collect() |>
-  unnest(hist)
-
-diamonds |> lm(price~carat,data=_)
 
 ## sql practice
 
