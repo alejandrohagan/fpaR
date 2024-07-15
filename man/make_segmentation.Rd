@@ -2,7 +2,7 @@
 % Please edit documentation in R/make_segmentation.R
 \name{make_segmentation}
 \alias{make_segmentation}
-\title{Title}
+\title{Make a segmentation with kmeans and umap}
 \usage{
 make_segmentation(
   .data,
@@ -11,14 +11,30 @@ make_segmentation(
   kmeans_nstart = 100,
   kmeans_iter.max = 100,
   centers_grid_range = 1:15,
+  max.overlaps = 10,
   ...
 )
 }
 \arguments{
-\item{kmeans_centers_init}{}
+\item{.data}{a tibble dataframe with an ID column and numeric variables}
+
+\item{id_col}{the ID column to join the kmeans and umap results together}
+
+\item{kmeans_centers_init}{the k means center to start with}
+
+\item{kmeans_nstart}{random variable to start iteration}
+
+\item{kmeans_iter.max}{the maximum number of iterations}
+
+\item{centers_grid_range}{range of kmeans center}
+
+\item{...}{}
+}
+\value{
+a list of objects including tibbles and ggplot
 }
 \description{
-Title
+Make a segmentation with kmeans and umap
 }
 \examples{
 make_segmentation(

@@ -1,15 +1,15 @@
 
-#' Title
+#' Make a segmentation with kmeans and umap
 #'
-#' @param .data
-#' @param id_col
-#' @param kmeans_nstart
-#' @param kmeans_iter.max
-#' @param centers_grid_range
+#' @param .data a tibble dataframe with an ID column and numeric variables
+#' @param id_col the ID column to join the kmeans and umap results together
+#' @param kmeans_centers_init the k means center to start with
+#' @param kmeans_nstart random variable to start iteration
+#' @param kmeans_iter.max the maximum number of iterations
+#' @param centers_grid_range range of kmeans center
 #' @param ...
-#' @param kmeans_centers_init
 #'
-#' @return
+#' @return a list of objects including tibbles and ggplot
 #' @export
 #'
 #' @examples
@@ -21,7 +21,7 @@
 #'kmeans_centers_init = 5,
 #'kmeans_iter.max = 100,
 #'centers_grid_range = 1:15)
-make_segmentation <- function(.data,id_col,kmeans_centers_init,kmeans_nstart=100,kmeans_iter.max=100,centers_grid_range=1:15,...) {
+make_segmentation <- function(.data,id_col,kmeans_centers_init,kmeans_nstart=100,kmeans_iter.max=100,centers_grid_range=1:15,max.overlaps=10,...) {
 
 # logic checks
 
@@ -182,6 +182,7 @@ plot_id_segmentation <-
   ggplot2::geom_point()+
   ggrepel::geom_text_repel(
     aes(label={{id_col}})
+    ,max.overlaps=max.overlaps
     ,...
   )
 #
@@ -200,14 +201,3 @@ plot_id_segmentation <-
 
 base::return(segmentation_output)
 }
-
-kmeans_lst <- make_segmentation(
-  .data =mtcars_kmeans,
-id_col=column1,
-kmeans_nstart = 10,
-kmeans_centers_init = 5,
-kmeans_iter.max = 100,
-centers_grid_range = 1:15)
-
-
-kmeans_lst$tbl_umap

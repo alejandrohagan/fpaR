@@ -1,7 +1,130 @@
 library(tidyverse)
 
+
+test <- read_csv("https://huggingface.co/datasets/AbhayBhan/SalesData/raw/main/s1.csv") |>
+  janitor::clean_names() |>
+  mutate(
+    date=mdy(date)
+  )
+
+## time intelligence
+
+
+ytd
+ptd
+mtd
+qtd
+pmtd
+pqtd
+yoy
+mom
+wow
+pop
+
+##after summary need to join to expand and have full calendar table
+
+## ytd
+
+summary_tbl |>
+  mutate(
+    year=year(date)
+    ,quarter=quarter(date)
+    ,month=month(date)
+    ,week=week(date)
+  ) |>
+  group_by(year,city)
+  mutate(
+    ytd=cumsum(n)
+  )
+
+  ## mtd
+
+  summary_tbl |>
+    mutate(
+      year=year(date)
+      ,quarter=quarter(date)
+      ,month=month(date)
+      ,week=week(date)
+    ) |>
+    group_by(year,month,city) |>
+  mutate(
+    mtd=cumsum(n)
+  )
+
+  ## wtd
+
+  summary_tbl |>
+    mutate(
+      year=year(date)
+      ,quarter=quarter(date)
+      ,month=month(date)
+      ,week=week(date)
+    ) |>
+    group_by(year,month,week,city) |>
+    mutate(
+      wtd=cumsum(n)
+    )
+
+  ## wtd
+
+  summary_tbl |>
+    mutate(
+      year=year(date)
+      ,quarter=quarter(date)
+      ,month=month(date)
+      ,week=week(date)
+    ) |>
+    group_by(year,month,week,city) |>
+    mutate(
+      wtd=cumsum(n)
+    )
+
+
+
+summary_tbl <- test |>
+  group_by(
+    city
+    ,date
+    ) |>
+  summarise(
+    n=n()
+    ,.groups="drop_last"
+  ) |>
+  arrange(city,date)
+
+calendar_tbl <- tibble(
+  calendar_date=seq.Date(from=min(summary_tbl$date),to=max(summary_tbl$date),by="day")
+)
+
+date_vec <- ymd("2021-01-01")
+
+
+date_vec+months(5)
+
+calendar_tbl |>
+  # rowwise() |>
+  mutate(
+    comparison_period=calendar_date%m+%months(1)
+      ) |>
+  left_join(
+    summary_tbl
+    ,by=join_by(calendar_date==date)
+  ) |>
+  left_join(
+    summary_tbl
+    ,by=join_by(comparison_period==date,city)
+  ) |>
+  mutate(
+   delta= n.x-n.y
+  ) |>
+  drop_na()
+
+
+
+
+
+
 devtools::document()
-rm(list = c("make_segmentation"))
 devtools::load_all()
 devtools::test()
 # load table
@@ -18,14 +141,14 @@ mtcars_kmeans <- mtcars |>
 
 make_segmentation(
   .data =mtcars_kmeans ,
-id_col="column1",
+id_col=column1,
 kmeans_nstart = 10,
 kmeans_centers_init = 5,
-kmeans_iter.max = 100,
+kmeans_iter.max = 100,max.overlaps = 100,
 centers_grid_range = 1:15)
 
-
-## sql practice
+devtools::test()
+# sql practice
 
 y  <- "price"
 x1 <- "x"
