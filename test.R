@@ -1,25 +1,79 @@
 library(tidyverse)
-
-
+devtools::load_all()
+devtools::document()
+devtools::test()
 test <- read_csv("https://huggingface.co/datasets/AbhayBhan/SalesData/raw/main/s1.csv") |>
   janitor::clean_names() |>
   mutate(
     date=mdy(date)
   )
 
+### period demo--------------
+summary_tbl <- test |>
+  mutate(
+    date=floor_date(date,"week")
+  ) |>
+  group_by(
+    date
+  ) |>
+  summarise(
+    inc=sum(gross_income)
+    ,.groups="drop"
+  )
+
+summary_tbl
+
+calendar_tbl <- tibble(
+  date=seq.Date(from=min(summary_tbl$date),to=max(summary_tbl$date),by = "week")
+)
+
+
+full_tbl <- full_join(
+  calendar_tbl
+  ,summary_tbl
+  ,by = join_by(date)
+) |>
+  replace_na(list(inc=0))
+
+
+### -- everything is the same until this tep -- just customize this step
+
+full_tbl |>
+  mutate(
+    yoy_inc=inc-lag(inc,1)
+  )
+
+## end demo-----------
+
+
+test |>
+  mutate(
+    date=floor_date(date,"week")
+  ) |>
+  group_by(
+    date
+  ) |>
+  summarise(
+    inc=sum(gross_income)
+    ,.groups="drop"
+  ) |>
+
 ## time intelligence
 
-
+### aggregation
 ytd
-ptd
+wtd
 mtd
 qtd
+ptd
+
+## yoy changes
 pmtd
 pqtd
 yoy
 mom
 wow
-pop
+qoq
 
 ##after summary need to join to expand and have full calendar table
 
@@ -835,32 +889,5 @@ diamonds_db |>
         )
     ) |>
   dplyr::select(-c(prop_total,cum_sum,max_row_id,))
-
-usethis::use_github_action()
-
-quare <- function(n) {
-  k <- 1
-  while(TRUE) {
-    if (k == n*n) {
-      print(k)
-      return(TRUE)
-    } else {
-      k <- k + 1
-    }
-  }
-}
-square(-20)
-
-
-square <- function(n) {
-  k <- 1
-  while (k <= n * n) {
-    if (k == n * n) {
-      return(k)
-    }
-    k <- k + 1
-  }
-}
-
 
 
