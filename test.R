@@ -1,15 +1,33 @@
 library(tidyverse)
-devtools::load_all()
 devtools::document()
+devtools::load_all()
 devtools::test()
-test <- read_csv("https://huggingface.co/datasets/AbhayBhan/SalesData/raw/main/s1.csv") |>
+
+dat <- read_csv("https://huggingface.co/datasets/AbhayBhan/SalesData/raw/main/s1.csv") |>
   janitor::clean_names() |>
   mutate(
     date=mdy(date)
   )
 
+totalytd(data,date_var = date,value_var = cogs)
+
+calculate(date_var=date,value_var = ytd,time_unit ="year" )
+make_aggregation_tbl(data,date_var=date,value_var = cogs,time_unit ="week" )
+
+totalytd(dat,date_var=date,value_var = cogs)
+
+totalmtd()
+
+totalqtd()
+
+totalwtd()
+
+totalall()
+
+
+
 ### period demo--------------
-summary_tbl <- test |>
+summary_tbl <- dat |>
   mutate(
     date=floor_date(date,"week")
   ) |>
@@ -21,7 +39,9 @@ summary_tbl <- test |>
     ,.groups="drop"
   )
 
-summary_tbl
+summary_tbl |>
+  gtsummary::tbl_summary()
+
 
 calendar_tbl <- tibble(
   date=seq.Date(from=min(summary_tbl$date),to=max(summary_tbl$date),by = "week")
@@ -60,6 +80,12 @@ test |>
 
 ## time intelligence
 
+
+  dat |>
+  mutate(
+    date=as.Date(date)
+    ) |>
+  make_aggregation_tbl(city,product_line,date_var =date, value_var = cogs,time_unit = "month")
 ### aggregation
 ytd
 wtd
@@ -70,10 +96,7 @@ ptd
 ## yoy changes
 pmtd
 pqtd
-yoy
-mom
-wow
-qoq
+
 
 ##after summary need to join to expand and have full calendar table
 
