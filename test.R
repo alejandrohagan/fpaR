@@ -1,20 +1,75 @@
 library(tidyverse)
+library(assertthat)
 devtools::document()
 devtools::load_all()
-devtools::test()
 
-dat <- read_csv("https://huggingface.co/datasets/AbhayBhan/SalesData/raw/main/s1.csv") |>
-  janitor::clean_names() |>
+
+sales_tbl <- fpaR::sales
+
+
+
+
+dat <- make_aggregation_tbl(sales_tbl,date_var = order_date,value_var = quantity,time_unit = "day")
+
+
+daily
+dod
+wow
+mom
+yoy
+
+daily_time_intelligence(dat,...,"yoy")
+yoy(dat,date_var = date,value_var = quantity,lag_n = 1) |> view()
+
+
+
+
+dat |>
   mutate(
-    date=mdy(date)
+    year_lag=date%m+% years(-1)
+    ,days_lag=date %m+%days(-1)
+    ,day_of_week=lubridate::wday(date,label=TRUE)
+    ,week_lag=date%m+%weeks(1)
+    ,month_lag=date+months(1)
+    ,month_lag2=date %m+% months(1)
+  ) |> view()
+
+
+totalmtd(sales_tbl,date_var = order_date,value_var = quantity)
+totalytd(dat,date_var = saledate,value_var = qnty)
+totalwtd(dat,date_var = saledate,value_var = qnty)
+totalatd(dat,date_var = saledate,value_var = qnty) |> view()
+
+
+dat |>
+  select(
+    date,city,product_line,cogs
+  ) |>
+  mutate(
+    day=lubridate::wday(date,label=TRUE)
+   ,previous_date=date-months(1)
+   ,p_day=wday(previous_date,label = TRUE)
   )
 
-totalytd(data,date_var = date,value_var = cogs)
 
+  ymd("2021-01-31")%m+%months(1)
+
+  lubridate::interval(ymd("2021-01-31"),"d")
+
+interval(ymd(20090201), ymd(20090101))
+totalytd(dat,date_var=date,value_var = cogs) |>
 calculate(date_var=date,value_var = ytd,time_unit ="year" )
 make_aggregation_tbl(data,date_var=date,value_var = cogs,time_unit ="week" )
 
 totalytd(dat,date_var=date,value_var = cogs)
+
+
+aggregation=c("daily","weekly","monthly","yearly")
+period=  c("cur","yoy","wow","mom")
+view =c("ftm","ytd")
+
+totalmtd()
+
 
 totalmtd()
 

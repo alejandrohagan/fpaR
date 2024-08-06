@@ -1,0 +1,75 @@
+StoreKey,StoreCode,GeoAreaKey,CountryCode,CountryName,State,OpenDate,CloseDate,Description,SquareMeters,Status
+10,1,1,AU,Australia,Australian Capital Territory,2008-01-01,,Contoso Store Australian Capital Territory,595,
+20,2,3,AU,Australia,Northern Territory,2008-01-12,2016-07-07,Contoso Store Northern Territory,665,Closed
+30,3,5,AU,Australia,South Australia,2012-01-07,2015-08-08,Contoso Store South Australia,2000,Restructured
+35,3,5,AU,Australia,South Australia,2015-12-08,,Contoso Store South Australia,3000,
+40,4,6,AU,Australia,Tasmania,2010-01-01,,Contoso Store Tasmania,2000,
+50,5,7,AU,Australia,Victoria,2015-12-09,,Contoso Store Victoria,2000,
+60,6,8,AU,Australia,Western Australia,2010-01-01,,Contoso Store Western Australia,2000,
+70,7,12,CA,Canada,New Brunswick,2007-05-07,2014-03-09,Contoso Store New Brunswick,1105,Restructured
+72,7,12,CA,Canada,New Brunswick,2015-01-11,2018-02-02,Contoso Store New Brunswick,1500,Restructured
+74,7,12,CA,Canada,New Brunswick,2018-06-02,,Contoso Store New Brunswick,3500,
+80,8,13,CA,Canada,Newfoundland and Labrador,2014-07-02,,Contoso Store Newfoundland and Labrador,2105,
+90,9,15,CA,Canada,Northwest Territories,2005-03-04,,Contoso Store Northwest Territories,1500,
+100,10,16,CA,Canada,Nunavut,2015-04-04,,Contoso Store Nunavut,1210,
+110,11,21,CA,Canada,Yukon,2009-06-03,2015-05-05,Contoso Store Yukon,1210,Closed
+120,12,41,FR,France,Basse-Normandie,2012-06-06,,Contoso Store Basse-Normandie,350,
+130,13,46,FR,France,Corse,2013-06-07,,Contoso Store Corse,245,
+140,14,47,FR,France,Franche-Comté,2009-12-15,,Contoso Store Franche-Comté,350,
+150,15,55,FR,France,La Réunion,2015-01-01,,Contoso Store La Réunion,400,
+160,16,52,FR,France,Limousin,2010-06-03,,Contoso Store Limousin,385,
+170,17,57,FR,France,Martinique,2007-07-08,,Contoso Store Martinique,350,
+180,18,58,FR,France,Mayotte,2012-08-08,,Contoso Store Mayotte,310,
+190,19,23,DE,Germany,Berlin,2015-04-04,,Contoso Store Berlin,1295,
+200,20,22,DE,Germany,Brandenburg,2012-12-15,2019-08-08,Contoso Store Brandenburg,1715,Closed
+210,21,26,DE,Germany,Freie Hansestadt Bremen,2018-06-03,,Contoso Store Freie Hansestadt Bremen,560,
+220,22,37,DE,Germany,Freistaat Thüringen,2008-03-06,,Contoso Store Freistaat Thüringen,2000,
+230,23,28,DE,Germany,Hamburg,2010-01-01,,Contoso Store Hamburg,1365,
+240,24,27,DE,Germany,Hessen,2012-12-15,,Contoso Store Hessen,1855,
+250,25,29,DE,Germany,Mecklenburg-Vorpommern,2010-01-01,2015-04-04,Contoso Store Mecklenburg-Vorpommern,1610,Restructured
+255,25,29,DE,Germany,Mecklenburg-Vorpommern,2015-08-08,,Contoso Store Mecklenburg-Vorpommern,2800,
+260,26,34,DE,Germany,Saarland,2019-03-05,,Contoso Store Saarland,350,
+270,27,36,DE,Germany,Sachsen-Anhalt,2008-08-08,,Contoso Store Sachsen-Anhalt,2000,
+280,28,474,IT,Italy,Caltanissetta,2012-12-15,2017-08-03,Contoso Store Caltanissetta,1200,Closed
+290,29,481,IT,Italy,Enna,2008-01-01,,Contoso Store Enna,1000,
+300,30,519,IT,Italy,Pesaro,2008-01-12,,Contoso Store Pesaro,2100,
+310,31,554,NL,Netherlands,Drenthe,2012-01-07,,Contoso Store Drenthe,1085,
+320,32,555,NL,Netherlands,Flevoland,2010-01-01,,Contoso Store Flevoland,910,
+330,33,556,NL,Netherlands,Friesland,2015-12-09,,Contoso Store Friesland,1540,
+340,34,558,NL,Netherlands,Groningen,2010-01-01,,Contoso Store Groningen,1365,
+350,35,564,NL,Netherlands,Zeeland,2007-05-07,2015-07-06,Contoso Store Zeeland,1225,Closed
+360,36,74,GB,United Kingdom,Armagh,2014-07-02,,Contoso Store Armagh,1300,
+370,37,79,GB,United Kingdom,Ayrshire,2005-03-04,,Contoso Store Ayrshire,2100,
+380,38,89,GB,United Kingdom,Belfast,2015-04-04,,Contoso Store Belfast,1800,
+390,39,96,GB,United Kingdom,Blaenau Gwent,2009-06-03,,Contoso Store Blaenau Gwent,2100,
+400,40,166,GB,United Kingdom,Dungannon and South Tyrone,2012-06-06,,Contoso Store Dungannon and South Tyrone,1300,
+410,41,193,GB,United Kingdom,Fermanagh,2013-06-07,2018-09-09,Contoso Store Fermanagh,2100,Closed
+420,42,291,GB,United Kingdom,North Down,2009-12-15,,Contoso Store North Down,1900,
+430,43,566,US,United States,Alaska,2015-01-01,,Contoso Store Alaska,1190,
+440,44,568,US,United States,Arkansas,2010-06-03,,Contoso Store Arkansas,2000,
+450,45,572,US,United States,Connecticut,2007-07-08,,Contoso Store Connecticut,2000,
+460,46,574,US,United States,Delaware,2012-08-08,2015-03-03,Contoso Store Delaware,1015,Restructured
+465,46,574,US,United States,Delaware,2015-06-06,2019-08-03,Contoso Store Delaware,1015,Closed
+470,47,577,US,United States,Hawaii,2015-04-04,,Contoso Store Hawaii,1120,
+480,48,579,US,United States,Idaho,2012-12-15,,Contoso Store Idaho,1540,
+490,49,578,US,United States,Iowa,2018-06-03,,Contoso Store Iowa,2000,
+500,50,582,US,United States,Kansas,2008-03-06,,Contoso Store Kansas,2000,
+510,51,587,US,United States,Maine,2010-01-01,,Contoso Store Maine,1295,
+520,52,591,US,United States,Mississippi,2009-06-03,2015-06-03,Contoso Store Mississippi,2000,Closed
+530,53,592,US,United States,Montana,2012-06-06,,Contoso Store Montana,1260,
+540,54,595,US,United States,Nebraska,2013-06-07,,Contoso Store Nebraska,2000,
+550,55,599,US,United States,Nevada,2009-12-15,,Contoso Store Nevada,2000,
+560,56,596,US,United States,New Hampshire,2015-01-01,,Contoso Store New Hampshire,1260,
+570,57,598,US,United States,New Mexico,2010-06-03,,Contoso Store New Mexico,1645,
+580,58,594,US,United States,North Dakota,2007-07-08,2015-07-06,Contoso Store North Dakota,1330,Restructured
+585,58,594,US,United States,North Dakota,2015-12-15,,Contoso Store North Dakota,3500,
+590,59,603,US,United States,Oregon,2012-08-08,,Contoso Store Oregon,2000,
+600,60,605,US,United States,Rhode Island,2005-04-04,2013-12-05,Contoso Store Rhode Island,1260,Restructured
+605,60,605,US,United States,Rhode Island,2014-06-03,,Contoso Store Rhode Island,1260,
+610,61,606,US,United States,South Carolina,2012-12-15,,Contoso Store South Carolina,2000,
+620,62,607,US,United States,South Dakota,2018-06-03,,Contoso Store South Dakota,1120,
+630,63,610,US,United States,Utah,2008-03-06,2019-11-03,Contoso Store Utah,2000,
+650,65,573,US,United States,Washington DC,2010-01-01,,Contoso Store Washington DC,1330,
+660,66,615,US,United States,West Virginia,2012-01-01,,Contoso Store West Virginia,1785,
+670,67,616,US,United States,Wyoming,2014-01-01,,Contoso Store Wyoming,840,
+999999,-1,-1,--,Online,Online,2010-01-01,,Online store,,

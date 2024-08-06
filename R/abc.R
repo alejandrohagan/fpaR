@@ -116,12 +116,13 @@ abc <- function(.data,...,dim,a=.7,b=.26,c=.04,func=c("sum")){
         dplyr::case_when(
           dim_category=="A"~a
           ,dim_category=="B"~(a+b)
-          ,.default                        = c
+          ,.default                = c
         )
     ) |>
-    dplyr::select(-c(prop_total,cum_sum,max_row_id))
+    dplyr::select(-base::c(prop_total,cum_sum,max_row_id))
 
   return(out)
 
 
 }
+
