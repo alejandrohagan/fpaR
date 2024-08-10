@@ -2,26 +2,105 @@ library(tidyverse)
 library(assertthat)
 devtools::document()
 devtools::load_all()
-
-
+devtools::check()
+devtools::test()
+is.Date()
 sales_tbl <- fpaR::sales
 
+usethis::use_test("time_intelligence")
+
+(.data <- make_aggregation_tbl(sales_tbl,date_var = order_date,value_var = quantity,time_unit = "week"))
+
+sales_tbl |> yoy(date_var = order_date,value_var = quantity,lag_n = 1,time_unit = "year")
+
+.data |>
+  mutate(
+    day_of_week=lubridate::wday(date,label=TRUE)
+    ,week_num=lubridate::week(date)
+    ,week_iso=lubridate::isoweek(date)
+    ,date_lag=date %m-% years(1)
+    ,week_num_lag=lubridate::week(date_lag)
+    ,week_iso_lag=lubridate::isoweek(date_lag)
+    ,year=year(date)
+  ) |> view()
+
+
+diff(floor_date(dat$date,"halfyear"))
+
+
+date_check <- function(data,date_var,time_unit){
+
+  ## daily
+  if(sum(diff(.data$date)!=1)==0){
+
+    date_check_vec <- "day"
+
+  }
 
 
 
-dat <- make_aggregation_tbl(sales_tbl,date_var = order_date,value_var = quantity,time_unit = "day")
+  ## month
+  sum(!diff(dat$date) %in% c(29,30,31,28))
 
 
+
+  ## week
+  sum(!diff(dat$date) %in% c(7))
+
+  ## quarter
+  sum(!diff(dat$date) %in% c(90,91,92))
+
+
+
+
+}
+
+?lubridate::floor_date()
+
+
+
+tex <- tibble(
+  x=
+    c(
+      # .57115
+      .5223
+      ,.513)
+  ,y=c(
+    # .4138
+    .4324
+    ,.468)
+) |>
+  mutate(
+    id=row_number()
+  )
+
+lm(x~id,data=tex) |> broom::tidy()
+
+-0.00930 *3+0.532
+
+approx(tex$x,y=tex$y)
+
+
+c(c(.5715-.4138),c(.5223-.4324),c(.513-.468)) |> approx()
 daily
 dod
 wow
 mom
 yoy
 
+dat |> view()
+
 daily_time_intelligence(dat,...,"yoy")
-yoy(dat,date_var = date,value_var = quantity,lag_n = 1) |> view()
+yoy(dat,date_var = date,value_var = quantity,lag_n = 1,time_unit = "week") |> view()
+wow(dat,date_var = date,value_var = quantity,lag_n = -1)
+mom(dat,date_var = date,value_var = quantity,lag_n = 1) |> view()
 
 
+.data
+ddays(14)
+dhours(1)
+
+duration(5,units="minutes")
 
 
 dat |>
@@ -31,7 +110,7 @@ dat |>
     ,day_of_week=lubridate::wday(date,label=TRUE)
     ,week_lag=date%m+%weeks(1)
     ,month_lag=date+months(1)
-    ,month_lag2=date %m+% months(1)
+    ,month_lag2=date %m+% ?months(1)
   ) |> view()
 
 
@@ -504,12 +583,6 @@ out <- create_date_db(contoso_fact_sales_db,start_date = "2021-01-01",end_date =
 
 DBI::dbGetQuery(conn = con,statement = out)
 
-
-contoso_fact_sales_db |>
-  group_by(SalesKey) |>
-  mutate(
-   id=(SalesKey)
-  )
 
 
 contoso_fact_sales_db |> pluck("src") |> pluck("con")

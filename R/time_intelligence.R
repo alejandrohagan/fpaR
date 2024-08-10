@@ -1,10 +1,10 @@
 #' Aggregate and expand date table
 #'
-#' @param data
-#' @param ...
-#' @param date_var
-#' @param value_var
-#' @param time_unit
+#' @param .data tibble
+#' @param ... dimensions to group by
+#' @param date_var dimension with main date column
+#' @param value_var dimension with values to aggregate by
+#' @param time_unit which time unit to aggregate to
 #'
 #' @return tibble
 #' @export
@@ -13,18 +13,16 @@
 #' make_aggregation_tbl(fpaR::sales,date,quantity,"day")
 make_aggregation_tbl <- function(.data,...,date_var,value_var, time_unit) {
 
+
   assertthat::assert_that(base::is.data.frame(.data), msg = "Data must be a data frame.")
   assertthat::assert_that(base::is.character(time_unit), msg = "Time unit must be a character string.")
-  assertthat::assert_that(time_unit %in% base::c("day", "week","quarter", "month", "year"), msg = "Time frame must be one of 'day', 'week', 'month', or 'year'.")
-  # assert_that(is.Date(date_var), msg = "The date column is not in Date format.")
-
-  # # Check if the column follows the yyyy-mm-dd format
+  assertthat::assert_that(time_unit %in% base::c("day", "week","quarter","semester","month", "year"), msg = "Time frame must be one of 'day', 'week','semester', 'month', or 'year'.")
+  assertthat::assert_that(lubridate::is.Date(.data |> pull({{date_var}})), msg = "The date column is not in Date format.")
+  #
+  # # # Check if the column follows the yyyy-mm-dd format
   # formatted_dates <- format(date_var, "%Y-%m-%d")
-  # assert_that(all(date_var == as.Date(formatted_dates)), msg = "The date column does not follow the yyyy-mm-dd format.")
-
-  date_lbl <- glue::glue("date_{time_unit}")
-
-  # value_lbl <- deparse(enquo(value_var))
+  # assertthat::assert_that(base::all(date_var == base::as.Date(formatted_dates)), msg = "The date column does not follow the yyyy-mm-dd format.")
+  #
 
   # Floor the date to the specified time frame
   summary_tbl <- .data |>
@@ -59,52 +57,40 @@ make_aggregation_tbl <- function(.data,...,date_var,value_var, time_unit) {
 
 }
 
-
-#' Total year to date aggregtation
-#'
-#' @param .data table
-#' @param ... dimensions to aggregrate by
-#' @param date_var column with date var to aggregate by
-#' @param value_var column with the value to aggregate
-#' @param time_unit
-#'
-#' @return tibble
-#' @export
-#'
-#' @examples
-calculate <- function(.data,...,date_var,value_var,time_unit){
-
-  # Validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
-  assertthat::assert_that(base::is.character(time_unit), msg = "time_unit must be a character")
-
-  # Aggregate data based on provided time unit
-
-  full_tbl <-  .data |>
-    make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit=time_unit)
-
-  # Determine label for the time unit
-
-  lbl <-   base::names(
-    base::match.arg(
-      "week"
-      ,choices = c("mom"="month","yoy"="year","wow"="week","dod"="day")
-      ,several.ok = FALSE
-    )
-  )
-
-
-  # Calculate difference and proportional change
-
-  out_tbl <- full_tbl |>
-    dplyr::mutate(
-      !!lbl:= {{value_var}} - lag({{value_var}}, 1)
-      ,prop_delta=  .data[[!!lbl]]/{{value_var}}
-    )
-
-  return(out_tbl)
-
-}
+#
+# calculate <- function(.data,...,date_var,value_var,time_unit){
+#
+#   # Validate inputs
+#   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+#   assertthat::assert_that(base::is.character(time_unit), msg = "time_unit must be a character")
+#
+#   # Aggregate data based on provided time unit
+#
+#   full_tbl <-  .data |>
+#     make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit=time_unit)
+#
+#   # Determine label for the time unit
+#
+#   lbl <-   base::names(
+#     base::match.arg(
+#       "week"
+#       ,choices = c("mom"="month","yoy"="year","wow"="week","dod"="day")
+#       ,several.ok = FALSE
+#     )
+#   )
+#
+#
+#   # Calculate difference and proportional change
+#
+#   out_tbl <- full_tbl |>
+#     dplyr::mutate(
+#       !!lbl:= {{value_var}} - lag({{value_var}}, 1)
+#       ,prop_delta=  .data[[!!lbl]]/{{value_var}}
+#     )
+#
+#   return(out_tbl)
+#
+# }
 
 
 #' Total year to date values
@@ -284,7 +270,6 @@ totalwtd <- function(.data,...,date_var,value_var){
 }
 
 
-
 #' Total since inception
 #'
 #' @param .data tibble of values
@@ -323,7 +308,7 @@ totalatd <- function(.data,...,date_var,value_var){
 }
 
 
-#' Year over year values
+#' Week over week values
 #' @description
 #' For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
 #'
@@ -336,8 +321,8 @@ totalatd <- function(.data,...,date_var,value_var){
 #' @export
 #'
 #' @examples
-#' yoy(sales_tbl,date_var = order_date,value_var = quantity)
-yoy <- function(.data,...,date_var,value_var,lag_n=1){
+#' wow(sales_tbl,date_var = order_date,value_var = quantity)
+wow <- function(.data,...,date_var,value_var,lag_n=1){
 
   # Validate inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
@@ -354,8 +339,60 @@ yoy <- function(.data,...,date_var,value_var,lag_n=1){
 
   lag_table <- full_tbl |>
     dplyr::mutate(
-      date_lag=date %m-% lubridate::years(lag_n)
-      ,"{{value_var}}_yoy":={{value_var}}
+      date_lag=date %m-% lubridate::weeks(lag_n)
+      ,"{{value_var}}_wow":={{value_var}}
+    ) |>
+    select(-c(date,{{value_var}}))
+
+
+  out_tbl <-  left_join(
+    full_tbl
+    ,lag_table
+    ,by=join_by(date==date_lag)
+  )
+
+  return(out_tbl)
+
+}
+
+
+
+
+
+
+#' Month over month values
+#' @description
+#' For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
+#'
+#' @param .data tibble of values
+#' @param ... optional columns to group by
+#' @param date_var column with date var to aggregate by
+#' @param value_var column with value to aggregate
+#'
+#' @return tibble
+#' @export
+#'
+#' @examples
+#' yoy(sales_tbl,date_var = order_date,value_var = quantity)
+mom <- function(.data,...,date_var,value_var,lag_n=1){
+
+  # Validate inputs
+  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+
+  # Aggregate data based on provided time unit
+
+  full_tbl <-  .data |>
+    make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day")
+
+  # Determine label for the time unit
+
+
+  # Calculate difference and proportional change
+
+  lag_table <- full_tbl |>
+    dplyr::mutate(
+      date_lag=date %m-% base::months(lag_n)
+      ,"{{value_var}}_mom":={{value_var}}
     ) |>
     select(-c(date,{{value_var}}))
 
@@ -367,6 +404,77 @@ yoy <- function(.data,...,date_var,value_var,lag_n=1){
   )
 
   return(out_tbl)
+
+}
+
+
+#' Year over year values
+#' @description
+#' For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
+#'
+#' @param .data tibble of values
+#' @param ... optional columns to group by
+#' @param date_var column with date var to aggregate by
+#' @param value_var column with value to aggregate
+#'
+#' @return tibble
+#' @export
+#'
+#' @examples
+#' yoy(fpaR::sales,date_var = order_date,value_var = quantity)
+yoy <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){
+
+  # Validate inputs
+  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+  assertthat::assert_that(time_unit %in% base::c("day", "quarter","semester","month", "year"), msg = "Time frame must be one of 'day', 'month', or 'year'.")
+  # Aggregate data based on provided time unit
+
+  full_tbl <-  .data |>
+    make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit=time_unit) |>
+    arrange(
+      date
+    )
+
+
+  ## multiplication factor
+
+  multiply_options <- c("day"=1,"month"=12,"quarter"=4,"year"=1)
+
+
+  multiply_vec <- multiply_options[time_unit] |> unname()
+
+
+
+  if(time_unit %in% c("day")){
+
+  # Calculate difference and proportional change
+
+  lag_tbl <- full_tbl |>
+    dplyr::mutate(
+      date_lag=date %m-% lubridate::years(lag_n)
+      ,"{{value_var}}_yoy":={{value_var}}
+    ) |>
+    select(-c({{value_var}}))
+
+
+  out_tbl <-  left_join(
+    full_tbl
+    ,lag_tbl
+    ,by=join_by(date==date_lag)
+  )
+
+    return(lag_tbl)
+
+  } else {
+
+    out_tbl <-  full_tbl |>
+      dplyr::mutate(
+        "{{value_var}}_yoy":=dplyr::lag({{value_var}},n=(lag_n*multiply_vec))
+      )
+    return(out_tbl)
+
+  }
+
 
 }
 

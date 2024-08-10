@@ -3,9 +3,15 @@ title: "README"
 format: gfm
 ---
 
-# Status
+# Developer Notes
 
--   Package is still in development mode -- not ready for installation
+## 2024-08-10
+
+-   Cleaning up documentation
+-   Make unit tests for yoy 
+-   Clean up consistency of syntax
+-   Fixed make aggregation tbl assertthat formula
+
 
 # Introduction to fpaR
 

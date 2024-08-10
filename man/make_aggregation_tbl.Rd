@@ -7,7 +7,15 @@
 make_aggregation_tbl(.data, ..., date_var, value_var, time_unit)
 }
 \arguments{
-\item{time_unit}{}
+\item{.data}{tibble}
+
+\item{...}{dimensions to group by}
+
+\item{date_var}{dimension with main date column}
+
+\item{value_var}{dimension with values to aggregate by}
+
+\item{time_unit}{which time unit to aggregate to}
 }
 \value{
 tibble
