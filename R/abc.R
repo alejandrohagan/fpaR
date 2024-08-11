@@ -10,14 +10,14 @@
 #' @param b incremental segment threshold expressed as a percentage eg .26
 #' @param c final segment threshold expressed as a percentage eg .04
 #' @param func either "sum" or "n"; sum to sum your dim or n for row count
-#' @param ... columns  to group by
+#' @param ... columns to group by
 #'
 #' @return a tibble or DBI object
 #' @export
 #'
 #' @examples
 #'
-#' customer_abc <- abc(fpaR::Sales,customer_key,dim=quantity,a=.7,b=.2,c=.1)
+#' customer_abc <- abc(fpaR::sales,customer_key,dim=quantity,a=.7,b=.2,c=.1)
 abc <- function(.data,...,dim,a=.7,b=.26,c=.04,func=c("sum")){
 
   ## function check

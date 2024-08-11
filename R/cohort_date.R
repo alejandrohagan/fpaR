@@ -7,7 +7,7 @@
 #'
 #' @param .data Either a database or tibble object
 #' @param id_var The variable that you want to track over time
-#' @param time_unit The time unit as character eg('day','week','month',etc) to round the transaction date passed to lubridate::floor_date()
+#' @param time_unit The time unit as string eg('day','week','month',etc) to round the transaction date passed to lubridate::floor_date()
 #' @param date_var  The date column representing the transaction date
 #' @param period_label Logical value if you want the represent the dates as periods or Dates
 #'
@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-#' fpaR::contoso_fact_sales |>  make_cohort_tbl(id_var=ProductKey,date_var=DateKey,time_unit = 'week',period_label =TRUE)
+#' fpaR::sales |>  make_cohort_tbl(id_var=product_key,date_var=order_date,time_unit = 'week',period_label =TRUE)
 #'
 #'
 make_cohort_tbl <- function(.data,id_var,date_var,time_unit="month",period_label=FALSE){

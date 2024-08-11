@@ -19,7 +19,7 @@ make_cohort_tbl(
 
 \item{date_var}{The date column representing the transaction date}
 
-\item{time_unit}{The time unit as character eg('day','week','month',etc) to round the transaction date passed to lubridate::floor_date()}
+\item{time_unit}{The time unit as string eg('day','week','month',etc) to round the transaction date passed to lubridate::floor_date()}
 
 \item{period_label}{Logical value if you want the represent the dates as periods or Dates}
 }
@@ -32,7 +32,7 @@ chort_table_month, cohort_table_year, cohort_table_day into a single package.
 Re-written to be database friendly tested against snowflake and duckdb databases
 }
 \examples{
-fpaR::contoso_fact_sales |>  make_cohort_tbl(id_var=ProductKey,date_var=DateKey,time_unit = 'week',period_label =TRUE)
+fpaR::sales |>  make_cohort_tbl(id_var=product_key,date_var=order_date,time_unit = 'week',period_label =TRUE)
 
 
 }

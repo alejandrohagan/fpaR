@@ -2,7 +2,7 @@
 test_that("yoy - day success", {
 
   testthat::expect_no_error(
-  fpaR::sales |> fpaR::yoy(date_var = order_date,value_var=quantity,lan_n=1,time_unit="day")
+  fpaR::sales |> yoy(date_var = order_date,value_var=quantity,lag_n=1,time_unit="day")
   )
 })
 
@@ -10,7 +10,7 @@ test_that("yoy - day success", {
 test_that("yoy - month success", {
 
   testthat::expect_no_error(
-    fpaR::sales |> fpaR::yoy(date_var = order_date,value_var=quantity,lan_n=1,time_unit="month")
+    fpaR::sales |> fpaR::yoy(date_var = order_date,value_var=quantity,lag_n=1,time_unit="month")
   )
 })
 
@@ -18,7 +18,7 @@ test_that("yoy - month success", {
 test_that("yoy - year success", {
 
   testthat::expect_no_error(
-    fpaR::sales |> fpaR::yoy(date_var = order_date,value_var=quantity,lan_n=1,time_unit="year")
+    fpaR::sales |> fpaR::yoy(date_var = order_date,value_var=quantity,lag_n=1,time_unit="year")
   )
 })
 
@@ -26,7 +26,7 @@ test_that("yoy - year success", {
 test_that("yoy - week fail ", {
 
   testthat::expect_error(
-    fpaR::sales |> fpaR::yoy(date_var = order_date,value_var=quantity,lan_n=1,time_unit="week")
+    fpaR::sales |> fpaR::yoy(date_var = order_date,value_var=quantity,lag_n=1,time_unit="week")
   )
 })
 
