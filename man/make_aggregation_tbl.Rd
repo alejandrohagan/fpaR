@@ -24,5 +24,5 @@ tibble
 Aggregate and expand date table
 }
 \examples{
-make_aggregation_tbl(fpaR::sales,date,quantity,"day")
+make_aggregation_tbl(fpaR::sales,date_var=date,value_var=quantity,time_unit="day")
 }

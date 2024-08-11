@@ -17,12 +17,11 @@
 #'
 #' @examples
 #'
-#' customer_abc <- abc(contoso,customer_key,dim=margin,a=.7,b=.2,c=.1)
+#' customer_abc <- abc(fpaR::Sales,customer_key,dim=quantity,a=.7,b=.2,c=.1)
 abc <- function(.data,...,dim,a=.7,b=.26,c=.04,func=c("sum")){
 
   ## function check
-
- func_vec <-  match.arg(
+ func_vec <-  base::match.arg(
     func
     ,choices = c("sum","n")
   )
@@ -100,8 +99,8 @@ abc <- function(.data,...,dim,a=.7,b=.26,c=.04,func=c("sum")){
 
   out <-   temp |>
     dplyr::mutate(
-      cum_sum=cumsum(var)
-      ,prop_total=var/max(cum_sum)
+      cum_sum=base::cumsum(var)
+      ,prop_total=var/base::max(cum_sum)
       ,cum_prop_total=base::cumsum(prop_total)
       ,row_id=dplyr::row_number()
       ,max_row_id=max(row_id)
@@ -121,7 +120,7 @@ abc <- function(.data,...,dim,a=.7,b=.26,c=.04,func=c("sum")){
     ) |>
     dplyr::select(-base::c(prop_total,cum_sum,max_row_id))
 
-  return(out)
+  base::return(out)
 
 
 }

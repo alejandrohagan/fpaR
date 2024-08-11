@@ -22,5 +22,5 @@ tibble
 Total Week to date values
 }
 \examples{
-totalwtd(sales_tbl,date_var = order_date,value_var = quantity)
+totalwtd(fpaR:sales,date_var = order_date,value_var = quantity)
 }

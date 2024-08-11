@@ -30,5 +30,5 @@ thresholds
 }
 \examples{
 
-customer_abc <- abc(contoso,customer_key,dim=margin,a=.7,b=.2,c=.1)
+customer_abc <- abc(fpaR::Sales,customer_key,dim=quantity,a=.7,b=.2,c=.1)
 }

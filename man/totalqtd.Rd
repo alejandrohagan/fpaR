@@ -22,5 +22,5 @@ tibble
 Total quarter to date values
 }
 \examples{
-totaly  td(sales_tbl,date_var = order_date,value_var = quantity)
+totalqtd(fpaR:sales,date_var = order_date,value_var = quantity)
 }

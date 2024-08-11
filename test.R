@@ -7,9 +7,19 @@ devtools::test()
 is.Date()
 sales_tbl <- fpaR::sales
 
-usethis::use_test("time_intelligence")
 
-(.data <- make_aggregation_tbl(sales_tbl,date_var = order_date,value_var = quantity,time_unit = "week"))
+
+
+
+
+
+sales_tbl
+
+(.data <- make_aggregation_tbl(dat,currency_code,date_var = order_date,value_var = quantity,time_unit = "day"))
+
+
+.data |> head(1e4) |> view()
+
 
 sales_tbl |> yoy(date_var = order_date,value_var = quantity,lag_n = 1,time_unit = "year")
 
@@ -24,76 +34,15 @@ sales_tbl |> yoy(date_var = order_date,value_var = quantity,lag_n = 1,time_unit 
     ,year=year(date)
   ) |> view()
 
-
-diff(floor_date(dat$date,"halfyear"))
-
-
-date_check <- function(data,date_var,time_unit){
-
-  ## daily
-  if(sum(diff(.data$date)!=1)==0){
-
-    date_check_vec <- "day"
-
-  }
-
-
-
-  ## month
-  sum(!diff(dat$date) %in% c(29,30,31,28))
-
-
-
-  ## week
-  sum(!diff(dat$date) %in% c(7))
-
-  ## quarter
-  sum(!diff(dat$date) %in% c(90,91,92))
-
-
-
-
-}
-
-?lubridate::floor_date()
-
-
-
-tex <- tibble(
-  x=
-    c(
-      # .57115
-      .5223
-      ,.513)
-  ,y=c(
-    # .4138
-    .4324
-    ,.468)
-) |>
-  mutate(
-    id=row_number()
+dat <- fpaR::sales |>
+  filter(
+    year(order_date)%in%c("2015","2016")
   )
 
-lm(x~id,data=tex) |> broom::tidy()
-
--0.00930 *3+0.532
-
-approx(tex$x,y=tex$y)
-
-
-c(c(.5715-.4138),c(.5223-.4324),c(.513-.468)) |> approx()
-daily
-dod
-wow
-mom
-yoy
-
-dat |> view()
-
-daily_time_intelligence(dat,...,"yoy")
-yoy(dat,date_var = date,value_var = quantity,lag_n = 1,time_unit = "week") |> view()
-wow(dat,date_var = date,value_var = quantity,lag_n = -1)
-mom(dat,date_var = date,value_var = quantity,lag_n = 1) |> view()
+totalytd(dat,currency_code,date_var = order_date,value_var = quantity)
+yoy(dat,currency_code,date_var = order_date,value_var = quantity,lag_n = 1,time_unit = "day")
+wow(dat,date_var = order_date,value_var = quantity,lag_n = 1)
+mom(dat,currency_code,date_var = order_date,value_var = quantity,lag_n = 1) |> view()
 
 
 .data
@@ -114,10 +63,10 @@ dat |>
   ) |> view()
 
 
-totalmtd(sales_tbl,date_var = order_date,value_var = quantity)
-totalytd(dat,date_var = saledate,value_var = qnty)
-totalwtd(dat,date_var = saledate,value_var = qnty)
-totalatd(dat,date_var = saledate,value_var = qnty) |> view()
+totalmtd(dat,date_var = order_date,value_var = quantity)
+totalytd(dat,date_var = order_date,value_var = quantity)
+totalwtd(dat,date_var = order_date,value_var = qquantitynty)
+totalatd(dat,date_var = order_date,value_var = quantity) |> view()
 
 
 dat |>

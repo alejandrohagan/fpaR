@@ -22,5 +22,5 @@ tibble
 Total month to date values
 }
 \examples{
-totalmtd(sales_tbl,date_var = order_date,value_var = quantity)
+totalmtd(fpaR:sales,date_var = order_date,value_var = quantity)
 }

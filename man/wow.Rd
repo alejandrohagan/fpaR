@@ -22,5 +22,5 @@ tibble
 For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
 }
 \examples{
-wow(sales_tbl,date_var = order_date,value_var = quantity)
+wow(fpaR:sales,date_var = order_date,value_var = quantity)
 }

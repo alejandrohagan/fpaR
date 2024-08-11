@@ -119,7 +119,7 @@ make_segmentation <- function(.data,id_col,kmeans_centers_init,kmeans_nstart=100
     )
 
 
-  print("success3")
+  base::print("success3")
   base::cat("\033[93m[1] Success:\033[0m \033[1mKmeans done successfully\033[0m\n")
 
     #plots grid of different centers and tot.withinss
@@ -166,7 +166,10 @@ tbl_kmeans <-   tbl_grid |>
 #
 tbl_segmentation_id <-
   tbl_kmeans |>
-  dplyr::left_join(tbl_umap,by=join_by({{id_col}}=={{id_col}}))
+  dplyr::left_join(
+    tbl_umap
+    ,by=dplyr::join_by({{id_col}}=={{id_col}})
+    )
 
 #
 #   ## plot kmeans clusters and 2 dimensional modeling
@@ -181,7 +184,7 @@ plot_id_segmentation <-
            )+
   ggplot2::geom_point()+
   ggrepel::geom_text_repel(
-    aes(label={{id_col}})
+    ggplot2::aes(label={{id_col}})
     ,max.overlaps=max.overlaps
     ,...
   )

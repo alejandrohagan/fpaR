@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-#' make_aggregation_tbl(fpaR::sales,date,quantity,"day")
+#' make_aggregation_tbl(fpaR::sales,date_var=date,value_var=quantity,time_unit="day")
 make_aggregation_tbl <- function(.data,...,date_var,value_var, time_unit) {
 
 
@@ -42,14 +42,29 @@ make_aggregation_tbl <- function(.data,...,date_var,value_var, time_unit) {
     date = base::seq.Date(from = base::min(summary_tbl$date,na.rm=TRUE), to = base::max(summary_tbl$date,na.rm = TRUE), by = time_unit)
   )
 
+  # create crossing table of groups
+
+  if(!missing(...)){
+
+    calendar_tbl <- dplyr::left_join(
+      summary_tbl |> dplyr::distinct(...) |> dplyr::mutate(id="id")
+      ,calendar_tbl |> dplyr::mutate(id="id")
+      ,by=dplyr::join_by(id)
+      ,relationship = "many-to-many"
+    ) |>
+      dplyr::select(-id)
+
+  }
+
   # Perform a full join to ensure all time frames are represented
   full_tbl <- dplyr::full_join(
     calendar_tbl
     ,summary_tbl
-    ,by = dplyr::join_by(date==date)
+    ,by = dplyr::join_by(date,...)
   ) |>
     dplyr::mutate(
-      dplyr::across(dplyr::where(\(x) base::is.numeric(x)),\(x) tidyr::replace_na(x,0))
+      # dplyr::across(dplyr::where(\(x) base::is.numeric(x)),\(x) tidyr::replace_na(x,0))
+      "{{value_var}}":= dplyr::coalesce({{value_var}}, 0)
     )
 
 
@@ -104,7 +119,7 @@ make_aggregation_tbl <- function(.data,...,date_var,value_var, time_unit) {
 #' @export
 #'
 #' @examples
-#' totaly  td(sales_tbl,date_var = order_date,value_var = quantity)
+#' totalytd(fpaR:sales,date_var = order_date,value_var = quantity)
 totalytd <- function(.data,...,date_var,value_var){
 
   # Validate inputs
@@ -122,7 +137,7 @@ totalytd <- function(.data,...,date_var,value_var){
 
 
   out_tbl <- full_tbl |>
-    dplyr::group_by(year) |>
+    dplyr::group_by(year,...) |>
     dplyr::mutate(
     ytd=base::cumsum({{value_var}})
   ) |>
@@ -145,7 +160,7 @@ totalytd <- function(.data,...,date_var,value_var){
 #' @export
 #'
 #' @examples
-#' totaly  td(sales_tbl,date_var = order_date,value_var = quantity)
+#' totalqtd(fpaR:sales,date_var = order_date,value_var = quantity)
 totalqtd <- function(.data,...,date_var,value_var){
 
   # Validate inputs
@@ -164,7 +179,7 @@ totalqtd <- function(.data,...,date_var,value_var){
 
 
   out_tbl <- full_tbl |>
-    dplyr::group_by(year,quarter) |>
+    dplyr::group_by(year,quarter,...) |>
     dplyr::mutate(
       ytd=base::cumsum({{value_var}})
     ) |>
@@ -188,7 +203,7 @@ totalqtd <- function(.data,...,date_var,value_var){
 #' @export
 #'
 #' @examples
-#' totalmtd(sales_tbl,date_var = order_date,value_var = quantity)
+#' totalmtd(fpaR:sales,date_var = order_date,value_var = quantity)
 totalmtd <- function(.data,...,date_var,value_var){
 
   # Validate inputs
@@ -210,7 +225,7 @@ totalmtd <- function(.data,...,date_var,value_var){
   # Calculate difference and proportional change
 
   out_tbl <- full_tbl |>
-    dplyr::group_by(year,month) |>
+    dplyr::group_by(year,month,...) |>
     dplyr::mutate(
       mtd=base::cumsum({{value_var}})
     ) |>
@@ -232,7 +247,7 @@ totalmtd <- function(.data,...,date_var,value_var){
 #' @export
 #'
 #' @examples
-#' totalwtd(sales_tbl,date_var = order_date,value_var = quantity)
+#' totalwtd(fpaR:sales,date_var = order_date,value_var = quantity)
 totalwtd <- function(.data,...,date_var,value_var){
 
   # Validate inputs
@@ -259,6 +274,7 @@ totalwtd <- function(.data,...,date_var,value_var){
       week
       ,month
       ,year
+      ,...
     ) |>
     dplyr::mutate(
       wtd=base::cumsum({{value_var}})
@@ -281,7 +297,7 @@ totalwtd <- function(.data,...,date_var,value_var){
 #' @export
 #'
 #' @examples
-#' totalatd(sales_tbl,date_var = order_date,value_var = quantity)
+#' totalatd(fpaR:sales,date_var = order_date,value_var = quantity)
 totalatd <- function(.data,...,date_var,value_var){
 
   # Validate inputs
@@ -299,6 +315,7 @@ totalatd <- function(.data,...,date_var,value_var){
   # Calculate difference and proportional change
 
   out_tbl <- full_tbl |>
+    group_by(...) |>
     dplyr::mutate(
       atd=base::cumsum({{value_var}})
     )
@@ -321,7 +338,7 @@ totalatd <- function(.data,...,date_var,value_var){
 #' @export
 #'
 #' @examples
-#' wow(sales_tbl,date_var = order_date,value_var = quantity)
+#' wow(fpaR:sales,date_var = order_date,value_var = quantity)
 wow <- function(.data,...,date_var,value_var,lag_n=1){
 
   # Validate inputs
@@ -338,18 +355,23 @@ wow <- function(.data,...,date_var,value_var,lag_n=1){
   # Calculate difference and proportional change
 
   lag_table <- full_tbl |>
+    dplyr::group_by(...) |>
     dplyr::mutate(
-      date_lag=date %m-% lubridate::weeks(lag_n)
+      date_lag=date %m+% lubridate::weeks(lag_n)
       ,"{{value_var}}_wow":={{value_var}}
     ) |>
-    select(-c(date,{{value_var}}))
+    dplyr::select(-c(date,{{value_var}})) |>
+    dplyr::ungroup()
 
 
-  out_tbl <-  left_join(
+  out_tbl <-  dplyr::left_join(
     full_tbl
     ,lag_table
-    ,by=join_by(date==date_lag)
-  )
+    ,by=dplyr::join_by(date==date_lag,...)
+  ) |>
+    mutate(
+      "{{value_var}}_wow" := dplyr::coalesce(.data[[rlang::englue("{{value_var}}_wow")]],0)
+    )
 
   return(out_tbl)
 
@@ -373,35 +395,43 @@ wow <- function(.data,...,date_var,value_var,lag_n=1){
 #' @export
 #'
 #' @examples
-#' yoy(sales_tbl,date_var = order_date,value_var = quantity)
+#' mom(sales_tbl,date_var = order_date,value_var = quantity)
 mom <- function(.data,...,date_var,value_var,lag_n=1){
 
   # Validate inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
-
   # Aggregate data based on provided time unit
 
+  print("pass assert")
   full_tbl <-  .data |>
     make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day")
 
+  print("pass full_tbl")
   # Determine label for the time unit
 
 
   # Calculate difference and proportional change
 
   lag_table <- full_tbl |>
+    dplyr::group_by(...) |>
     dplyr::mutate(
-      date_lag=date %m-% base::months(lag_n)
+      date_lag=date %m+% base::months(lag_n)
       ,"{{value_var}}_mom":={{value_var}}
     ) |>
-    select(-c(date,{{value_var}}))
+    dplyr::select(-c(date,{{value_var}})) |>
+    dplyr::ungroup()
+
+  print(full_tbl)
 
 
- out_tbl <-  left_join(
+ out_tbl <-  dplyr::left_join(
     full_tbl
     ,lag_table
-    ,by=join_by(date==date_lag)
-  )
+    ,by=dplyr::join_by(date==date_lag,...)
+  ) |>
+   mutate(
+     "{{value_var}}_mom" := dplyr::coalesce(.data[[rlang::englue("{{value_var}}_mom")]],0)
+   )
 
   return(out_tbl)
 
@@ -426,7 +456,7 @@ yoy <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){
 
   # Validate inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
-  assertthat::assert_that(time_unit %in% base::c("day", "quarter","semester","month", "year"), msg = "Time frame must be one of 'day', 'month', or 'year'.")
+  assertthat::assert_that(time_unit %in% base::c("day","quarter","month", "year"), msg = "Time frame must be one of 'day', 'month',;quarter' or 'year'.")
   # Aggregate data based on provided time unit
 
   full_tbl <-  .data |>
@@ -441,7 +471,8 @@ yoy <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){
   multiply_options <- c("day"=1,"month"=12,"quarter"=4,"year"=1)
 
 
-  multiply_vec <- multiply_options[time_unit] |> unname()
+
+  multiply_vec <- multiply_options[time_unit] |> base::unname()
 
 
 
@@ -449,28 +480,39 @@ yoy <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){
 
   # Calculate difference and proportional change
 
+
   lag_tbl <- full_tbl |>
+    dplyr::group_by(...) |>
     dplyr::mutate(
-      date_lag=date %m-% lubridate::years(lag_n)
+      date_lag=date %m+% lubridate::years(lag_n)
       ,"{{value_var}}_yoy":={{value_var}}
     ) |>
-    select(-c({{value_var}}))
+    dplyr::select(-c(date,{{value_var}})) |>
+    dplyr::ungroup()
 
 
-  out_tbl <-  left_join(
+
+  out_tbl <-  dplyr::left_join(
     full_tbl
     ,lag_tbl
-    ,by=join_by(date==date_lag)
-  )
+    ,by=dplyr::join_by(date==date_lag,...)
+  ) |>
+    mutate(
+      "{{value_var}}_yoy" := dplyr::coalesce(.data[[rlang::englue("{{value_var}}_yoy")]],0)
+    )
 
-    return(lag_tbl)
+
+    return(out_tbl)
 
   } else {
 
     out_tbl <-  full_tbl |>
+      group_by(...) |>
       dplyr::mutate(
         "{{value_var}}_yoy":=dplyr::lag({{value_var}},n=(lag_n*multiply_vec))
-      )
+      ) |>
+      dplyr::ungroup()
+
     return(out_tbl)
 
   }

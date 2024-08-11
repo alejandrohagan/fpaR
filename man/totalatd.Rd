@@ -22,5 +22,5 @@ tibble
 Total since inception
 }
 \examples{
-totalatd(sales_tbl,date_var = order_date,value_var = quantity)
+totalatd(fpaR:sales,date_var = order_date,value_var = quantity)
 }

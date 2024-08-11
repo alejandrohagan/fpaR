@@ -21,12 +21,17 @@ abc_graph <- function(.data){
               last_cum_unit_percent=dplyr::last(cum_unit_prop),
               n=dplyr::n(),
               threshold=dplyr::first(dim_threshold)
-    ) |> dplyr::collect()
+    ) |>
+    dplyr::collect()
 
 
   abc_plt <- .data |>
-    ggplot2::ggplot(ggplot2::aes(x=cum_unit_prop,
-               y=cum_prop_total))+
+    ggplot2::ggplot(
+      ggplot2::aes(
+        x=cum_unit_prop
+        ,y=cum_prop_total
+        )
+      )+
     ggplot2::geom_point()+
     ggplot2::geom_line()+
     ggplot2::annotate(geom = "rect",
@@ -45,14 +50,18 @@ abc_graph <- function(.data){
              col="#007e2f")+
     #B dotted line--------------------------------------------------------------------------
 
-  ggplot2::geom_vline(xintercept = abc_coordinates$last_cum_unit_percent[2],
-             linetype="dashed",
-             col="#ffcd12")+
+  ggplot2::geom_vline(
+    xintercept = abc_coordinates$last_cum_unit_percent[2]
+    ,linetype="dashed"
+    ,col="#ffcd12"
+    )+
 
     # C dotted line, I think i take this out???------------------------------------------------------------------------
-  ggplot2::geom_vline(xintercept = abc_coordinates$last_cum_unit_percent[3],
-             linetype="dashed",
-             col="#a40000")+
+  ggplot2::geom_vline(
+    xintercept = abc_coordinates$last_cum_unit_percent[3]
+    ,linetype="dashed"
+    ,col="#a40000"
+    )+
     # A text -----------------------------------------------------------------------------
 
     #format scales---------------------------------------------------------------------------------------------
@@ -67,7 +76,7 @@ abc_graph <- function(.data){
   abc_lst$abc_coordinates <- abc_coordinates
   abc_lst$abc_tbl <- .data
 
-  return(abc_lst)
+  base::return(abc_lst)
 
 
 }

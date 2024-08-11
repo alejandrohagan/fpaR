@@ -37,7 +37,7 @@ temp_data1 <-
 
   object_class_vec <- temp_data1 |> class()
 
-  if(any(stringr::str_detect(object_class_vec,"dbi"))){
+  if(base::any(stringr::str_detect(object_class_vec,"dbi"))){
 
   ## sorts the dataframe
 
@@ -81,8 +81,8 @@ temp_data1 <-
   tempdata_3 <- tempdata_2 |>
     dplyr::mutate(
       row_id=dplyr::row_number()
-      ,prop_n=n/sum(n,na.rm=na.rm)
-      ,cumsum_prop_n=cumsum(prop_n)
+      ,prop_n=n/base::sum(n,na.rm=na.rm)
+      ,cumsum_prop_n=base::cumsum(prop_n)
       ) |>
     dplyr::relocate(row_id)
 

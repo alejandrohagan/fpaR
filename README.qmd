@@ -12,6 +12,19 @@ format: gfm
 -   Clean up consistency of syntax
 -   Fixed make aggregation tbl assertthat formula
 
+## 2024-08-11
+
+-   Cleaned up group by logic in time intelligence functions
+
+## to do list
+
+-   update examples with contoso exmaple
+-   convert time intelligence to sql equivalents
+-   covert lm to sql equivalents
+-   design and create robust unit tests
+-   make 554 calendar date table
+-   create documentation with examples
+
 
 # Introduction to fpaR
 
