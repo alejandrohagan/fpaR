@@ -68,66 +68,12 @@ make_aggregation_tbl <- function(.data,...,date_var,value_var, time_unit) {
     )
 
 
+
   return(full_tbl)
 
 }
 
 
-
-
-make_aggregation_sql <- function(.data,...,date_var,value_var, time_unit){
-
- cols <-  enquos(...)
- group_cols <- deparse(cols)
-
-
-  summary_sql <- glue_sql("
-  WITH summary_tbl AS (
-    SELECT
-      DATE_TRUNC({time_unit}, {`date_var`}) AS date,
-      {`value_var`},
-      {`glue_sql_collapse(group_vars, sep = ', ')`}
-    FROM {`DBI::SQL(.data)`} -- Replace .data with your actual table
-    GROUP BY date, {`glue_sql_collapse(group_vars, sep = ', ')`}
-  ),
-
-  calendar_tbl AS (
-    SELECT
-      generate_series(
-        DATE_TRUNC({time_unit}, MIN(date)),
-        DATE_TRUNC({time_unit}, MAX(date)),
-        INTERVAL '1 {time_unit}'
-      )::DATE AS date
-    FROM summary_tbl
-  ),
-
-  crossing_tbl AS (
-    SELECT
-      calendar_tbl.date,
-      {`glue_sql_collapse(group_vars, sep = ', ')`}
-    FROM
-      calendar_tbl
-      CROSS JOIN (
-        SELECT DISTINCT {`glue_sql_collapse(group_vars, sep = ', ')`}
-        FROM summary_tbl
-      ) AS distinct_groups
-  ),
-
-  full_tbl AS (
-    SELECT
-      crossing_tbl.date,
-      {`glue_sql_collapse(group_vars, sep = ', ')'},
-      COALESCE(summary_tbl.{`value_var`}, 0) AS {`value_var`}
-    FROM
-      crossing_tbl
-      LEFT JOIN summary_tbl
-      ON crossing_tbl.date = summary_tbl.date
-      AND {`paste(glue_sql('{distinct_groups}', .con = DBI::SQL('')), collapse = ' AND ')`}
-  )
-  SELECT * FROM full_tbl
-", .con = DBI::SQL("your_database_connection"))
-
-}
 
 
 

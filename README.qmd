@@ -16,15 +16,21 @@ format: gfm
 
 -   Cleaned up group by logic in time intelligence functions
 
-## to do list
 
+## 2024-08-13
+-   translated make_aggregation_tbl to sql (without group logic)
+-   fixed how to add sub query that contains all previous steps
+## 2024-08-15
+
+## to do list
+-   Figure out how to delay unquoted evaluation so that we can pass args to make aggregtation tbl
+-   replicate time intellitgence functions
 -   update examples with contoso exmaple
--   convert time intelligence to sql equivalents
 -   covert lm to sql equivalents
 -   design and create robust unit tests
 -   make 554 calendar date table
 -   create documentation with examples
-
+-   investigate factor anlaysis
 
 # Introduction to fpaR
 
@@ -145,7 +151,6 @@ tibble::tribble(
   )
 ```
 
-Like-for-like comparison
 
 factor analysis
 

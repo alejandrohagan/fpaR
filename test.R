@@ -5,12 +5,179 @@ devtools::load_all()
 devtools::check()
 devtools::test()
 
+
+## sql converstion of time intelligence function
 drv <- duckdb::duckdb(dbdir="/home/hagan/database.duckdb")
 
-con <- DBI::dbConnect(drv)
-DBI::dbListTables(con)
+con <- DBI::dbConnect(duckdb::duckdb())
 
-diamonds_db <- tbl(con,"mtcars_dbi")
+duckdb::duckdb_register(con,"sales",fpaR::sales)
+
+
+sales_db <- dplyr::tbl(con,sql("select * from sales"))
+
+
+
+make_aggregation_sql <- function(.data,...,date_var,value_var,time_unit){
+
+  time_unit="day"
+  sql_data="sales"
+  value_var="quantity"
+  date_var="order_date"
+  interval_key <- "1 day"
+  group_val <- c("product_key","store_key")
+
+
+no_group_sql <- glue::glue_sql("
+
+-- Recursive CTE to generate a continuous sequence of dates
+WITH RECURSIVE calendar_tbl AS (
+
+    -- Start with the minimum date in the dataset, truncated to the day level
+
+    SELECT MIN(DATE_TRUNC({time_unit}, {`date_var`})) AS date
+    FROM {`sql_data`}
+
+    UNION ALL
+
+    -- Recursively add one day to the current date until the maximum date is reached
+    SELECT DATE_ADD(date, INTERVAL {interval_key})
+    FROM calendar_tbl
+    WHERE date < (SELECT MAX(DATE_TRUNC({time_unit}, {`date_var`})) FROM {`sql_data`})
+  ),
+
+-- Summarize the data by date
+summary_tbl AS (
+    SELECT
+      -- Truncate the date to day level for grouping
+      DATE_TRUNC({time_unit}, {`date_var`}) AS date,
+
+      -- Sum the values for each date
+      SUM({`value_var`}) AS {`value_var`}
+    FROM
+      {`sql_data`}
+    GROUP BY
+      DATE_TRUNC({time_unit}, {`date_var`})
+  )
+
+-- Join the calendar table with the summary table
+SELECT
+  c.date,  -- The continuous date from the calendar table
+  COALESCE(s.{`value_var`}, 0) AS {`value_var`}  -- Use 0 if there's no value for the date
+FROM
+  calendar_tbl c
+LEFT JOIN
+  summary_tbl s
+ON
+  c.date = s.date  -- Join on the date field
+ORDER BY
+  c.date  -- Order the results by date
+", .con = con)
+
+
+
+group_sql <- glue::glue_sql("
+WITH RECURSIVE CALENDAR_TBL AS (
+
+    SELECT
+
+    MIN(DATE_TRUNC({time_unit}, {`date_var`})) AS DATE
+
+    FROM {`sql_data`}
+
+    UNION ALL
+
+    SELECT DATE_ADD(date, INTERVAL {interval_key})
+
+    FROM CALENDAR_TBL
+
+    WHERE
+    TRUE
+    AND DATE < (SELECT MAX(DATE_TRUNC({time_unit}, {`date_var`})) FROM {`sql_data`})
+),
+
+SUMMARY_TBL AS (
+
+     SELECT
+
+     DATE_TRUNC({time_unit}, {`date_var`}) AS DATE
+    ,SUM({`value_var`}) AS {`value_var`}
+    ,{`group_val`*}
+
+    FROM
+
+    {`sql_data`}
+
+    GROUP BY ALL
+)
+
+SELECT
+  c.DATE
+  ,COALESCE(s.{`value_var`}, 0) AS {`value_var`}
+  ,s.{`group_val`*}
+
+  FROM
+  CALENDAR_TBL c
+  LEFT JOIN
+  SUMMARY_TBL s
+  ON
+  c.DATE = s.DATE
+ORDER BY
+  c.date", .con = con)
+
+
+tbl_sql <- glue::glue_sql("
+
+WITH date_series AS (
+    SELECT generate_series('2023-01-01'::DATE, '2023-01-10'::DATE, INTERVAL 1 DAY) AS date_list
+)
+
+SELECT UNNEST(date_list) AS date
+FROM date_series
+", .con = con)
+
+
+
+
+# Assuming `con` is your database connection
+# Create a query using build_sql
+query <- build_sql("SELECT * FROM sales", con = con)
+
+tbl(con,query)
+
+
+
+test <- as.character(dbplyr::remote_table(sales_db))
+
+
+
+dbplyr::remote_query(sales_db |> head())
+
+dbplyr::remote_con(sales_db)
+query <- sql("SELECT * FROM sales")
+
+# Render the SQL statement
+rendered_sql <- sql_render(query, con = con)
+
+# Render the SQL query
+rendered_sql <- sql_render(query, con = con, sql_options = sql_options(cte = TRUE))
+
+# Print the rendered SQL
+print(rendered_sql)
+
+
+dbplyr::as_table_path(con,no_group_sql)
+
+dbplyr::db_sql_render(con,group_sql,sql_options = sql_options(cte = TRUE))
+
+
+}
+
+
+
+
+
+
 
 ## linear modeling
 
@@ -263,6 +430,14 @@ time_unit <- "month"
 .data <- "contoso_fact_sales"
 id_var <- "StoreKey"
 date <- "DateKey"
+
+
+
+
+
+
+
+
 
 
 test_sql <- glue::glue_sql(
