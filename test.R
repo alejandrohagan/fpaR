@@ -6,6 +6,169 @@ devtools::check()
 devtools::test()
 
 
+## summarize dataframe
+sales_tbl <- fpaR::sales |>
+  mutate(
+    month=month(order_date)
+  ) |>
+  group_by(
+    month
+    ,product_key
+  ) |>
+  summarize(
+    quantity=sum(quantity)
+    ,net_price=sum(net_price)
+    ,mean=mean(unit_price)
+    ,.groups="drop"
+  ) |>
+  group_by(month) |>
+  arrange(product_key,.by_group = TRUE) |>
+  ungroup() |>
+  mutate(
+    price_realization=net_price/quantity
+    ,mix=net_price/sum(net_price)
+    # ,quantity_lead=lead(quantity,2517)
+    # ,net_price_lead=lead(quantity,2517)
+    # ,mean_price_lead=lead(mean,2517)
+    # ,price_realization_lead=lead(price_realization,2517)
+    # ,quantity_delta=lead(quantity,2517)-quantity
+    # ,net_price_delta=lead(quantity,2517)-net_price
+    # ,mean_delta=lead(mean,2517)-mean
+    # ,price_realization_delta=lead(price_realization,2517)-price_realization
+  ) |>
+  filter(
+    month %in% c(1,2)
+  )
+
+
+sales_tbl
+
+mod <- lm(net_price_delta~quantity_delta+price_realization_delta-1,sales_tbl |> filter(month==1))
+
+
+sales_wide_tbl <- sales_tbl |>
+  group_split(month) |>
+  map2(
+    .y = c("jan", "feb"),
+    .f = \(.x,.y) {
+      x <- .x  # Assign .x to x for clarity
+      y <- .y  # Assign .y to y for clarity
+
+      x |>
+        rename_with(
+          .fn = ~ glue::glue("{y}_{.x}"),  # Use y and .col explicitly
+          .cols = c(quantity, net_price, mean, price_realization,mix)
+        ) |>
+        select(-month)
+    }
+  ) |>
+  reduce(
+    \(.x,prev){
+      .x |>
+        left_join(
+          prev
+          ,by=join_by(product_key)
+        )
+    }
+  ) |>
+  mutate(
+    quantity_delta=jan_quantity-feb_quantity
+    ,net_price_delta=jan_net_price-feb_net_price
+    ,mean_delta=jan_mean-feb_mean
+    ,pr_delta=jan_price_realization-feb_price_realization
+  )
+
+
+## Methodology 1
+## https://www.fpandaclub.com/handson/becoming-the-master-of-factor-analysis-of-profit-the-secrets-of-calculation
+
+sales_wide_tbl |>
+  mutate(
+    total_vol=sum(feb_quantity,na.rm = TRUE)
+    ,jan_mix=jan_quantity/sum(jan_quantity)
+    ,feb_mix=feb_quantity/sum(feb_quantity)
+    ,vol_reclac=(total_vol*jan_mix)
+    ,vol_effect=(vol_reclac*jan_price_realization)
+    ,vol=vol_effect-jan_net_price
+    ,mix_effect=(feb_quantity*jan_price_realization)
+    ,mix=mix_effect-vol_effect
+    ,price_effect=(feb_price_realization*feb_quantity)
+    ,price=price_effect-mix_effect
+  ) |>
+  relocate(vol,mix,price,pr_delta,total_vol,feb_mix,vol_reclac) |>
+  summarise(
+    vol=sum(vol)
+    ,mix=sum(mix,na.rm=TRUE)
+    ,price=sum(price,na.rm=TRUE)
+    ,total_var=sum(net_price_delta,na.rm = TRUE)
+  ) |>
+  rowwise() |>
+  mutate(
+    total_fct=sum(c_across(c(-vol,-mix,-price)),na.rm = TRUE)
+  )
+
+
+
+factor_tbl <- sales_wide_tbl |>
+  mutate(
+    vol=sum(quantity_delta)*jan_mix*jan_price_realization
+    ,price=pr_delta*feb_quantity
+    ,total_var=vol+price
+  ) |>
+  relocate(
+    vol
+    ,price
+    ,net_price_delta
+    ,total_var
+  ) |>
+  summarise(
+    vol=sum(vol,na.rm=TRUE)
+    ,price=sum(price,na.rm = TRUE)
+    ,net_price=sum(net_price_delta,na.rm = TRUE)
+    ,total_var=sum(total_var,na.rm=TRUE)
+    ,quantity=sum(quantity_delta,na.rm=TRUE)
+  )
+
+
+stats::model.frame()
+
+stats::terms()
+
+test <- stats::terms(out~inside+inner+outter)
+
+
+
+str(test)
+
+## pull in columns
+variables_vec <- attr(test,"variables")
+target_vec <- as.character(variables_vec[[2]])
+
+input_vec <- attr(test,"term.labels")
+
+# extract the data base don columns
+model.frame(formula(mpg~cyl+am+vs),data=mtcars)
+
+
+factor_tbl
+sales_tbl |>
+  lm(net_price~0+quantity+mean,data=_)
+
+
+sales_wide_tbl |>
+  lm(net_price_delta~quantity_delta+jan_price_realization+pr_delta+feb_quantity+product_key-1,data=_) |>
+  # broom::tidy()
+  broom::augment()
+
+
+
+
+
+
+
+
+
+
 ## sql converstion of time intelligence function
 drv <- duckdb::duckdb(dbdir="/home/hagan/database.duckdb")
 
@@ -15,169 +178,6 @@ duckdb::duckdb_register(con,"sales",fpaR::sales)
 
 
 sales_db <- dplyr::tbl(con,sql("select * from sales"))
-
-
-
-make_aggregation_sql <- function(.data,...,date_var,value_var,time_unit){
-
-  time_unit="day"
-  sql_data="sales"
-  value_var="quantity"
-  date_var="order_date"
-  interval_key <- "1 day"
-  group_val <- c("product_key","store_key")
-
-
-no_group_sql <- glue::glue_sql("
-
--- Recursive CTE to generate a continuous sequence of dates
-WITH RECURSIVE calendar_tbl AS (
-
-    -- Start with the minimum date in the dataset, truncated to the day level
-
-    SELECT MIN(DATE_TRUNC({time_unit}, {`date_var`})) AS date
-    FROM {`sql_data`}
-
-    UNION ALL
-
-    -- Recursively add one day to the current date until the maximum date is reached
-    SELECT DATE_ADD(date, INTERVAL {interval_key})
-    FROM calendar_tbl
-    WHERE date < (SELECT MAX(DATE_TRUNC({time_unit}, {`date_var`})) FROM {`sql_data`})
-  ),
-
--- Summarize the data by date
-summary_tbl AS (
-    SELECT
-      -- Truncate the date to day level for grouping
-      DATE_TRUNC({time_unit}, {`date_var`}) AS date,
-
-      -- Sum the values for each date
-      SUM({`value_var`}) AS {`value_var`}
-    FROM
-      {`sql_data`}
-    GROUP BY
-      DATE_TRUNC({time_unit}, {`date_var`})
-  )
-
--- Join the calendar table with the summary table
-SELECT
-  c.date,  -- The continuous date from the calendar table
-  COALESCE(s.{`value_var`}, 0) AS {`value_var`}  -- Use 0 if there's no value for the date
-FROM
-  calendar_tbl c
-LEFT JOIN
-  summary_tbl s
-ON
-  c.date = s.date  -- Join on the date field
-ORDER BY
-  c.date  -- Order the results by date
-", .con = con)
-
-
-
-group_sql <- glue::glue_sql("
-WITH RECURSIVE CALENDAR_TBL AS (
-
-    SELECT
-
-    MIN(DATE_TRUNC({time_unit}, {`date_var`})) AS DATE
-
-    FROM {`sql_data`}
-
-    UNION ALL
-
-    SELECT DATE_ADD(date, INTERVAL {interval_key})
-
-    FROM CALENDAR_TBL
-
-    WHERE
-    TRUE
-    AND DATE < (SELECT MAX(DATE_TRUNC({time_unit}, {`date_var`})) FROM {`sql_data`})
-),
-
-SUMMARY_TBL AS (
-
-     SELECT
-
-     DATE_TRUNC({time_unit}, {`date_var`}) AS DATE
-    ,SUM({`value_var`}) AS {`value_var`}
-    ,{`group_val`*}
-
-    FROM
-
-    {`sql_data`}
-
-    GROUP BY ALL
-)
-
-SELECT
-  c.DATE
-  ,COALESCE(s.{`value_var`}, 0) AS {`value_var`}
-  ,s.{`group_val`*}
-
-  FROM
-  CALENDAR_TBL c
-  LEFT JOIN
-  SUMMARY_TBL s
-  ON
-  c.DATE = s.DATE
-ORDER BY
-  c.date", .con = con)
-
-
-tbl_sql <- glue::glue_sql("
-
-WITH date_series AS (
-    SELECT generate_series('2023-01-01'::DATE, '2023-01-10'::DATE, INTERVAL 1 DAY) AS date_list
-)
-
-SELECT UNNEST(date_list) AS date
-FROM date_series
-", .con = con)
-
-
-
-
-# Assuming `con` is your database connection
-# Create a query using build_sql
-query <- build_sql("SELECT * FROM sales", con = con)
-
-tbl(con,query)
-
-
-
-test <- as.character(dbplyr::remote_table(sales_db))
-
-
-
-dbplyr::remote_query(sales_db |> head())
-
-dbplyr::remote_con(sales_db)
-query <- sql("SELECT * FROM sales")
-
-# Render the SQL statement
-rendered_sql <- sql_render(query, con = con)
-
-# Render the SQL query
-rendered_sql <- sql_render(query, con = con, sql_options = sql_options(cte = TRUE))
-
-# Print the rendered SQL
-print(rendered_sql)
-
-
-dbplyr::as_table_path(con,no_group_sql)
-
-dbplyr::db_sql_render(con,group_sql,sql_options = sql_options(cte = TRUE))
-
-
-}
-
-
-
-
-
-
 
 ## linear modeling
 

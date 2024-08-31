@@ -5,10 +5,7 @@ library(tidyverse)
 
 
 library(DBI)
-diamonds |> colnames()
-con <- DBI::dbConnect(duckdb())
-
-## use this to create tables in your databe -- this will be empty until you insert values into it
+con <- DBI::dbConnect(duckdb::duckdb())
 
 dbExecute(con, "CREATE TABLE items ( cut VARCHAR, x INTEGER, y INTEGER)")
 
@@ -21,9 +18,9 @@ DBI::dbListTables(con)
 ##manually like this -- you can create a statemen that you continous update
 rs <-  dbSendStatement(con, "INSERT INTO items VALUES ('jeans',  1,1), ('hammer', 2,1)")
 
-## or you can use place holder value 
+## or you can use place holder value
 dat <- diamonds |> select(cut,x,y)
-
+library(tidyverse)
 
 
 ## or you can put places holders and insert lists or unnamed datframe to the place holders
@@ -31,7 +28,7 @@ dat <- diamonds |> select(cut,x,y)
 ### this updates the databse but just doesn't reutrn any results
 
 rs <- dbSendStatement(con, "INSERT INTO items (cut,x,y) VALUES (?,?,?)",params=dat |> unname())
-dbSendStatement(con, "INSERT INTO diamonds (carat,cut,color,clarity,depth,\"table\",price,x,y,z) VALUES (?,?,?,?,?,?,?,?,?,?)",params=diamonds |> unname())
+bSendStatement(con, "INSERT INTO diamonds (carat,cut,color,clarity,depth,\"table\",price,x,y,z) VALUES (?,?,?,?,?,?,?,?,?,?)",params=diamonds |> unname())
 
 ## or use a statement placeholder and use dbBind to update
 
@@ -50,9 +47,9 @@ dbGetQuery(con, "SELECT cut,x,y FROM items WHERE y < ? AND cut=?", list(10,'Good
 dbClearResult(rs)
 
 #---- dbFetch is used after dbi query to return the query
-## dbGetRowcount follows dbFetch to get the total rows that were returned 
+## dbGetRowcount follows dbFetch to get the total rows that were returned
 ## dbsendQuery doesn't execute the satement
-rs <- dbSendQuery(con, "SELECT* from diamonds ") 
+rs <- dbSendQuery(con, "SELECT* from diamonds ")
 rs |> dbFetch()
 ## dbFetch returns the returned results
 dbGetRowCount(rs)

@@ -1,75 +1,172 @@
 library(tidyverse)
+devtools::document()
 devtools::load_all()
 
-con <- DBI::dbConnect(duckdb::duckdb())
-
-duckdb::duckdb_register(con,"sales",fpaR::sales)
-
-
-sales_db <- dplyr::tbl(con,sql("select * from sales"))
-#' Validate an input is YYYY-MM-DD format
-#'
-#' @param x date column
-#'
-#' @return logical
-#' @export
-#'
-#' @examples
-#' is_yyyy_mm_dd("2024-01-01")
-is_yyyy_mm_dd <- function(x) {
-  grepl("^\\d{4}-\\d{2}-\\d{2}$", x)
-}
 
 
 
-#' Convert quoted or unquoted input to string
-#'
-#' @param x quoted or unquoted input
-#'
-#' @return string
-#' @export
-#'
-#' @examples
-#' convert_input_to_string(hello)
-convert_input_to_string <- function(x) {
+db <-  create_database_data()
 
 
-  var_quo <- rlang::enquo(x)
-  var_expr <- rlang::quo_get_expr(var_quo)
 
 
-  if (rlang::is_symbolic(var_expr) || rlang::is_call(var_expr)) {
-    out <- as_label(var_expr)
+
+
+
+
+sql1 <- "select * from sales"
+
+sql2 <- "select * from sales_cte limit 1000"
+
+sql3 <- "select customer_key, sum(quantity) as quant from abb group by all"
+
+
+sql_query_select_x <- function(
+    .data,
+    previous_query,
+    select,
+    from,
+    where = NULL,
+    group_by = NULL,
+    having = NULL,
+    window = NULL,
+    order_by = NULL,
+    limit = NULL,
+    distinct = FALSE){
+
+  con <- dbplyr::remote_con(.data)
+  previous_query_sql=dbplyr::remote_query(.data)
+
+
+  if(previous_query){
+
+ out <-  dbplyr::sql_query_select(
+    con=con
+    ,from=dplyr::sql(paste0("(",previous_query_sql,")"))
+    ,where=where
+    ,group_by=group_by
+    ,select = select
+    ,having = having
+    ,window = window
+    ,order_by = order_by
+    ,limit = limit
+    ,distinct = distinct
+  )
+
+ return(out)
+
+  }else{
+
+    out <- dbplyr::sql_query_select(
+      con=con
+      ,from=from
+      ,where=where
+      ,group_by=group_by
+      ,select = select
+      ,having = having
+      ,window = window
+      ,order_by = order_by
+      ,limit = limit
+      ,distinct = distinct
+    )
 
     return(out)
-  } else {
-    out <- x
 
-    return(out)
   }
+}
 
+
+first_sql <- sql_query_select_x(
+  sales_db
+  ,previous_query = TRUE
+  ,select=sql("sum(quantity) as quantity,customer_key")
+  ,group_by=sql("ALL")
+  )
+
+
+second_sql <- sql_query_select_x(
+  sales_db
+  ,previous_query = TRUE
+  ,select=sql("mean(net_price) as mean_price, customer_key")
+  ,group_by=sql("ALL")
+)
+
+
+third_sql <- sql_query_select_x(
+  sales_db
+  ,previous_query = TRUE
+  ,select=sql("mean(unit_cost) as mean_cost, customer_key")
+  ,group_by=sql("ALL")
+)
+
+
+
+cte <- function(con,...){
+
+  vars_quos <- rlang::enquos(...)
+
+  vars_exprs <- lapply(vars_quos, rlang::eval_tidy)
+
+  print(vars_exprs)
+
+
+  # Combine the queries into a single SQL statement
+  combined_query <- paste(vars_exprs, collapse = " ",sep = "\n")
+  print(combined_query)
+
+  # Execute the combined query
+  out <- dplyr::tbl(con, dplyr::sql(combined_query))
+  cat(combined_query)
+  return(out)
 }
 
 
 
-#' Capture dot arguments and turn into strings
-#'
-#' @param ... dot args
-#'
-#' @return strings
-#' @export
-#'
-#' @examples
-#' convert_dots_to_string(hello,how,are,you)
-convert_dots_to_string <- function(...){
 
-  args <- rlang::enquos(...)
 
-  group_var <- map_chr(args,\(x) convert_input_to_string({{x}}))
+with(
+  query=
+    "select * from {previous_query}"
+)
 
-  return(group_var)
 
-}
+
+cte(
+  con=con
+  ,with(
+    query = first_sql
+    ,query_name = quant
+    ,order = "first")
+  ,with(query = second_sql,query_name = price,order = "middle")
+  ,with(query = third_sql,query_name = cost,order = "last")
+  ,sql("
+       select
+       q.customer_key
+       ,q.quantity
+       ,p.mean_price
+
+       from quant q
+       left join price p on
+
+       q.customer_key=p.customer_key
+
+       ")
+)
+
+
+
+tbl(con,test_sql)
+
+dbplyr::remote_query(sales_db)
+
+db1 <- DBI::dbConnect(duckdb::duckdb())
+f <- tempfile("mtcars", fileext = ".csv")
+write.csv(mtcars, f)
+
+library(tidyverse)
+
+usethis::use_r("utils-misc")
+
 
 #' Create a calendar table in sql (standalone or part of CTE)
 #'
