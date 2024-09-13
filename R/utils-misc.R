@@ -29,10 +29,13 @@ convert_input_to_string <- function(x) {
   var_expr <- rlang::quo_get_expr(var_quo)
 
 
-  if (rlang::is_symbolic(var_expr) || rlang::is_call(var_expr)) {
+
+    if (rlang::is_symbolic(var_expr) || rlang::is_call(var_expr)) {
+
     out <- as_label(var_expr)
 
     return(out)
+
   } else {
     out <- x
 

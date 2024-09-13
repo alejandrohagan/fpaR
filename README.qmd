@@ -23,8 +23,47 @@ format: gfm
 ## 2024-08-15
 -   fixed with and cte functions to build queries quicker
 
+## 2024-08-31
+-   I figured out template for factor analysis -- now i just need to figure out methodology and modeling approach
+-   will use formula approach (target~factor1+factor2+factor3+...)
+-   do pop calculations first with ti functions
+-   then sequence the attribution
+-   documented two methodologies for calculating sales price mix
 
+
+## 2024-09-01
+-   updated formula calls and structure of methodology -- period + agg args
+-   established possible framework to execute 
+
+
+## 2024-09-07
+
+-   Finished with() and cte() helper functions for time intelligence conversions
+-   pushed sql helper function to package
+    
+    -   sql_query_select
+    -   date_seq_sql
+    -   capture_original_query
+    -   with()
+    -   cte()
+- started rewriting queries to take advantage of new sql helper functions
+- create first draft of make_aggregation_tbl in sql -- need to work through groups version
+    
+    -   Error in referencing the column names (coming in quoted) 
+    
+## 2024-09-10
+
+-   figured out quoting issue and it can be solved with DBI::Id("test", "species")
+
+## 2024-09-11
+-   fiture out how to do unique groups issue, so just need to optimize for multiple groups and clean up
+-   Then can move to other time intelligence functions
+    
 ## to do list
+
+-   New Products introduced within the period
+-   Discontinued Products within the period
+-   Discounts and Returns for products that result in zero or negative revenue over a period
 -   Figure out how to delay unquoted evaluation so that we can pass args to make aggregation tbl
 -   replicate time intelligence functions
 -   update examples with contoso example
@@ -32,43 +71,44 @@ format: gfm
 -   design and create robust unit tests
 -   make 554 calendar date table
 -   create documentation with examples
--   investigate factor analysis
 
 # Introduction to fpaR
 
-This is a collection of business intelligence tools and patterns to help with common data queries and insights. This is based on numerous blogs, books, post and work experience in what I have seen as most frequent analysis /work effort
+This is a collection of business intelligence tools and patterns to help with common data queries and insights. This is based on numerous blogs, books, post and work experience in what I have seen as most frequent analysis /work effort.
+
 
 The package functions can be split between three focus areas:
 
-1)  Segmentation strategies
+-   Segmentation strategies
 
     -   UMAP
     -   Kmeans
     -   ABC
     -   New vs. Returning Customers/ Vendors
     
-2)  Time intelligence functions
+-  Time intelligence functions
 
     -   List of standard time intelligence functions such as month-to-date, year over year for standard and non-standard calendars
     -   See table before complete list
     -   Non-standard calendar such a 5-5-4 calendar
 
-3)  Variance analysis strategies
+- DAX Equivalents
 
     -   Applied statsitical techniques to underestand variance analysis including graphing techniques
-        -   quantile regression
-        -   anova
     -   Like for like comparison
-    - Something like a mix between marginalmeans, anova, lm and rq 
-        -   You calculate certain components such as price, customer turnover, high margin vs. low margin segmentations
-        -   Then do a quantile regression on the parts to see how there is difference between high margin and low margin indicators
-        -   ideally we then have our factors and we can simply take the coefficients and see directly the components that is driving changes
-            -   so we start at customer level, store level and product level attributes and other componets that when muliplied and added get what you are calcualted
-            -price X vol =rev
-            -avg.price X product mix
-            -vol =product mix X quantity
+        -   You calculate certain components such as price, customer turnover, high margin vs. jkdjklow margin segmentations
+        
+-   Factor / Variation analysis
+  
+    -   price, quantity, mix factor analysis with variations
+
+
+
+The package is designed to work with regular tibble data and database by translating the functions to their sql variation
+
 
 ## Installation
+
 
 You can install the development version of fpaR from [GitHub](https://github.com/alejandrohagan/fpaR) with:
 
@@ -93,8 +133,9 @@ This package is heavily inspired by the DAX Patterns for the time intelligence f
 **Segmentation helpers:**
 
 -   **make_segmentation()** will use kmeans and umap to create a segmentation
--   **abc_segmentation()**
--   Turnover customers
+-   **make_cohort_tbl()** will segment your data into cohorts based on their first transaction date
+-   **abc()** will create a three category segmentation ('A','B','C') based on the cut points that are submitted
+-   **abc_graph()** will plot your `abc()` segmentation 
 
 **Calculation Helpers**
 
@@ -104,7 +145,6 @@ This package is heavily inspired by the DAX Patterns for the time intelligence f
 
 -   **divide** will give an default  NA or alternative  to dividing by zero that isn't `Inf` (model after [DAX divide](https://learn.microsoft.com/en-us/dax/divide-function-dax))
 
--   Calculate() model after DAX calculate, basically a supercharged sumif that allows you to filter data with or with any filter context
 
 **Time Intelligence Functions**
 
@@ -116,13 +156,24 @@ This package is heavily inspired by the DAX Patterns for the time intelligence f
     -   These are calendars that maybe more common in the retail business (Eg. 5-4-5 quarter calcualtion)
     -   These calendars aim to control for weekends as that may be larger driver of sales
 
+Time intelligence functions aren't always as straight forward as you want them to be as you may have missing dates from previous comparison periods.
+
+The function basically ensures you have a complete date field and then does common time intelligence functions against the augmented data
+
+
+
+
+
+
+
+
 **Variation Analysis**
 
 -   variance / factor analysis
 
 **Practice Datasets**
 
--   Microsoft's Contoso Dataset to help with practice with transaction data
+-   Microsoft's Contoso Dataset to help with practice with transaction data in both tibble and duckdb data
 
 
 ```{r}
@@ -154,7 +205,6 @@ tibble::tribble(
 ```
 
 
-factor analysis
 
 
 

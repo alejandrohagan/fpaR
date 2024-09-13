@@ -19,7 +19,6 @@ create_date_sql <- function(.data,start_date,end_date){
   ##---- assign variables
 
 
-
   start_date_vec <-  base::substitute(start_date)
 
   end_date_vec <- base::substitute(end_date)
