@@ -73,9 +73,239 @@ make_aggregation_tbl <- function(.data,...,date_var,value_var, time_unit) {
 
 }
 
+#' Aggregate and expand date table
+#'
+#' @param .data tibble
+#' @param ... dimensions to group by
+#' @param date_var dimension with main date column
+#' @param value_var dimension with values to aggregate by
+#' @param time_unit which time unit to aggregate to
+
+
+#' Aggregate and expand date table
+#'
+#' @param .data dbi object
+#' @param ... dimensions to group by
+#' @param date_var dimension with main date column
+#' @param value_var dimension with values to aggregate by
+#' @param time_unit which time unit to aggregate to
+#'
+#' @return list of dbi and sql object
+#' @export
+#'
+#' @examples
+make_aggregation_dbi <- function(.data, ..., date_var, value_var, time_unit){
+
+  ## create inputs----------
+  original_query <- fpaR::capture_original_query(.data)
+
+  min_date <- .data |>
+    dplyr::summarize(
+      min = min({{ date_var }}, na.rm = TRUE)
+    ) |>
+    dplyr::pull(min)
+
+  max_date <- .data |>
+    dplyr::summarize(
+      max = max({{ date_var }}, na.rm = TRUE)
+    ) |>
+    dplyr::pull(max)
+
+  date_var     <- fpaR::convert_input_to_string({{ date_var }})
+  value_var    <- fpaR::convert_input_to_string({{ value_var }})
+  time_unit    <- fpaR::convert_input_to_string({{ time_unit }})
+  interval_key <- base::paste("1", time_unit)
+  con          <- dbplyr::remote_con(.data)
+
+  # Create conditional variables-----------------
+
+  if(!missing(...)){
 
 
 
+    # declare vars
+    group_var              <- fpaR::convert_dots_to_string(...)
+
+
+    summary_group_var      <- paste0("SUMMARY_TBL.",group_var)
+    unique_group_var       <- paste0("UNIQUE_GROUPS.",group_var)
+    cross_joined_group_var <- paste0("CROSS_JOINED.",group_var)
+
+    if(length(group_var)>1){
+
+    summary_group_id       <- purrr::map(group_var,\(x) DBI::Id("SUMMARY_TBL"  ,x))
+    unique_group_id        <- purrr::map(group_var,\(x) DBI::Id("UNIQUE_GROUPS",x))
+    cross_joined_group_id  <- purrr::map(group_var,\(x) DBI::Id("CROSS_JOINED" ,x))
+
+    }else{
+
+      summary_group_id       <- DBI::Id("SUMMARY_TBL"  ,group_var)
+      unique_group_id        <- DBI::Id("UNIQUE_GROUPS",group_var)
+      cross_joined_group_id  <- DBI::Id("CROSS_JOINED" ,group_var)
+
+
+    }
+    #create join sql queries
+
+
+    initial_join_sql <- glue::glue_sql(
+      "LEFT JOIN
+    SUMMARY_TBL
+    ON
+    CROSS_JOINED.date = SUMMARY_TBL.date"
+    ,.con=con)
+
+
+    if(length(group_var)>1){
+
+
+    cross_joined_group_id <- purrr::map(group_var,\(x) DBI::Id("CROSS_JOINED" ,x))
+    summary_group_id      <- purrr::map(group_var,\(x) DBI::Id("SUMMARY_TBL"  ,x))
+    join_group_var        <- glue::glue_sql("AND {`cross_joined_group_id`}={`summary_group_id`}",.con=con)
+    join_group_sql        <- dplyr::sql(base::paste0(join_group_var) |> stringr::str_flatten(collapse = " "))
+
+    }else{
+
+    cross_joined_group_id <- DBI::Id("CROSS_JOINED" ,group_var)
+    summary_group_id      <- DBI::Id("SUMMARY_TBL"  ,group_var)
+    join_group_sql        <- glue::glue_sql("AND {`cross_joined_group_id`}={`summary_group_id`}",.con=con)
+    }
+  }
+
+  ## create calendar---------------
+
+  calendar_sql <- fpaR::seq_date_sql(start_date = {{min_date}},end_date = {{max_date}},time_unit = {{time_unit}},con = con,cte=TRUE)$sql
+
+  ## no group summary table-------
+
+  no_group_summary_sql <-
+    fpaR::with(
+      query=fpaR::sql_query_select(
+        select = glue::glue_sql("
+                       DATE_TRUNC({time_unit}, {`date_var`})::DATE AS date
+                       ,SUM({`value_var`}) AS {`value_var`}",.con=con)
+        ,group_by=dplyr::sql("ALL")
+        ,previous_query = TRUE
+        ,.data = .data
+      )$sql
+      ,query_name=summary_tbl
+      ,order="last"
+
+    )
+
+
+  no_group_collect_sql <-
+    glue::glue_sql("
+  SELECT
+  CALENDAR_TBL.date
+  ,COALESCE(SUMMARY_TBL.{`value_var`}, 0) AS {`value_var`}
+
+  FROM
+  CALENDAR_TBL
+
+  LEFT JOIN
+  SUMMARY_TBL ON
+
+  CALENDAR_TBL.date = SUMMARY_TBL.date
+
+  ORDER BY
+  SUMMARY_TBL.date",.con = con)
+
+
+  ## group summary table--------
+
+  if(!missing(...)){
+
+    print("step1")
+
+    group_summary_sql <- fpaR::with(
+
+      query=
+        fpaR::sql_query_select(
+
+          select = glue::glue_sql("
+                       DATE_TRUNC({time_unit}, {`date_var`})::DATE AS date
+                       ,SUM({`value_var`}) AS {`value_var`}
+                      ,{`group_var`*}",.con=con)
+
+          ,group_by=dplyr::sql("ALL")
+          ,previous_query = TRUE
+          ,.data = .data
+        )$sql
+      ,query_name=SUMMARY_TBL
+      ,order="middle"
+    )
+
+    print("step2")
+
+
+    unique_groups_sql <- fpaR::with(
+      query=glue_sql("
+        SELECT DISTINCT {`summary_group_id`*}
+        FROM SUMMARY_TBL",.con=con)
+      ,query_name=UNIQUE_GROUPS
+      ,order = "middle"
+    )
+
+    print("step3")
+
+    cross_join_sql <- fpaR::with(
+      query=
+        glue_sql("
+    SELECT
+    CALENDAR_TBL.date,
+    {`unique_group_id`*}
+
+    FROM
+    CALENDAR_TBL
+    CROSS JOIN
+    UNIQUE_GROUPS",.con=con)
+    ,query_name=CROSS_JOINED
+    ,order = "last"
+    )
+    print("step5")
+
+    group_collect_sql <-
+      glue::glue_sql("
+    SELECT
+    CROSS_JOINED.date,
+    {`cross_joined_group_id`*},
+    COALESCE(SUMMARY_TBL.{`value_var`}, 0) AS {`value_var`}
+
+    FROM
+    CROSS_JOINED",.con = con)
+  }
+
+  ## return logic---------------
+
+  if (missing(...)) {
+
+    no_group_cte <- fpaR::cte(
+      con = con
+      ,calendar_sql
+      ,no_group_summary_sql
+      ,no_group_collect_sql
+    )
+
+    return(no_group_cte)
+
+  } else {
+
+    print("step6")
+
+    group_cte <- cte(
+      con=con
+      ,calendar_sql
+      ,group_summary_sql
+      ,unique_groups_sql
+      ,cross_join_sql
+      ,group_collect_sql
+      ,initial_join_sql
+      ,join_group_sql
+    )
+    return(group_cte)
+  }
+}
 
 
 

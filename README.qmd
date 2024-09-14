@@ -56,8 +56,13 @@ format: gfm
 -   figured out quoting issue and it can be solved with DBI::Id("test", "species")
 
 ## 2024-09-11
--   fiture out how to do unique groups issue, so just need to optimize for multiple groups and clean up
+-   Figure out how to do unique groups issue, so just need to optimize for multiple groups and clean up
 -   Then can move to other time intelligence functions
+
+2024-09-14
+
+-  solved multiple group issue (finally!) need to clean up and layer it to R package and document / clean up 
+- need add logic for one group var vs. multiple group var
     
 ## to do list
 
