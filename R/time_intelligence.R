@@ -216,7 +216,6 @@ make_aggregation_dbi <- function(.data, ..., date_var, value_var, time_unit){
 
   if(!missing(...)){
 
-    print("step1")
 
     group_summary_sql <- fpaR::with(
 
@@ -236,7 +235,6 @@ make_aggregation_dbi <- function(.data, ..., date_var, value_var, time_unit){
       ,order="middle"
     )
 
-    print("step2")
 
 
     unique_groups_sql <- fpaR::with(
@@ -247,7 +245,6 @@ make_aggregation_dbi <- function(.data, ..., date_var, value_var, time_unit){
       ,order = "middle"
     )
 
-    print("step3")
 
     cross_join_sql <- fpaR::with(
       query=
@@ -263,7 +260,6 @@ make_aggregation_dbi <- function(.data, ..., date_var, value_var, time_unit){
     ,query_name=CROSS_JOINED
     ,order = "last"
     )
-    print("step5")
 
     group_collect_sql <-
       glue::glue_sql("
@@ -291,7 +287,6 @@ make_aggregation_dbi <- function(.data, ..., date_var, value_var, time_unit){
 
   } else {
 
-    print("step6")
 
     group_cte <- cte(
       con=con
@@ -386,6 +381,45 @@ totalytd <- function(.data,...,date_var,value_var){
 
 }
 
+#' Total year to date values
+#'
+#' @param .data tibble of values
+#' @param ... optional columns to group by
+#' @param date_var column with date var to aggregate by
+#' @param value_var column with value to aggregate
+#'
+#' @return dbi object
+#' @export
+#'
+#' @examples
+#' totalytd(fpaR:sales,date_var = order_date,value_var = quantity)
+totalytd_dbi <- function(.data,...,date_var,value_var){
+
+  # Validate inputs
+  assertthat::assert_that(
+    any(class(.data) %in% c("tbl_dbi"))
+    , msg = "data must be a DBI"
+  )
+
+  # Aggregate data based on provided time unit
+  full_dbi <- .data |>
+    make_aggregation_dbi(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+    pluck("dbi") |>
+    dplyr::mutate(
+      year=lubridate::year(date)
+    )
+
+
+  out_dbi <- full_dbi |>
+    dbplyr::window_order(year,...) |>
+    dplyr::mutate(
+      ytd=base::cumsum({{value_var}})
+    ) |>
+    dplyr::ungroup()
+
+  return(out_dbi)
+
+}
 
 
 #' Total quarter to date values
@@ -420,7 +454,7 @@ totalqtd <- function(.data,...,date_var,value_var){
   out_tbl <- full_tbl |>
     dplyr::group_by(year,quarter,...) |>
     dplyr::mutate(
-      ytd=base::cumsum({{value_var}})
+      qtd=base::cumsum({{value_var}})
     ) |>
     dplyr::ungroup()
 
@@ -428,6 +462,45 @@ totalqtd <- function(.data,...,date_var,value_var){
 
 }
 
+#' Total quarter to date values
+#'
+#' @param .data tibble of values
+#' @param ... optional columns to group by
+#' @param date_var column with date var to aggregate by
+#' @param value_var column with value to aggregate
+#'
+#' @return
+#' @export
+#'
+#' @examples
+totalqtd_dbi <- function(.data,...,date_var,value_var){
+
+  # Validate inputs
+  assertthat::assert_that(
+    any(class(.data) %in% c("tbl_dbi"))
+    , msg = "data must be a DBI"
+  )
+
+  # Aggregate data based on provided time unit
+  full_dbi <- .data |>
+    make_aggregation_dbi(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+    pluck("dbi") |>
+    dplyr::mutate(
+      year=lubridate::year(date)
+      ,quarter=lubridate::quarter(date)
+    )
+
+
+  out_dbi <- full_dbi |>
+    dbplyr::window_order(year,quarter,...) |>
+    dplyr::mutate(
+      qtd=base::cumsum({{value_var}})
+    ) |>
+    dplyr::ungroup()
+
+  return(out_dbi)
+
+}
 
 
 
@@ -456,7 +529,8 @@ totalmtd <- function(.data,...,date_var,value_var){
       month=lubridate::month(date)
       ,year=lubridate::year(date)
       ,.before=1
-    )
+    ) |>
+    arrnage(date)
 
   # Determine label for the time unit
 
@@ -471,6 +545,48 @@ totalmtd <- function(.data,...,date_var,value_var){
     dplyr::ungroup()
 
   return(out_tbl)
+
+}
+
+#' Total month to date values
+#'
+#' @param .data tibble of values
+#' @param ... optional columns to group by
+#' @param date_var column with date var to aggregate by
+#' @param value_var column with value to aggregate
+#'
+#' @return
+#' @export
+#'
+#' @examples
+totalmtd_dbi <- function(.data,...,date_var,value_var){
+
+  # Validate inputs
+  assertthat::assert_that(
+    any(class(.data) %in% c("tbl_dbi"))
+    , msg = "data must be a DBI"
+  )
+
+  # Aggregate data based on provided time unit
+  full_dbi <- .data |>
+    make_aggregation_dbi(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+    pluck("dbi") |>
+    dplyr::mutate(
+      year=lubridate::year(date)
+      ,month=lubridate::month(date)
+    )
+
+  print("full_dbi completed")
+
+
+  out_dbi <- full_dbi |>
+    dbplyr::window_order(year,month,...) |>
+    dplyr::mutate(
+      mtd=base::cumsum({{value_var}})
+    ) |>
+    dplyr::ungroup()
+
+  return(out_dbi)
 
 }
 
@@ -509,18 +625,54 @@ totalwtd <- function(.data,...,date_var,value_var){
   # Calculate difference and proportional change
 
   out_tbl <- full_tbl |>
-    dplyr::group_by(
-      week
-      ,month
-      ,year
-      ,...
-    ) |>
+    dplyr::group_by(week,month,year,... ) |>
     dplyr::mutate(
       wtd=base::cumsum({{value_var}})
     ) |>
     dplyr::ungroup()
 
   return(out_tbl)
+
+}
+
+#' Total week to date values
+#'
+#' @param .data tibble of values
+#' @param ... optional columns to group by
+#' @param date_var column with date var to aggregate by
+#' @param value_var column with value to aggregate
+#'
+#' @return
+#' @export
+#'
+#' @examples
+totalwtd_dbi <- function(.data,...,date_var,value_var){
+
+  # Validate inputs
+  assertthat::assert_that(
+    any(class(.data) %in% c("tbl_dbi"))
+    , msg = "data must be a DBI"
+  )
+
+  # Aggregate data based on provided time unit
+  full_dbi <- .data |>
+    make_aggregation_dbi(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+    pluck("dbi") |>
+    dplyr::mutate(
+      year=lubridate::year(date)
+      ,month=lubridate::month(date)
+      ,week=sql("EXTRACT(WEEK FROM date)")
+    )
+
+
+  out_dbi <- full_dbi |>
+    dbplyr::window_order(year,month,week,...) |>
+    dplyr::mutate(
+      wtd=base::cumsum({{value_var}})
+    ) |>
+    dplyr::ungroup()
+
+  return(out_dbi)
 
 }
 
@@ -562,6 +714,45 @@ totalatd <- function(.data,...,date_var,value_var){
   return(out_tbl)
 
 }
+
+#' Total since inception
+#'
+#' @param .data tibble of values
+#' @param ... optional columns to group by
+#' @param date_var column with date var to aggregate by
+#' @param value_var column with value to aggregate
+#'
+#' @return
+#' @export
+#'
+#' @examples
+totalatd_dbi <- function(.data,...,date_var,value_var){
+
+  # Validate inputs
+  assertthat::assert_that(
+    any(class(.data) %in% c("tbl_dbi"))
+    , msg = "data must be a DBI"
+  )
+
+  # Aggregate data based on provided time unit
+  full_dbi <- .data |>
+    make_aggregation_dbi(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+    pluck("dbi") |>
+    dplyr::arrange(date)
+
+
+  out_dbi <- full_dbi |>
+    dbplyr::window_order(...) |>
+    dplyr::mutate(
+      atd=base::cumsum({{value_var}})
+    ) |>
+    dplyr::ungroup()
+
+  return(out_dbi)
+
+}
+
+
 
 
 #' Week over week values
