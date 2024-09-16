@@ -11,54 +11,79 @@ sales_db <- db$sales
 
 con <- dbplyr::remote_con(sales_db)
 
-.data <- sales_db
+.data <- sales_db |>
+  filter(
+    year(order_date)<=2016
+  )
 
-totalatd_dbi(sales_db,date_var=order_date,value_var=quantity)
-
-totalatd(sales,date_var=order_date,value_var=quantity)
-
-full_dbi <- sales_db |>
-  filter(year(order_date) %in% c("2015","2016")) |>
-  make_aggregation_dbi(customer_key,date_var=order_date,value_var=quantity,time_unit="day") |>
-  pluck("dbi")
+dbi_tbl <- make_aggregation_dbi(.data,customer_key,date_var=order_date,value_var =quantity,time_unit="day") |> pluck("dbi")
+df_tbl <- make_aggregation_tbl(sales |> filter(year(order_date)<=2016),customer_key,date_var=order_date,value_var =quantity,time_unit="day")
 
 
-value_var <- "quantity"
+totalytd_dbi(.data,customer_key,date_var=order_date,value_var=quantity) |>
+  filter(
+  customer_key=="210071"
+  # customer_key=="1979682"
+) |> view()
+  group_by(customer_key,year) |>
+  summarise(
+    max=max(ytd)
+    ,sum=sum(ytd)
+  )
+
+
+full_dbi <- dbi_tbl |>
+dplyr::mutate(
+  year=lubridate::year(date)
+  ,.before = 1
+)
+
 
 full_dbi |>
+  dbplyr::window_order(customer_key,date) |>
+  arrange(customer_key,date) |>
   dplyr::mutate(
-    date_lag=dplyr::sql("date + INTERVAL 1 WEEK")
-    ,"{{noquote(value_var)}}_wow":=quantity
-  )
-  dplyr::select(-c(date,{{value_var}})) |>
+    ytd=base::cumsum(quantity)
+  ) |>
+
   dplyr::ungroup()
 
 
-out_tbl <-  dplyr::left_join(
-  full_tbl
-  ,lag_table
-  ,by=dplyr::join_by(date==date_lag,...)
+all.equal(dbi_tbl,df_tbl)
+
+
+full_join(
+  dbi_tbl
+  ,df_tbl
+  ,by=join_by(date,customer_key)
 ) |>
+  group_by(
+    customer_key
+  ) |>
+  summarise(
+    dbi=sum(quantity.x)
+    ,df=sum(quantity.y)
+    ,n=n()
+    ,.groups = "drop"
+  ) |>
   mutate(
-    "{{value_var}}_wow" := dplyr::coalesce(.data[[rlang::englue("{{value_var}}_wow")]],0)
+    delta=dbi-df
+  ) |>
+  summarise(
+    sum_delta=sum(delta)
   )
-  ) |>
-  dplyr::ungroup()
+  # filter(customer_key=="2")
 
-
-
-cout |>
-  pluck("dbi") |>
-  dplyr::mutate(
-    year=lubridate::year(date)
-    ,month=lubridate::quarter(date)
-  ) |>
-  dbplyr::window_order(year,month) |>
-  dplyr::mutate(
-    mtd=base::cumsum(quantity)
-  ) |>
-  dplyr::ungroup()
-
-
+  count(customer_key,wt="quantity.x")
+totalytd_dbi(.data,customer_key,date_var=order_date,value_var=quantity)
+totalatd_dbi(.data,customer_key,date_var=order_date,value_var=quantity)
+totalmtd_dbi(.data,customer_key,date_var=order_date,value_var=quantity)
+totalqtd_dbi(.data,customer_key,date_var=order_date,value_var=quantity) |>
+  group_by(customer_key,quarter,year) |>
+  summarise(
+    qtd=max(qtd)
+    ,sum=sum(quantity)
+  ) |> view()
+totalwtd_dbi(.data,customer_key,date_var=order_date,value_var=quantity)
 
 

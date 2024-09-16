@@ -65,7 +65,10 @@ format: gfm
 -   solved  logic for one group var vs. multiple group var
 -   created dbi equivalents all w,m,y,a todate functions
 -   remaining functions are wow,mom, and yoy
-    
+
+2024-09-15
+- cleaned up window_order / group_by for dbi *td expressions
+
 ## to do list
 
 -   replicate time intelligence functions

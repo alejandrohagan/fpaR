@@ -372,6 +372,7 @@ totalytd <- function(.data,...,date_var,value_var){
 
   out_tbl <- full_tbl |>
     dplyr::group_by(year,...) |>
+    dplyr::arrange(date,.by_group = TRUE) |>
     dplyr::mutate(
     ytd=base::cumsum({{value_var}})
   ) |>
@@ -411,7 +412,8 @@ totalytd_dbi <- function(.data,...,date_var,value_var){
 
 
   out_dbi <- full_dbi |>
-    dbplyr::window_order(year,...) |>
+    dplyr::group_by(...,year) |>
+    dbplyr::window_order(date) |>
     dplyr::mutate(
       ytd=base::cumsum({{value_var}})
     ) |>
@@ -492,7 +494,8 @@ totalqtd_dbi <- function(.data,...,date_var,value_var){
 
 
   out_dbi <- full_dbi |>
-    dbplyr::window_order(year,quarter,...) |>
+    dplyr::group_by(year,quarter,...) |>
+    dbplyr::window_order(date) |>
     dplyr::mutate(
       qtd=base::cumsum({{value_var}})
     ) |>
@@ -576,11 +579,11 @@ totalmtd_dbi <- function(.data,...,date_var,value_var){
       ,month=lubridate::month(date)
     )
 
-  print("full_dbi completed")
 
 
   out_dbi <- full_dbi |>
-    dbplyr::window_order(year,month,...) |>
+    dplyr::group_by(year,month,...) |>
+    dbplyr::window_order(date) |>
     dplyr::mutate(
       mtd=base::cumsum({{value_var}})
     ) |>
@@ -666,7 +669,8 @@ totalwtd_dbi <- function(.data,...,date_var,value_var){
 
 
   out_dbi <- full_dbi |>
-    dbplyr::window_order(year,month,week,...) |>
+    dplyr::group_by(year,month,week,...) |>
+    dbplyr::window_order(date) |>
     dplyr::mutate(
       wtd=base::cumsum({{value_var}})
     ) |>
@@ -742,7 +746,8 @@ totalatd_dbi <- function(.data,...,date_var,value_var){
 
 
   out_dbi <- full_dbi |>
-    dbplyr::window_order(...) |>
+    dplyr::group_by(...) |>
+    dbplyr::window_order(date) |>
     dplyr::mutate(
       atd=base::cumsum({{value_var}})
     ) |>
