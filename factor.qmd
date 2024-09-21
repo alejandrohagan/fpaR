@@ -1,0 +1,287 @@
+---
+title: "factors"
+format: html
+---
+
+## factor documentation
+
+time units:
+
+-   pp   = prior period
+-   cp   = current period
+-   diff = difference between pp and cp
+
+aggregate dimensions
+-   sum  = sum the the value_var  
+-   mean = take the simple row level average of the the value_var  
+-   row  = keep the row level granularity without aggregating
+-   wtdavg  = take the wtd. average of the value_var
+
+
+
+```{r}
+
+library(tidyverse)
+devtools::load_all()
+
+db <- fpaR::create_contonso_duckdb()
+
+sales_db <- db$sales
+
+sales_tbl <- 
+  fpaR::sales |>
+  mutate(
+    month=month(order_date)
+  ) |>
+  group_by(
+    month
+    ,product_key
+  ) |>
+  summarize(
+    quantity=sum(quantity)
+    ,net_price=sum(net_price)
+    ,.groups="drop"
+  ) |>
+  group_by(month) |>
+  arrange(product_key,.by_group = TRUE) |>
+  ungroup() |>
+  mutate(
+    price_realization=net_price/quantity
+    ,mix=net_price/sum(net_price)
+    ,revenue=net_price*quantity
+  ) |>
+  filter(
+    month %in% c(1,2)
+  ) |> 
+    select(
+    month,product_key,quantity,net_price,revenue
+  ) 
+
+
+sales_tbl |> 
+
+  pivot_wider(
+    names_from = month
+    ,values_from=quantity:revenue
+  )
+  
+  
+sales_slim_tbl <- sales_tbl |> 
+  group_by(month) |> 
+  mutate(
+    total_revenue=sum(revenue)
+    ,total_quantity=sum(quantity)
+  ) |> 
+  group_by(product_key) |> 
+  mutate(
+    lag_quantity=lag(quantity,1,NA)
+    ,lag_revenue=lag(revenue,1,NA)
+    ,lag_net_price=lag(net_price,1,NA)
+    ,lag_total_revenue=lag(total_revenue,1,NA)
+     ,lag_total_quantity=lag(total_quantity,1,NA)
+    ,delta_quantity=quantity-lag_quantity
+    ,delta_net_price=net_price-lag_net_price
+    ,delta_revenue=revenue-lag_revenue
+    ,mix=revenue/total_revenue
+    ,lag_max=lag_revenue/lag_total_revenue
+    ,quantity_prop=quantity/total_quantity
+    ,lag_quantity_prop=lag_quantity/lag_total_quantity
+  ) |> 
+  arrange(product_key) |> 
+  drop_na()
+
+
+## factor analysis
+sales_slim_tbl |> 
+  group_by(month) |> 
+  mutate(
+    volume_effect=((quantity*lag_quantity_prop)-lag_quantity)*net_price
+  ) |> 
+  ungroup() |> 
+  summarise(
+    volume_effect=sum(volume_effect)
+  )
+  relocate(volume_effect)
+  
+```
+
+
+vol=(cp(quantity,row)*pp(quantity_prop,row)-pp(quantity-row))*cp(net_price,row)
+
+cp(quantity,row)=quantity
+pp(quantity_prop,row)=lag_quantity_prop
+cp(net_price,row)=net_price
+
+cp=column_as_is
+pp=lag_column_as_is
+row=nothing
+
+
+
+
+
+```{r}
+sales_wide_tbl |>
+  # head(10) |>
+  mutate(
+    price=pr_delta*jan_quantity
+    ,vol=quantity_delta*feb_price_realization
+    ,jan_mix=jan_quantity/sum(jan_quantity)
+    ,feb_mix=feb_quantity/sum(feb_quantity)
+    ,mix_vol=(sum(feb_quantity)*jan_mix)-feb_quantity
+    ,mix_price=jan_price_realization-mean(jan_price_realization)
+    ,mix=mix_vol*mix_price
+  ) |>
+  summarise(
+    vol=sum(vol,na.rm=TRUE)
+    ,mix=sum(mix,na.rm=TRUE)
+    ,price=sum(price,na.rm=TRUE)
+    ,total_var=sum(net_price_delta,na.rm = TRUE)
+  ) |>
+  rowwise() |>
+  mutate(
+    total_fct=sum(c_across(c(-vol,-mix,-price)),na.rm = TRUE)
+  )
+
+```
+
+
+```{r}
+
+
+
+
+```{r}
+factor(
+  revenue~
+      vol(vol     ~ pp(quantity,sum)          * d(price_realization) )+
+    price(price   ~ d(quantity)           * cp(price_realization) )+
+     mix1(mix1    ~ cp(quantity,sum))     * pp(mix)-cp(quantity))+
+     mix2(mix2    ~ pp(price_realization) -  pp(price_realization,mean))+
+      mix(mix     ~ mix1                  * mix2)
+,time_unit="month"
+)
+```
+
+
+```{r}
+
+sales_wide_tbl <- sales_tbl |>
+  group_split(month) |>
+  map2(
+    .y = c("jan", "feb"),
+    .f = \(.x,.y) {
+      x <- .x  # Assign .x to x for clarity
+      y <- .y  # Assign .y to y for clarity
+
+      x |>
+        rename_with(
+          .fn = ~ glue::glue("{y}_{.x}"),  # Use y and .col explicitly
+          .cols = c(quantity, net_price, mean, price_realization,mix)
+        ) |>
+        select(-month)
+    }
+  ) |>
+  reduce(
+    \(.x,prev){
+      .x |>
+        left_join(
+          prev
+          ,by=join_by(product_key)
+        )
+    }
+  ) |>
+  mutate(
+    quantity_delta=jan_quantity-feb_quantity
+    ,net_price_delta=jan_net_price-feb_net_price
+    ,mean_delta=jan_mean-feb_mean
+    ,pr_delta=jan_price_realization-feb_price_realization
+  )
+
+
+## Methodology 1
+## https://www.fpandaclub.com/handson/becoming-the-master-of-factor-analysis-of-profit-the-secrets-of-calculation
+
+sales_wide_tbl |>
+  # head(10) |>
+  mutate(
+    total_vol=sum(feb_quantity,na.rm = TRUE)
+    ,jan_mix=jan_quantity/sum(jan_quantity)
+    ,feb_mix=feb_quantity/sum(feb_quantity)
+    ,vol_reclac=(total_vol*jan_mix)
+    ,vol_effect=(vol_reclac*jan_price_realization)
+    ,vol=vol_effect-jan_net_price
+    ,mix_effect=(feb_quantity*jan_price_realization)
+    ,mix=mix_effect-vol_effect
+    ,price_effect=(feb_price_realization*feb_quantity)
+    ,price=price_effect-mix_effect
+  ) |>
+  relocate(vol,mix,price,pr_delta,total_vol,feb_mix,vol_reclac) |>
+  summarise(
+    vol=sum(vol)
+    ,mix=sum(mix,na.rm=TRUE)
+    ,price=sum(price,na.rm=TRUE)
+    ,total_var=sum(net_price_delta,na.rm = TRUE)
+  ) |>
+  rowwise() |>
+  mutate(
+    total_fct=sum(c_across(c(-vol,-mix,-price)),na.rm = TRUE)
+  )
+```
+
+
+```{r}
+library(tidyverse)
+
+
+out <- formula(
+  revenue~
+      vol     ~ pp(quantity)          * d(price_realization) +
+    price   ~ d(quantity)           * cp(price_realization)
+)
+
+
+formula(
+  revenue~
+      vol     ~ pp(quantity)          * d(price_realization) +
+    price(price   ~ d(quantity)           * cp(price_realization) )+
+     mix1(mix1    ~ cp(quantity,sum))     * pp(mix)-cp(quantity))+
+     mix2(mix2    ~ pp(price_realization) -  pp(price_realization,mean))+
+      mix(mix     ~ mix1                  * mix2)
+# ,time_unit="month"
+)
+
+fpaR::sales |>
+  fpaR::mom(date_var = order_date,value_var = quantity) |> tail()
+
+str(formula_vec)
+attr(formula_vec,"term.label")[[1]]
+attr(formula_vec,"variables")
+attr(formula_vec,"factors")
+
+formula_vec[[2]][3]
+
+price=pr_delta*jan_quantity
+,vol=quantity_delta*feb_price_realization
+,mix_vol=(sum(feb_quantity)*jan_mix)-feb_quantity
+,mix_price=jan_price_realization-mean(jan_price_realization)
+,mix=mix_vol*mix_price
+
+
+rlang::fn_body(out)
+```
+
+
+```{r}
+
+library(tidyverse)
+
+
+
+```
+
+I want a function in R that uses the below syntax
+formula(net_price~cp(sales,quantity,'row') * pp(sales,quantity_prop,'row') - pp(sales,quantity,'row') *pp(sales,quantity,'row'))
+
+where the final result will be a mutate function where net_price (to the left of ~) is the name of the column and each of 
+ cp(sales,quantity,'row'), pp(sales,quantity_prop,'row'),pp(sales,quantity,'row') and pp(sales,quantity,'row') will be captured call objects and executed which will eventually return column names so that mutate will use the armethic indicators against the columns names. 

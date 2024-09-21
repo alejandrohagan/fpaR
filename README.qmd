@@ -69,13 +69,30 @@ format: gfm
 2024-09-15
 - cleaned up window_order / group_by for dbi *td expressions
 
+2024-09-15
+-   added dod,wow,mom, and yoy dbi args
+-   added dod tibble args
+
+2024-09-21
+-   add working factor() formula where you can pass in args of pp(),cp() and d() to create new column names
+-   need to figure out how to transform the dataset with required columns, add in column checks
+-   perhaps dataset is passed through first and transformed then a check to see if the transformation has already happened if yes then don't do anything then a check if columns exist with types, we can remove it out of pp,d,cp formulas
+-    only question if need some wtd. average
+-   also orginal part was to put the target value and various formulas against that to autoamte checks and reporting?
+
 ## to do list
 
--   replicate time intelligence functions
--   New Products introduced within the period
--   Discontinued Products within the period
+-   finalize time intelligence functions
+    
+    -   create consistent pattern for labels
+    -   for pop create return granularity arg
+    -   create unified framework for dbi or tibble objects?
+-   Create factor analysis 
+    
+    -   New Products introduced within the period
+    -   Discontinued Products within the period
+    -    
 -   Discounts and Returns for products that result in zero or negative revenue over a period
--   Figure out how to delay unquoted evaluation so that we can pass args to make aggregation tbl
 -   update examples with contoso example
 -   covert lm to sql equivalents
 -   design and create robust unit tests

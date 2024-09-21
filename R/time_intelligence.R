@@ -758,6 +758,152 @@ totalatd_dbi <- function(.data,...,date_var,value_var){
 }
 
 
+#' Day over day valus
+#'
+#' @param .data
+#' @param ...
+#' @param date_var
+#' @param value_var
+#' @param lag_n
+#' @param time_unit
+#'
+#' @return
+#' @export
+#'
+#' @examples
+dod <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){
+
+  # Validate inputs
+  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+  assertthat::assert_that(time_unit %in% base::c("day","quarter","month", "year"), msg = "Time frame must be one of 'day', 'month',;quarter' or 'year'.")
+  # Aggregate data based on provided time unit
+
+  full_tbl <-  .data |>
+    make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit=time_unit) |>
+    arrange(
+      date
+    )
+
+
+  ## multiplication factor
+
+  multiply_options <- c("day"=1,"month"=12,"quarter"=4,"year"=1)
+
+
+
+  multiply_vec <- multiply_options[time_unit] |> base::unname()
+
+
+
+  if(time_unit %in% c("day")){
+
+    # Calculate difference and proportional change
+
+
+    lag_tbl <- full_tbl |>
+      dplyr::group_by(...) |>
+      dplyr::mutate(
+        date_lag=date %m+% lubridate::years(lag_n)
+        ,"{{value_var}}_dod":={{value_var}}
+      ) |>
+      dplyr::select(-c(date,{{value_var}})) |>
+      dplyr::ungroup()
+
+    out_tbl <-  dplyr::left_join(
+      full_tbl
+      ,lag_tbl
+      ,by=dplyr::join_by(date==date_lag,...)
+    ) |>
+      mutate(
+        "{{value_var}}_dod" := dplyr::coalesce(.data[[rlang::englue("{{value_var}}_dod")]],0)
+      )
+    return(out_tbl)
+
+  } else {
+
+    out_tbl <-  full_tbl |>
+      group_by(...) |>
+      dplyr::mutate(
+        "{{value_var}}_dod":=dplyr::lag({{value_var}},n=(lag_n*multiply_vec))
+      ) |>
+      dplyr::ungroup()
+
+    return(out_tbl)
+
+  }
+
+
+}
+
+#' calculate day over day values on a complete calendar table
+#'
+#' @param .data
+#' @param ...
+#' @param date_var
+#' @param value_var
+#' @param lag_n
+#'
+#' @return
+#' @export
+#'
+#' @examples
+dod_dbi <- function(.data,...,date_var,value_var,lag_n=1){
+
+  ## create variables
+
+  value_var_old <- deparse(substitute(value_var))
+  value_var_interim<- paste0(value_var_old,"_","dod")
+  value_var_final <- paste0(value_var_interim,"_",lag_n)
+
+
+  full_dbi <- .data |>
+    make_aggregation_dbi(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+    purrr::pluck("dbi")
+
+  if(!missing(...)){
+    # create lags
+    lag_table <-  full_dbi |>
+      dplyr::group_by(...) |>
+      dbplyr::window_order(date) |>
+      dplyr::mutate(
+        !!value_var_interim:={{value_var}}
+        ,date_lag=dplyr::sql(glue::glue("DATE + INTERVAL {lag_n} DAY"))
+      ) |>
+      dplyr::select(-c(date,all_of(value_var_old))) |>
+      dplyr::ungroup() |>
+      mutate(
+        date_lag=as.Date(date_lag)
+      )
+  }else{
+    lag_table <-  full_dbi |>
+      dbplyr::window_order(date) |>
+      dplyr::mutate(
+        !!value_var_interim:={{value_var}}
+        ,date_lag=dplyr::sql(glue::glue("DATE + INTERVAL {lag_n} DAY"))
+      ) |>
+      dplyr::select(-c(date,all_of(value_var_old))) |>
+      dplyr::ungroup() |>
+      mutate(
+        date_lag=as.Date(date_lag)
+      )
+  }
+
+  # join tables
+  out_tbl <-  dplyr::left_join(
+    full_dbi
+    ,lag_table
+    ,by=dplyr::join_by(date==date_lag,...)
+  ) |>
+    mutate(
+      !!value_var_final:=dplyr::sql(glue::glue("COALESCE({value_var_interim},0)"))
+    ) |>
+    select(-c(all_of(value_var_interim))) |>
+    arrange(date)
+
+  return(out_tbl)
+
+}
+
 
 
 #' Week over week values
@@ -768,6 +914,7 @@ totalatd_dbi <- function(.data,...,date_var,value_var){
 #' @param ... optional columns to group by
 #' @param date_var column with date var to aggregate by
 #' @param value_var column with value to aggregate
+#' @param lag_n the number of weeks to lag
 #'
 #' @return tibble
 #' @export
@@ -813,8 +960,74 @@ wow <- function(.data,...,date_var,value_var,lag_n=1){
 }
 
 
+#' week over week comparison for DBI objects
+#'
+#' @param .data tibble of values
+#' @param ... optional columns to group by
+#' @param date_var column with date var to aggregate by
+#' @param value_var column with value to aggregate
+#' @param lag_n the number of weeks to lag
+#'
+#' @return DBI object
+#' @export
+#'
+#' @examples
+wow_dbi <- function(.data,...,date_var,value_var,lag_n=1){
+
+  ## create variables
+
+  value_var_old <- deparse(substitute(value_var))
+  value_var_interim<- paste0(value_var_old,"_","wow")
+  value_var_final <- paste0(value_var_interim,"_",lag_n)
 
 
+  full_dbi <- .data |>
+    make_aggregation_dbi(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+    purrr::pluck("dbi")
+
+  if(!missing(...)){
+  # create lags
+  lag_table <-  full_dbi |>
+    dplyr::group_by(...) |>
+    dbplyr::window_order(date) |>
+    dplyr::mutate(
+      !!value_var_interim:={{value_var}}
+      ,date_lag=dplyr::sql(glue::glue("DATE + INTERVAL {lag_n} WEEK"))
+    ) |>
+    dplyr::select(-c(date,all_of(value_var_old))) |>
+    dplyr::ungroup() |>
+    mutate(
+      date_lag=as.Date(date_lag)
+    )
+  }else{
+    lag_table <-  full_dbi |>
+      dbplyr::window_order(date) |>
+      dplyr::mutate(
+        !!value_var_interim:={{value_var}}
+        ,date_lag=dplyr::sql(glue::glue("DATE + INTERVAL {lag_n} WEEK"))
+      ) |>
+      dplyr::select(-c(date,all_of(value_var_old))) |>
+      dplyr::ungroup() |>
+      mutate(
+        date_lag=as.Date(date_lag)
+      )
+    }
+
+  # join tables
+out_tbl <-  dplyr::left_join(
+  full_dbi
+    ,lag_table
+    ,by=dplyr::join_by(date==date_lag,...)
+  ) |>
+    mutate(
+      !!value_var_final:=dplyr::sql(glue::glue("COALESCE({value_var_interim},0)"))
+    ) |>
+  select(-c(all_of(value_var_interim))) |>
+  arrange(date)
+
+  return(out_tbl)
+
+}
 
 
 #' Month over month values
@@ -825,6 +1038,7 @@ wow <- function(.data,...,date_var,value_var,lag_n=1){
 #' @param ... optional columns to group by
 #' @param date_var column with date var to aggregate by
 #' @param value_var column with value to aggregate
+#' @param lag_n the number of weeks to lag
 #'
 #' @return tibble
 #' @export
@@ -837,11 +1051,9 @@ mom <- function(.data,...,date_var,value_var,lag_n=1){
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
   # Aggregate data based on provided time unit
 
-  print("pass assert")
   full_tbl <-  .data |>
     make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day")
 
-  print("pass full_tbl")
   # Determine label for the time unit
 
 
@@ -873,6 +1085,80 @@ mom <- function(.data,...,date_var,value_var,lag_n=1){
 }
 
 
+#' Month over month values
+#'
+#' @param .data tibble of values
+#' @param ... optional columns to group by
+#' @param date_var column with date var to aggregate by
+#' @param value_var column with value to aggregate
+#' @param lag_n the number of months to lag
+#'
+#' @return
+#' @export
+#'
+#' @examples
+mom_dbi <- function(.data,...,date_var,value_var,lag_n=1){
+
+  ## create variables
+
+  value_var_old <- deparse(substitute(value_var))
+  value_var_interim<- paste0(value_var_old,"_","mom")
+  value_var_final <- paste0(value_var_interim,"_",lag_n)
+
+
+  full_dbi <- .data |>
+    make_aggregation_dbi(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+    purrr::pluck("dbi")
+
+  if(!missing(...)){
+    # create lags
+    lag_table <-  full_dbi |>
+      dplyr::group_by(...) |>
+      dbplyr::window_order(date) |>
+      dplyr::mutate(
+        !!value_var_interim:={{value_var}}
+        ,date_lag=dplyr::sql(glue::glue("DATE + INTERVAL {lag_n} WEEK"))
+      ) |>
+      dplyr::select(-c(date,all_of(value_var_old))) |>
+      dplyr::ungroup() |>
+      mutate(
+        date_lag=as.Date(date_lag)
+      )
+  }else{
+    lag_table <-  full_dbi |>
+      dbplyr::window_order(date) |>
+      dplyr::mutate(
+        !!value_var_interim:={{value_var}}
+        ,date_lag=dplyr::sql(glue::glue("DATE + INTERVAL {lag_n} MONTH"))
+      ) |>
+      dplyr::select(-c(date,all_of(value_var_old))) |>
+      dplyr::ungroup() |>
+      mutate(
+        date_lag=as.Date(date_lag)
+      )
+  }
+
+  # join tables
+  out_tbl <-  dplyr::left_join(
+    full_dbi
+    ,lag_table
+    ,by=dplyr::join_by(date==date_lag,...)
+  ) |>
+    mutate(
+      !!value_var_final:=dplyr::sql(glue::glue("COALESCE({value_var_interim},0)"))
+    ) |>
+    select(-c(all_of(value_var_interim))) |>
+    arrange(date)
+
+  return(out_tbl)
+
+}
+
+
+
+
+
+
 #' Year over year values
 #' @description
 #' For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
@@ -881,6 +1167,8 @@ mom <- function(.data,...,date_var,value_var,lag_n=1){
 #' @param ... optional columns to group by
 #' @param date_var column with date var to aggregate by
 #' @param value_var column with value to aggregate
+#' @param lag_n
+#' @param time_unit
 #'
 #' @return tibble
 #' @export
@@ -925,8 +1213,6 @@ yoy <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){
     dplyr::select(-c(date,{{value_var}})) |>
     dplyr::ungroup()
 
-
-
   out_tbl <-  dplyr::left_join(
     full_tbl
     ,lag_tbl
@@ -935,8 +1221,6 @@ yoy <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){
     mutate(
       "{{value_var}}_yoy" := dplyr::coalesce(.data[[rlang::englue("{{value_var}}_yoy")]],0)
     )
-
-
     return(out_tbl)
 
   } else {
@@ -954,6 +1238,77 @@ yoy <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){
 
 
 }
+
+#' Year over year values for DBI objects
+#'
+#' @param .data tibble of values
+#' @param ... optional columns to group by
+#' @param date_var column with date var to aggregate by
+#' @param value_var column with value to aggregate
+#' @param lag_n number of time units to lagg
+#' @param time_unit to return aggregate data by 'day','week','month','quarter' or 'year'
+#'
+#' @return
+#' @export
+#'
+#' @examples
+yoy_dbi <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){
+
+  ## create variables
+
+  value_var_old <- deparse(substitute(value_var))
+  value_var_interim<- paste0(value_var_old,"_","mom")
+  value_var_final <- paste0(value_var_interim,"_",lag_n)
+
+
+  full_dbi <- .data |>
+    make_aggregation_dbi(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+    purrr::pluck("dbi")
+
+  if(!missing(...)){
+    # create lags
+    lag_table <-  full_dbi |>
+      dplyr::group_by(...) |>
+      dbplyr::window_order(date) |>
+      dplyr::mutate(
+        !!value_var_interim:={{value_var}}
+        ,date_lag=dplyr::sql(glue::glue("DATE + INTERVAL {lag_n} YEAR"))
+      ) |>
+      dplyr::select(-c(date,all_of(value_var_old))) |>
+      dplyr::ungroup() |>
+      mutate(
+        date_lag=as.Date(date_lag)
+      )
+  }else{
+    lag_table <-  full_dbi |>
+      dbplyr::window_order(date) |>
+      dplyr::mutate(
+        !!value_var_interim:={{value_var}}
+        ,date_lag=dplyr::sql(glue::glue("DATE + INTERVAL {lag_n} YEAR"))
+      ) |>
+      dplyr::select(-c(date,all_of(value_var_old))) |>
+      dplyr::ungroup() |>
+      mutate(
+        date_lag=as.Date(date_lag)
+      )
+  }
+
+  # join tables
+  out_tbl <-  dplyr::left_join(
+    full_dbi
+    ,lag_table
+    ,by=dplyr::join_by(date==date_lag,...)
+  ) |>
+    mutate(
+      !!value_var_final:=dplyr::sql(glue::glue("COALESCE({value_var_interim},0)"))
+    ) |>
+    select(-c(all_of(value_var_interim))) |>
+    arrange(date)
+
+  return(out_tbl)
+
+}
+
 
 
 

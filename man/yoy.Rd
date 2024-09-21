@@ -14,6 +14,8 @@ yoy(.data, ..., date_var, value_var, lag_n = 1, time_unit = "day")
 \item{date_var}{column with date var to aggregate by}
 
 \item{value_var}{column with value to aggregate}
+
+\item{time_unit}{}
 }
 \value{
 tibble

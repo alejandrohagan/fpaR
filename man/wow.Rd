@@ -14,6 +14,8 @@ wow(.data, ..., date_var, value_var, lag_n = 1)
 \item{date_var}{column with date var to aggregate by}
 
 \item{value_var}{column with value to aggregate}
+
+\item{lag_n}{the number of weeks to lag}
 }
 \value{
 tibble
