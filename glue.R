@@ -7,7 +7,7 @@ rm(wow_dbi)
 db <- fpaR::create_contonso_duckdb()
 rm(list = c("wow_dbi"))
 sales_db <- db$sales
-
+usethis::use_r("factor")
 con <- dbplyr::remote_con(sales_db)
 
 .data <- sales_db |>
