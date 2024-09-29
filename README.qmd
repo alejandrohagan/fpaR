@@ -73,12 +73,33 @@ format: gfm
 -   added dod,wow,mom, and yoy dbi args
 -   added dod tibble args
 
+
 2024-09-21
 -   add working factor() formula where you can pass in args of pp(),cp() and d() to create new column names
 -   need to figure out how to transform the dataset with required columns, add in column checks
 -   perhaps dataset is passed through first and transformed then a check to see if the transformation has already happened if yes then don't do anything then a check if columns exist with types, we can remove it out of pp,d,cp formulas
 -    only question if need some wtd. average
 -   also orginal part was to put the target value and various formulas against that to autoamte checks and reporting?
+-   okay need pp() to reduce multiple arumnets one of which is mutate create lag, and then also craete delta
+
+2024-09-26
+-   discovered pattern to keep formula object and then 
+-   formula > terms.formula>attr("variable") to get list of call objects (B) to execute them to get their output (C)
+-   take original formula and subset as needed then quo_name() to turn to string and then use str_replace(formula_chr,B[[2]],C[[1]]) to keep the operators
+
+2024-09-28
+
+-   have cp(), d(), and pp() just produce columns with names and capture the operations
+
+    -   eg. (lag_quanitity*price)+(price*quantity_prop)
+-   then have collector function eg. pvm() or something else take the columns names that are produced
+-   Create the required columns based on the column logic eg lag_quanitty means mutate(lag_quantity=lag(quantity,1))
+-   easier to capture controls and create the problems all at once
+-   now need to figure out to pass lists onto each other pp() to cp() should augment column names with each and then same from data object
+
+- so either we transfrom the dataframe as we go along eg each factor step mutates as we go along creating the columns
+- or factor step just passes along a list of formula and formula names to transform
+- I went down route B but realizing its easier with route A
 
 ## to do list
 
