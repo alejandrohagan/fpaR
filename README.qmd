@@ -3,6 +3,11 @@ title: "README"
 format: gfm
 ---
 
+ti.tbl_class # method
+make_aggregation_tbl # method
+
+
+
 # Developer Notes
 
 ## 2024-08-10
@@ -93,13 +98,29 @@ format: gfm
 
     -   eg. (lag_quanitity*price)+(price*quantity_prop)
 -   then have collector function eg. pvm() or something else take the columns names that are produced
--   Create the required columns based on the column logic eg lag_quanitty means mutate(lag_quantity=lag(quantity,1))
+-   Create the required columns based on the column logic eg lag_quantity means mutate(lag_quantity=lag(quantity,1))
 -   easier to capture controls and create the problems all at once
 -   now need to figure out to pass lists onto each other pp() to cp() should augment column names with each and then same from data object
 
-- so either we transfrom the dataframe as we go along eg each factor step mutates as we go along creating the columns
+- so either we transform the data frame as we go along eg each factor step mutates as we go along creating the columns
 - or factor step just passes along a list of formula and formula names to transform
 - I went down route B but realizing its easier with route A
+
+2024-09-30
+
+-   learnt about structure and how to pass instructions to data model for execution later on
+-   then factor will read the instructions apply to the formula, create the required columns and then apply them to the model   
+-   structure wont work because it goes away when you apply downstream functions
+-   but if I keep everything 
+
+2024-11-22
+
+-   need re do with S7-- plan out flow (4 hours)
+-   time intelligence (8 hours)
+-   factor ( 16 hours)
+-   mayble sql lm (8 hours)
+-   
+
 
 ## to do list
 
@@ -251,11 +272,6 @@ tibble::tribble(
       
   )
 ```
-
-
-
-
-
 
 
 

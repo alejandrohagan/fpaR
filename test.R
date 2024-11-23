@@ -1,5 +1,6 @@
 library(tidyverse)
 library(assertthat)
+library(S7)
 devtools::document()
 devtools::load_all()
 devtools::check()
@@ -7,7 +8,142 @@ devtools::test()
 
 
 
+sales |>
+  ti(date,value_var)
 
+
+
+## S7 class
+
+fpa <- new_class("fpa")
+
+ti.tbl <- new_class(
+  "ti.tbl"
+  ,parent = fpa
+  ,properties =
+    list(
+      data=class_data.frame
+      ,date_var=class_any
+      ,value_var=class_any
+      ,group=new_property(
+        class=class_list()
+        ,default = class_missing
+        ,getter = \(self){
+
+          x <- groups(self@data)
+          x
+        }
+      )
+    )
+  )
+
+sales <- fpaR::sales |> rename(date=order_date)
+
+test <- ti.tbl(data = sales ,date_var = "order_date",value_var = "unit_price")
+
+test@group
+
+ti.test@date_var
+
+
+ti.dbi <- new_class(
+  "ti.dbi"
+  ,parent = fpa
+  ,properties =
+    list(
+      date_col=class_any
+      ,value_var=class_any
+      ,time_unit=class_character
+    )
+)
+
+## methods
+
+
+ti <- new_generic("ti",".data",function(.data,date_var,value_var,time_unit){
+
+  S7_dispatch()
+
+})
+
+
+method(ti,class_data.frame) <- function(.data,date_var,value_var,time_unit){
+
+  assertthat::assert_that(base::is.data.frame(.data), msg = "Data must be a data frame.")
+  assertthat::assert_that(base::is.character(time_unit), msg = "Time unit must be a character string.")
+  assertthat::assert_that(time_unit %in% base::c("day", "week","quarter","semester","month", "year"), msg = "Time frame must be one of 'day', 'week','semester', 'month', or 'year'.")
+  assertthat::assert_that(lubridate::is.Date(.data |> pull({{date_var}})), msg = "The date column is not in Date format.")
+
+  # # # Check if the column follows the yyyy-mm-dd format
+  # formatted_dates <- format(date_var, "%Y-%m-%d")
+  # assertthat::assert_that(base::all(date_var == base::as.Date(formatted_dates)), msg = "The date column does not follow the yyyy-mm-dd format.")
+
+  date_var <- ensym(date_var)
+  value_var <- ensym(value_var)
+
+  # Floor the date to the specified time frame
+  summary_tbl <- .data |>
+    dplyr::mutate(
+      date = lubridate::floor_date({{date_var}}, time_unit)
+      ,time_unit=time_unit
+    ) |>
+    dplyr::group_by(date,...) |>
+    dplyr::summarise(
+      "{{value_var}}":= sum({{value_var}},na.rm=TRUE)
+      ,.groups = "drop"
+    )
+
+  # Create a calendar table with all the dates in the specified time frame
+  calendar_tbl <- tibble::tibble(
+    date = base::seq.Date(from = base::min(summary_tbl$date,na.rm=TRUE), to = base::max(summary_tbl$date,na.rm = TRUE), by = time_unit)
+  )
+
+  # create crossing table of groups
+
+  # if(!missing(...)){
+  #
+  #   calendar_tbl <- dplyr::left_join(
+  #     summary_tbl |> dplyr::distinct(...) |> dplyr::mutate(id="id")
+  #     ,calendar_tbl |> dplyr::mutate(id="id")
+  #     ,by=dplyr::join_by(id)
+  #     ,relationship = "many-to-many"
+  #   ) |>
+  #     dplyr::select(-id)
+  #
+  # }
+
+  # Perform a full join to ensure all time frames are represented
+  full_tbl <- dplyr::full_join(
+    calendar_tbl
+    ,summary_tbl
+    ,by = dplyr::join_by(date,...)
+  ) |>
+    dplyr::mutate(
+      # dplyr::across(dplyr::where(\(x) base::is.numeric(x)),\(x) tidyr::replace_na(x,0))
+      "{{value_var}}":= dplyr::coalesce({{value_var}}, 0)
+    )
+
+
+
+  return(full_tbl)
+
+
+
+}
+
+
+fpaR::make_aggregation_tbl(.data=fpaR::sales,date_var=order_date,value_var=net_price,time_unit="month")
+
+ti(.data=fpaR::sales,date_var=order_date,value_var=net_price,time_unit="month")
+
+
+test_db <- sales_db |>
+  group_by(order_key,store_key)
+
+group_test <- groups(test_db)
+
+group_test
+groups(test_db) |> stringr::str_flatten_comma()
 
 ## sql converstion of time intelligence function
 drv <- duckdb::duckdb(dbdir="/home/hagan/database.duckdb")

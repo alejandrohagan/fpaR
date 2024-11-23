@@ -8,7 +8,12 @@
 #' @examples
 #' is_yyyy_mm_dd("2024-01-01")
 is_yyyy_mm_dd <- function(x) {
-  grepl("^\\d{4}-\\d{2}-\\d{2}$", x)
+
+out <-   suppressWarnings(!is.na(lubridate::ymd(x)))
+
+return(out)
+
+
 }
 
 
@@ -64,3 +69,40 @@ convert_dots_to_string <- function(...){
   return(group_var)
 
 }
+
+
+
+#' Converts tibble to csv file and opens up in excel
+#'
+#' @param .data tibble of data
+#'
+#' @return a temp csv file
+#' @export
+#'
+#' @examples
+#' mtcars |>  show_in_excel()
+show_in_excel <- function(.data){
+
+  # supporting arguments
+  rows      <- base::dim(.data)[1]
+  cols      <- base::dim(.data)[2]
+
+  # send message based on table row size
+
+  cli::cli_alert("data contains {rows} row(s) and {cols} column(s)")
+
+  # create temp file path to be used later
+  temp <- base::paste0(base::tempfile(),".csv")
+
+  # save the table as a csv file
+  utils::write.csv(.data,file = temp)
+
+  # open up the csv file
+  fs::file_show(path=temp)
+
+  # alert that successful
+  cli::cli_alert_success("success: temp file {temp}")
+
+}
+
+

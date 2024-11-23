@@ -14,14 +14,22 @@
 #' @export
 #'
 #' @examples
-#' divide(mtcars,new_col_name=div_col,numerator=mpg,denominator=0,alternative_result=10)
-divide <- function(.data,new_col_name,numerator,denominator,alternative_result=NA_integer_){
+#' data(mtcars)
+#' mtcars |> divide(new_col_name=div_col,numerator=mpg,denominator=0,alternative_result=10)
+divide <- function(.data,new_col_name,numerator_col,denominator_col,alternative_result=NA_integer_){
 
 
+  assertthat::assert_that(
+    is.numeric(alternative_result),
+    msg = cli::format_error(c(
+      "x" = "Alternative result must be numeric.",
+      "!" = "You provided a value of class {.cls {class(alternative_result)}}."
+    ))
+  )
 
   out <- .data |>
     dplyr::mutate(
-      "{{new_col_name}}":=dplyr::if_else(base::is.na({{numerator}}/{{denominator}})|base::is.infinite({{numerator}}/{{denominator}}),alternative_result,{{numerator}}/{{denominator}})
+      "{{new_col_name}}":=dplyr::if_else(base::is.na({{numerator_col}}/{{denominator_col}})|base::is.infinite({{numerator_col}}/{{denominator_col}}),alternative_result,{{numerator_col}}/{{denominator_col}})
     )
 
   base::return(out)

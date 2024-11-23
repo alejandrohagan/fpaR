@@ -12,6 +12,21 @@
 #' clean_file_names()
 clean_file_names <- function(file_path,...){
 
+
+  # Assert that the directory exists
+  assertthat::assert_that(
+    fs::dir_exists(dir_path),
+    msg = cli::format_error("Directory {dir_path} does not exist.")
+  )
+
+  # Assert that the directory contains files
+
+  assertthat::assert_that(
+    length(files) > 0,
+    msg = cli::format_error("No files found in directory {dir_path}.")
+  )
+
+
 fp <- file_path
 
   old_names <- list.files(fp,full.names = TRUE)

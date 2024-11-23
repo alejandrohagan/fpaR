@@ -3,6 +3,7 @@ title: "factors"
 format: html
 ---
 
+
 ## factor documentation
 
 time units:
@@ -31,6 +32,14 @@ data |>
   factor(
     volume~(cp(quantity,row)*pp(quantity_prop,row)-pp(quantity-row))*cp(net_price,row)
   ) |> 
+  ## extract each argument one by one
+  ## modify each to add data to it
+  ## executive each to moditfy data an add column
+  ## then store the new colum names and add another column with the name 
+  ## how to deal with grups? add in a grouped frame
+  
+  
+  
   factor(
     price ~ (cp(quantity,row)*pp(quantity_prop,row)-pp(quantity-row))*cp(net_price,row)
   ) |> 
@@ -57,6 +66,44 @@ data |>
 ```
 
 # lets create some sample data
+
+
+```{r}
+alternative_result <- 10
+
+  if (!is.numeric(alternative_result)) {
+    
+  }
+
+assertthat::assert_that(
+  is.numeric("alternative_result")
+  ,msg = eval(msg)
+)
+
+
+msg <- cli::cli_alert(text = "tihs is a test")
+
+example_tbl <- function(class) {
+  vctrs::new_data_frame(
+    list(
+      a = letters[1:3],
+      b = data.frame(c = 1:3, d = 4:6 + 0.5)
+    ),
+    class = c(class, "tbl")
+  )
+}
+library(tibble)
+example_tbl("default")
+
+
+tbl_sum.default_header_extend <- function(x, ...) {
+  default_header <- NextMethod()
+  c(default_header, "PVM" = "Summary of PVM mix with inputs how long can this go and util it stops doing this")
+}
+
+
+pillar:::print_tbl(example_tbl("default_header_extend"))
+```
 
 
 
@@ -165,23 +212,78 @@ row=nothing
 
 ```{r}
 
-pp <- function(column,fn="row",...) {
+pp <- function(.data,column,fn="row"){
   
-  num <- rlang::dots_n(...)
-  
-  if(num>=1){
-    
-    test <- c(...)
-      
-  }
 
+  #original column name
     
   column_name <- rlang::as_name(rlang::enquo(column))
 
   # Capture the column name and aggregation function
   column_name_adj <- paste0("lag_",column_name)
   
+
+  if(fn=="row"){
+    
+  column_expr_adj <- column_name_adj
+    
+  }else{
+    
+  column_expr_adj <- rlang::quo_name(
+    rlang::call2(fn, column_name_adj,na.rm=TRUE)
+    )
+  }
   
+  
+  
+  if(is.null(attr(.data,"column_name"))){
+    
+    .data <- structure(.data,column_name=column_name)
+    
+  }else{
+    
+    attr(.data,"column_name") <- c(attr(.data,"column_name"),column_name)
+  }
+
+    
+  if(is.null(attr(.data,"column_name_adj"))){
+    
+  .data <-   structure(.data,column_name_adj=column_name_adj)
+    
+  }else{
+    
+    attr(.data,"column_name_adj") <- c(attr(.data,"column_name_adj"),column_name_adj)
+  }
+  
+   if(is.null(attr(.data,"column_expr_adj"))){
+    
+  .data <-   structure(.data,column_expr_adj=column_expr_adj)
+    
+  }else{
+    
+    attr(.data,"column_expr_adj") <- c(attr(.data,"column_expr_adj"),column_expr_adj)
+  }
+
+    
+  return(.data)
+
+}
+
+```
+
+
+
+```{r}
+
+cp <- function(.data,column,fn="row"){
+
+    
+  column_name <- rlang::as_name(rlang::enquo(column))
+
+  # Capture the column name and aggregation function
+  column_name_adj <- column_name
+  
+
 
   if(fn=="row"){
     
@@ -194,51 +296,51 @@ pp <- function(column,fn="row",...) {
     
   }
 
+ if(is.null(attr(.data,"column_name"))){
     
-  if(num>=1){
-  
-  test$column_name     <- c(test$column_name,column_name)
-  test$column_name_adj <- c(test$column_name_adj,column_name_adj)
-  test$column_expr_adj <- c(test$column_expr_adj,column_expr_adj) 
-  
+    .data <- structure(.data,column_name=column_name)
+    
   }else{
     
-  test                 <- list()
-  test$column_name     <- column_name
-  test$column_name_adj <- column_name_adj
-  test$column_expr_adj <- column_expr_adj
-  
-  
+    attr(.data,"column_name") <- c(attr(.data,"column_name"),column_name)
   }
-    
-  return(test)
 
-}
+    
+  if(is.null(attr(.data,"column_name_adj"))){
+    
+  .data <-   structure(.data,column_name_adj=column_name_adj)
+    
+  }else{
+    
+    attr(.data,"column_name_adj") <- c(attr(.data,"column_name_adj"),column_name_adj)
+  }
   
+   if(is.null(attr(.data,"column_expr_adj"))){
+    
+  .data <-   structure(.data,column_expr_adj=column_expr_adj)
+    
+  }else{
+    
+    attr(.data,"column_expr_adj") <- c(attr(.data,"column_expr_adj"),column_expr_adj)
+  }
+
+    
+  return(.data)
+}
 
 ```
 
 
-
 ```{r}
 
-cp <- function(column,fn="row",...) {
+d <- function(.data,column,fn="row") {
 
-
-  num <- rlang::dots_n(...)
-  
-  if(num>=1){
-    
-    test <- c(...)
-      
-  }
 
     
   column_name <- rlang::as_name(rlang::enquo(column))
 
   # Capture the column name and aggregation function
-  column_name_adj <- column_name
-  
+  column_name_adj <- paste0("delta_",column_name)
   
 
   if(fn=="row"){
@@ -246,84 +348,42 @@ cp <- function(column,fn="row",...) {
   column_expr_adj <- column_name_adj
     
   }else{
+    
   column_expr_adj <- rlang::quo_name(
-    rlang::call2(fn, column_adj_str,na.rm=TRUE)
+    rlang::call2(fn, column_name_adj,na.rm=TRUE)
     )
-    
   }
 
+ if(is.null(attr(.data,"column_name"))){
     
-  if(num>=1){
-  
-  test$column_name     <- c(test$column_name,column_name)
-  test$column_name_adj <- c(test$column_name_adj,column_name_adj)
-  test$column_expr_adj <- c(test$column_expr_adj,column_expr_adj) 
-  
+    .data <- structure(.data,column_name=column_name)
+    
   }else{
     
-  test                 <- list()
-  test$column_name     <- column_name
-  test$column_name_adj <- column_name_adj
-  test$column_expr_adj <- column_expr_adj
-  
-  
-  }
-    
-  return(test)
-
-}
-
-```
-
-
-```{r}
-
-d <- function(column,fn="row",...) {
-
- num <- rlang::dots_n(...)
-  
-  if(num>=1){
-    
-    test <- c(...)
-      
+    attr(.data,"column_name") <- c(attr(.data,"column_name"),column_name)
   }
 
     
-  column_name <- rlang::as_name(rlang::enquo(column))
-
-  # Capture the column name and aggregation function
-  column_name_adj <- paste0("delta_",column_str)
-  
-
-  if(fn=="row"){
+  if(is.null(attr(.data,"column_name_adj"))){
     
-  column_expr_adj <- column_name_adj
+  .data <-   structure(.data,column_name_adj=column_name_adj)
     
   }else{
-  column_expr_adj <- rlang::quo_name(
-    rlang::call2(fn, column_adj_str,na.rm=TRUE)
-    )
     
+    attr(.data,"column_name_adj") <- c(attr(.data,"column_name_adj"),column_name_adj)
+  }
+  
+   if(is.null(attr(.data,"column_expr_adj"))){
+    
+  .data <-   structure(.data,column_expr_adj=column_expr_adj)
+    
+  }else{
+    
+    attr(.data,"column_expr_adj") <- c(attr(.data,"column_expr_adj"),column_expr_adj)
   }
 
     
-  if(num>=1){
-  
-  test$column_name     <- c(test$column_name,column_name)
-  test$column_name_adj <- c(test$column_name_adj,column_name_adj)
-  test$column_expr_adj <- c(test$column_expr_adj,column_expr_adj) 
-  
-  }else{
-    
-  test                 <- list()
-  test$column_name     <- column_name
-  test$column_name_adj <- column_name_adj
-  test$column_expr_adj <- column_expr_adj
-  
-  
-  }
-    
-  return(test)
+  return(.data)
   
 }
 ```
@@ -331,56 +391,65 @@ d <- function(column,fn="row",...) {
 
 
 ```{r}
+mtcars |> 
 pp(column=quantity,fn = "row") |> 
   cp(column=price,fn="mean") |> 
-  d(column=volume,fn="row")
+  d(column=volume,fn="row") |> attributes()
 
 ```
-
-
-
 ```{r}
-
-fn1 <- function(lst,column){
+factor <- function(.data,formula){
   
-  name <- deparse(substitute(column))
+  formula <- y~x+b+c
   
-  if(!is_missing(lst)){
+  args <- attr(terms.formula(formula),"variables")
   
-  lst$col <- c(lst$col,name)
+  len <- length(call_lst)-1
   
-  }else{
-    lst <- list()
-    lst$col <- name
-  }
-  
-  return(lst)
-  
-}
 
 
-fn2 <- function(lst,column){
   
-  name <- deparse(substitute(column))
   
-  if(!is_missing(lst)){
+    args_lst <- map(
+  3:(3+len)
+  ,.f = \(x) call_modify(args[[x]],.data=expr(.data))
+) |> 
+  map(\(x) eval_tidy(x))
   
-  lst$col <- c(lst$col,name)
-  }else{
-    lst <- list()
-    lst$col <- name
-  }
-  return(lst)
-}
+  
 
-out <- fn1(column = test) |> 
-  fn1(column = quantity) 
-
-out$col |> 
-  map( 
-    \(x) print(x)
+      
+new_formula_chr <- reduce2(
+    .x=3:(3+len-1)
+    ,.y=1:len
+    ,.f=\(prev,.x,.y){
+      
+      prev |>
+  str_replace(
+    pattern =fixed(expr_name(args[[.x]]))
+    ,replacement =  paste0("args_lst[[",.y,"]]")
     )
+      
+      
+    },.init = rlang::expr_name(rlang::f_rhs(formula))
+  )
+
+  formula_values_vec <- new_formula_chr |> rlang::parse_expr() |> eval_tidy()
+  
+  
+  
+  data[expr_name(target)] <- formula_values_vec
+
+
+      formula_str <- rlang::expr_name(rlang::f_rhs(formula))
+  
+}
+
 ```
+
+
+
+
 
 ```{r}
 
@@ -646,130 +715,3 @@ formula(net_price~cp(sales,quantity,'row') * pp(sales,quantity_prop,'row') - pp(
 where the final result will be a mutate function where net_price (to the left of ~) is the name of the column and each of 
  cp(sales,quantity,'row'), pp(sales,quantity_prop,'row'),pp(sales,quantity,'row') and pp(sales,quantity,'row') will be captured call objects and executed which will eventually return column names so that mutate will use the armethic indicators against the columns names. 
 
-
-
-
-```{r}
-
-
-library(rlang)
-library(tidyverse)
-## create table
-
-tbl <- tibble(
-  volume=sample(1:100,120,replace = TRUE)
-  ,price=runif(120)
-  ,fx=runif(120)*10
-  ,month=rep(1:12,10)
-  ,revenue=volume*price*fx
-)
-
-## create functions
-
-
-
-run_rate <- function(.data,col){
-  
-  .data <- .data |> 
-    mutate(
-      revenue=({{col}}/month)*12
-    )
-  
-  out <- .data |> pull({{col}})
-  
-  return(out)
-}
-
-normalize <- function(.data,col,fx=2){
-  
-  .data <- .data |> 
-    mutate(
-      revenue={{col}}*.env$fx
-    )
-  out <- .data |> pull({{col}})
-  return(out)
-}
-
-
-
-
-test_fn <- function(formula,data){
-  
-  # capture the formula arguments as a call objects in a list()
-  formula <- revenue~run_rate(volume)*normalize(price,fx=4)
-  
-  args <- attr(terms.formula(formula),"variables")
-  
-  ## returns
-  list(revenue, run_rate(volume), normalize(price, fx = 4))
-  
-  # capture the "y" part of the formula
-  
-  target <- rlang::f_lhs(formula)
-  
-  ## returns
-  revenue
-  
-  # capture length of args
-  
-  len <- args[-c(1:2)] |> length()
-  
-  ## returns
-  args[[2]]
-  data <- tbl
-  # modify and execute the args (the original functions) 
-  x <- 3:4
-  
-  # modify and execute the args (the original functions) 
-  args_lst <- map(
-  3:(3+len-1)
-  ,.f = \(x) call_modify(args[[x]],.data=expr(data))
-) |> 
-  map(\(x) eval_tidy(x))
-  
-  #create function to replace executed function with real function
-  
-new_formula_chr <- reduce2(
-    .x=3:(3+len-1)
-    ,.y=1:len
-    ,.f=\(prev,.x,.y){
-      
-      prev |>
-  str_replace(
-    pattern =fixed(expr_name(args[[.x]]))
-    ,replacement =  paste0("args_lst[[",.y,"]]")
-    )
-      
-      
-    },.init = rlang::expr_name(rlang::f_rhs(formula))
-  )
-
-  formula_values_vec <- new_formula_chr |> rlang::parse_expr() |> eval_tidy()
-  
-  
-  
-  data[expr_name(target)] <- formula_values_vec
-
-  
-  return(data)
-
-  
-}
-
-test_fn(revenue~run_rate(volume)*normalize(price,fx=4),data=tbl)
-
-# Create a call with mean
-call <- expr(mean(c(1:10,NA_integer_)))
-
-eval(call)
-# returns
-NA
-
-# Modify the call to include na.rm = TRUE
-new_call <- call_modify(call, na.rm = TRUE)
-
-eval(new_call)
-
-#return 
-5.4
-```

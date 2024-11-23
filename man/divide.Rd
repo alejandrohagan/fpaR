@@ -7,8 +7,8 @@
 divide(
   .data,
   new_col_name,
-  numerator,
-  denominator,
+  numerator_col,
+  denominator_col,
   alternative_result = NA_integer_
 )
 }
@@ -17,11 +17,11 @@ divide(
 
 \item{new_col_name}{new column name for result}
 
+\item{alternative_result}{alternative results if divide results are inf or NA, must be numeric}
+
 \item{numerator}{column for numerator}
 
 \item{denominator}{column for denominator}
-
-\item{alternative_result}{alternative results if divide results are inf or NA, must be numeric}
 }
 \value{
 tibble or dbi object
@@ -31,5 +31,6 @@ A safe divide function that will catch info or NA values and return an alternati
 This is tibble or DBI friendly and will return same class as input
 }
 \examples{
-divide(mtcars,new_col_name=div_col,numerator=mpg,denominator=0,alternative_result=10)
+data(mtcars)
+mtcars |> divide(new_col_name=div_col,numerator=mpg,denominator=0,alternative_result=10)
 }

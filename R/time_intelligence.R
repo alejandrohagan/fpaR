@@ -306,7 +306,7 @@ make_aggregation_dbi <- function(.data, ..., date_var, value_var, time_unit){
 
 
 
-#
+
 # calculate <- function(.data,...,date_var,value_var,time_unit){
 #
 #   # Validate inputs
