@@ -3,59 +3,214 @@ library(assertthat)
 library(S7)
 devtools::document()
 devtools::load_all()
-devtools::check()
-devtools::test()
 
 
 
-sales |>
-  ti(date,value_var)
+
+sales |> # dataframe or dbi object-- must be grouped
+  totalmtd(value,date,"standard") # retunrns a ti object that is printed with instructions
+  calculate() ## returns the results executes the results
+
+# ti object with all the slots and checks
+
+## totalmd is a method that fills out a ti_object
+## calendar -- this is a function that fills in the ti_object
+##calculate -- this executive the function?
+
+
+
+
+# date
+# group
+# order_key
+# value_key
+# time_unit
+# method_type
+# new_column_name
 
 
 
 ## S7 class
-
-fpa <- new_class("fpa")
-
-ti.tbl <- new_class(
-  "ti.tbl"
-  ,parent = fpa
+fpa <- new_class(
+  name="fpa"
   ,properties =
     list(
-      data=class_data.frame
-      ,date_var=class_any
-      ,value_var=class_any
-      ,group=new_property(
-        class=class_list()
-        ,default = class_missing
-        ,getter = \(self){
+      data=class_any
+    )
+)
 
-          x <- groups(self@data)
-          x
+# time unit class
+
+time_unit <- new_class(
+  ,parent = fpa
+  ,name="time_unit"
+  ,properties = list(
+    value=new_property(
+      class=S7::class_character
+      ,default = "day"
+      ,setter=\(self,value){
+        value <- str_to_lower(value)
+        self@value <- value
+        self
+      }
+      ,validator = \(value){
+        if(length(value)!=1) cli::format_error("Please enter only one time unit")
+      }
+    )
+  )
+  ,validator = \(self){
+    valid_units <- c("day","week","month","quarter","year")
+    if(!any(self@value %in% valid_units))  cli::format_error("Please only enter {valid_units}")
+  }
+)
+
+
+
+
+# action class
+
+action <- new_class(
+  name="action"
+  ,parent = fpa
+  ,properties=list(
+    value=new_property(
+      class=class_character
+      ,setter = \(self,value){
+        value <- stringr::str_to_lower(value)
+        self@value <- value
+        self
         }
       )
     )
+  ,validator = \(self){
+    if(!any(self@value %in% c("shift","compare","aggregate"))) return('Action must return "shift","compare" or "aggregate"')
+  }
+)
+
+
+## calendar class
+
+calendar <- new_class(
+  name="calendar"
+  ,parent=fpa
+  ,properties = list(
+    type=new_property(
+      class=class_character
+      ,validator = \(value){
+       if(!any(value %in% c("standard","554"))) cli::format_error("Please return either 'standard' or '554'")
+      }
+      ,setter=\(self,value){
+        value <- stringr::str_to_lower(value)
+        self@type <- value
+        self
+      }
+    )
+    ,date_vec=new_property(
+      class=class_character
+    )
+    ,date_quo=new_property(
+      class=class_any
+      ,getter=\(self){
+        x <- rlang::quo(rlang::enquo(rlang::expr(!!self@date_vec)))
+        x
+      }
+    )
+    ,min_date=new_property(
+      class=class_numeric
+      ,default = NULL
+      ,getter=\(self){
+        x <-  self@data |> pull(all_of(self@date_vec)) |> min(na.rm=TRUE)
+        x
+      }
+    )
+    ,max_date=new_property(
+      class=class_numeric
+      ,default=NULL
+      ,getter=\(self){
+
+        x <-  self@data |> pull(all_of(self@date_vec)) |> max(na.rm=TRUE)
+        x
+      }
+    )
+
   )
+)
 
-sales <- fpaR::sales |> rename(date=order_date)
+calendar(sales,type="standard",date_vec = "order_date")
 
-test <- ti.tbl(data = sales ,date_var = "order_date",value_var = "unit_price")
-
-test@group
-
-ti.test@date_var
-
-
-ti.dbi <- new_class(
-  "ti.dbi"
+ti_tbl <- new_class(
+  "ti_tbl"
   ,parent = fpa
   ,properties =
     list(
-      date_col=class_any
-      ,value_var=class_any
-      ,time_unit=class_character
+      # direct inputs
+      value_vec=new_property(class=class_character)
+      ,value_quo=new_property(
+        class=class_any
+      ,getter=\(self){
+        x <- rlang::quo(rlang::enquo(rlang::expr(!!self@value_vec)))
+        x
+      }
     )
+      ,new_column_name=new_property(class=class_character)
+      ,sort_logic=new_property(class=class_logical)
+      ,fn=new_property(class=class_function)
+      #custom classes
+      ,action=new_property(class=action)
+      ,time_unit=new_property(class=time_unit)
+      ,calendar=new_property(class=calendar)
+      # calculated inputs
+    ,group_indicator=new_property(
+      class=class_logical
+      ,getter=\(self){
+        x <- dplyr::if_else(!purrr::is_empty(groups(self@data)),TRUE,FALSE)
+        x
+      }
+    )
+    ,group_quo=new_property(
+      class=class_any
+      ,getter = \(self){
+        x <- dplyr::groups(self@data)
+        x
+      }
+    )
+    ,group_vec=new_property(
+      class=class_any
+      ,getter = \(self){
+       x <-  as.character(unlist(dplyr::groups(self@data)))
+       x
+      }
+    )
+
+    )
+  ,validator = \(self){
+    column_names <- colnames(data)
+    if(!any(rlang::as_label(self@date_quo) %in% column_names)){
+      cli::format_error("Please ensure date column is in dataset")
+    }
+    if(!any(self@data |> pull(!!self@date_quo) |> class() %in% c("Date"))){
+      cli::format_error("Date column must be a date format")
+    }
+  }
 )
+
+
+
+ti_tbl(
+  data = sales |> group_by(store_key)
+  ,value_vec= "unit_price"
+  ,time_unit=time_unit(value = "day")
+  ,new_column = NA_character_
+  ,sort_logic = TRUE
+  ,fn=mean
+  ,action=action(value = c("shift"))
+  ,calendar = calendar(sales,date_vec = "order_date",type = "standard")
+  )
+
+
+
+
+
 
 ## methods
 
