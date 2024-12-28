@@ -119,7 +119,28 @@ make_aggregation_tbl # method
 -   time intelligence (8 hours)
 -   factor ( 16 hours)
 -   mayble sql lm (8 hours)
--   
+
+
+2024-12-28
+
+-   factor analysis API is finalized -- still needs execution
+-   needs to figure how to do ti functions -- I keep getting stuck
+
+
+Option 1:
+  sales |> # dataframe
+  totalytd(quantity,order_date) |> # returns ti object with printed instructions
+  calculate() # returns data.frame
+
+- informs what is going on
+- complexity in execution, i need to have multiple classes and calculate for each or come up with something else
+- one class, ti_tbl() that fills in all information
+- one method per custom class
+
+Option 2:
+  sales |> 
+  totalytd(quantity,order_date) # returns dataframe
+
 
 
 ## to do list
