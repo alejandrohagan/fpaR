@@ -4,12 +4,9 @@ library(S7)
 devtools::document()
 devtools::load_all()
 
+options(error=NULL)
 
 
-
-sales |> # dataframe or dbi object-- must be grouped
-  totalmtd(value,date,"standard") # retunrns a ti object that is printed with instructions
-  calculate() ## returns the results executes the results
 
 # ti object with all the slots and checks
 
@@ -19,6 +16,41 @@ sales |> # dataframe or dbi object-- must be grouped
 
 
 
+target <- new_class(
+  "target"
+  ,properties=list(
+    data=class_data.frame
+    ,value=class_character
+  )
+)
+
+
+fct <- new_class(
+  "fct"
+  ,parent = target
+  ,properties = list(
+    formula=new_property(
+      class=class_any
+      )
+    )
+  )
+
+
+factor <- new_generic("factor","x")
+
+method(factor,target) <- function(x,formula){
+
+out <-   fct(data=x@data,value=x@value,formula)
+out
+
+
+}
+
+factor(target(mtcars,"mpg"),vs~mpg)
+
+fact(data=mtcars,formula = mpg~vs,value="mpg") |>
+
+  fact(data=_@data,formula=am~vs)
 
 # date
 # group
@@ -30,285 +62,6 @@ sales |> # dataframe or dbi object-- must be grouped
 
 
 
-## S7 class
-fpa <- new_class(
-  name="fpa"
-  ,properties =
-    list(
-      data=class_any
-    )
-)
-
-# time unit class
-
-time_unit <- new_class(
-  ,parent = fpa
-  ,name="time_unit"
-  ,properties = list(
-    value=new_property(
-      class=S7::class_character
-      ,default = "day"
-      ,setter=\(self,value){
-        value <- str_to_lower(value)
-        self@value <- value
-        self
-      }
-      ,validator = \(value){
-        if(length(value)!=1) cli::format_error("Please enter only one time unit")
-      }
-    )
-  )
-  ,validator = \(self){
-    valid_units <- c("day","week","month","quarter","year")
-    if(!any(self@value %in% valid_units))  cli::format_error("Please only enter {valid_units}")
-  }
-)
-
-
-
-
-# action class
-
-action <- new_class(
-  name="action"
-  ,parent = fpa
-  ,properties=list(
-    value=new_property(
-      class=class_character
-      ,setter = \(self,value){
-        value <- stringr::str_to_lower(value)
-        self@value <- value
-        self
-        }
-      )
-    )
-  ,validator = \(self){
-    if(!any(self@value %in% c("shift","compare","aggregate"))) return('Action must return "shift","compare" or "aggregate"')
-  }
-)
-
-
-## calendar class
-
-calendar <- new_class(
-  name="calendar"
-  ,parent=fpa
-  ,properties = list(
-    type=new_property(
-      class=class_character
-      ,validator = \(value){
-       if(!any(value %in% c("standard","554"))) cli::format_error("Please return either 'standard' or '554'")
-      }
-      ,setter=\(self,value){
-        value <- stringr::str_to_lower(value)
-        self@type <- value
-        self
-      }
-    )
-    ,date_vec=new_property(
-      class=class_character
-    )
-    ,date_quo=new_property(
-      class=class_any
-      ,getter=\(self){
-        x <- rlang::quo(rlang::enquo(rlang::expr(!!self@date_vec)))
-        x
-      }
-    )
-    ,min_date=new_property(
-      class=class_numeric
-      ,default = NULL
-      ,getter=\(self){
-        x <-  self@data |> pull(all_of(self@date_vec)) |> min(na.rm=TRUE)
-        x
-      }
-    )
-    ,max_date=new_property(
-      class=class_numeric
-      ,default=NULL
-      ,getter=\(self){
-
-        x <-  self@data |> pull(all_of(self@date_vec)) |> max(na.rm=TRUE)
-        x
-      }
-    )
-
-  )
-)
-
-calendar(sales,type="standard",date_vec = "order_date")
-
-ti_tbl <- new_class(
-  "ti_tbl"
-  ,parent = fpa
-  ,properties =
-    list(
-      # direct inputs
-      value_vec=new_property(class=class_character)
-      ,value_quo=new_property(
-        class=class_any
-      ,getter=\(self){
-        x <- rlang::quo(rlang::enquo(rlang::expr(!!self@value_vec)))
-        x
-      }
-    )
-      ,new_column_name=new_property(class=class_character)
-      ,sort_logic=new_property(class=class_logical)
-      ,fn=new_property(class=class_function)
-      #custom classes
-      ,action=new_property(class=action)
-      ,time_unit=new_property(class=time_unit)
-      ,calendar=new_property(class=calendar)
-      # calculated inputs
-    ,group_indicator=new_property(
-      class=class_logical
-      ,getter=\(self){
-        x <- dplyr::if_else(!purrr::is_empty(groups(self@data)),TRUE,FALSE)
-        x
-      }
-    )
-    ,group_quo=new_property(
-      class=class_any
-      ,getter = \(self){
-        x <- dplyr::groups(self@data)
-        x
-      }
-    )
-    ,group_vec=new_property(
-      class=class_any
-      ,getter = \(self){
-       x <-  as.character(unlist(dplyr::groups(self@data)))
-       x
-      }
-    )
-
-    )
-  ,validator = \(self){
-    column_names <- colnames(data)
-    if(!any(rlang::as_label(self@date_quo) %in% column_names)){
-      cli::format_error("Please ensure date column is in dataset")
-    }
-    if(!any(self@data |> pull(!!self@date_quo) |> class() %in% c("Date"))){
-      cli::format_error("Date column must be a date format")
-    }
-  }
-)
-
-
-
-ti_tbl(
-  data = sales |> group_by(store_key)
-  ,value_vec= "unit_price"
-  ,time_unit=time_unit(value = "day")
-  ,new_column = NA_character_
-  ,sort_logic = TRUE
-  ,fn=mean
-  ,action=action(value = c("shift"))
-  ,calendar = calendar(sales,date_vec = "order_date",type = "standard")
-  )
-
-
-
-
-
-
-## methods
-
-
-ti <- new_generic("ti",".data",function(.data,date_var,value_var,time_unit){
-
-  S7_dispatch()
-
-})
-
-
-method(ti,class_data.frame) <- function(.data,date_var,value_var,time_unit){
-
-  assertthat::assert_that(base::is.data.frame(.data), msg = "Data must be a data frame.")
-  assertthat::assert_that(base::is.character(time_unit), msg = "Time unit must be a character string.")
-  assertthat::assert_that(time_unit %in% base::c("day", "week","quarter","semester","month", "year"), msg = "Time frame must be one of 'day', 'week','semester', 'month', or 'year'.")
-  assertthat::assert_that(lubridate::is.Date(.data |> pull({{date_var}})), msg = "The date column is not in Date format.")
-
-  # # # Check if the column follows the yyyy-mm-dd format
-  # formatted_dates <- format(date_var, "%Y-%m-%d")
-  # assertthat::assert_that(base::all(date_var == base::as.Date(formatted_dates)), msg = "The date column does not follow the yyyy-mm-dd format.")
-
-  date_var <- ensym(date_var)
-  value_var <- ensym(value_var)
-
-  # Floor the date to the specified time frame
-  summary_tbl <- .data |>
-    dplyr::mutate(
-      date = lubridate::floor_date({{date_var}}, time_unit)
-      ,time_unit=time_unit
-    ) |>
-    dplyr::group_by(date,...) |>
-    dplyr::summarise(
-      "{{value_var}}":= sum({{value_var}},na.rm=TRUE)
-      ,.groups = "drop"
-    )
-
-  # Create a calendar table with all the dates in the specified time frame
-  calendar_tbl <- tibble::tibble(
-    date = base::seq.Date(from = base::min(summary_tbl$date,na.rm=TRUE), to = base::max(summary_tbl$date,na.rm = TRUE), by = time_unit)
-  )
-
-  # create crossing table of groups
-
-  # if(!missing(...)){
-  #
-  #   calendar_tbl <- dplyr::left_join(
-  #     summary_tbl |> dplyr::distinct(...) |> dplyr::mutate(id="id")
-  #     ,calendar_tbl |> dplyr::mutate(id="id")
-  #     ,by=dplyr::join_by(id)
-  #     ,relationship = "many-to-many"
-  #   ) |>
-  #     dplyr::select(-id)
-  #
-  # }
-
-  # Perform a full join to ensure all time frames are represented
-  full_tbl <- dplyr::full_join(
-    calendar_tbl
-    ,summary_tbl
-    ,by = dplyr::join_by(date,...)
-  ) |>
-    dplyr::mutate(
-      # dplyr::across(dplyr::where(\(x) base::is.numeric(x)),\(x) tidyr::replace_na(x,0))
-      "{{value_var}}":= dplyr::coalesce({{value_var}}, 0)
-    )
-
-
-
-  return(full_tbl)
-
-
-
-}
-
-
-fpaR::make_aggregation_tbl(.data=fpaR::sales,date_var=order_date,value_var=net_price,time_unit="month")
-
-ti(.data=fpaR::sales,date_var=order_date,value_var=net_price,time_unit="month")
-
-
-test_db <- sales_db |>
-  group_by(order_key,store_key)
-
-group_test <- groups(test_db)
-
-group_test
-groups(test_db) |> stringr::str_flatten_comma()
-
-## sql converstion of time intelligence function
-drv <- duckdb::duckdb(dbdir="/home/hagan/database.duckdb")
-
-con <- DBI::dbConnect(duckdb::duckdb())
-
-duckdb::duckdb_register(con,"sales",fpaR::sales)
-
-
-sales_db <- dplyr::tbl(con,sql("select * from sales"))
 
 ## linear modeling
 

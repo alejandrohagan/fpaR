@@ -9,7 +9,17 @@ value <- day_unit@value
 day_unit2 <-  time_unit(value=valid_input2)
 value2 <- day_unit@value
 
-
+ti_tbl_object <- ti_tbl(
+  data = sales |> group_by(store_key)
+  ,value_vec= "unit_price"
+  ,time_unit=time_unit(value = "day")
+  ,new_column = NA_character_
+  ,sort_logic = TRUE
+  ,fn=mean
+  ,action=action(value = c("shift"))
+  ,date_vec = "order_date"
+  ,type = "standard"
+)
 
 # create tests
 test_that(
@@ -25,8 +35,7 @@ test_that(
 test_that(
   "valiation of input works",{
     testthat::expect_equal(
-     value
-      ,c("day")
+     value,c("day")
     )
   }
 )
@@ -58,5 +67,17 @@ test_that(
     )
   }
 )
+
+
+test_that(
+  "calendar_tbl returns valid class",{
+    testthat::expect_equal(
+      ti_tbl_object|> class()
+      ,c("ti_tbl","calendar_tbl","fpa","S7_object")
+    )
+  }
+)
+
+
 
 
