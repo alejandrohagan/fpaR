@@ -124,23 +124,18 @@ make_aggregation_tbl # method
 2024-12-28
 
 -   factor analysis API is finalized -- still needs execution
--   needs to figure how to do ti functions -- I keep getting stuck
-
+-   finalized ti api
+    
+    - need to add calendar class that calculates missing dates across x groups
+    - need to add group count indicator
+    - need to add printing logic
+    - 
 
 Option 1:
   sales |> # dataframe
   totalytd(quantity,order_date) |> # returns ti object with printed instructions
   calculate() # returns data.frame
-
-- informs what is going on
-- complexity in execution, i need to have multiple classes and calculate for each or come up with something else
-- one class, ti_tbl() that fills in all information
-- one method per custom class, ti_tbl,totalytd_tbl
-
-Option 2:
-  sales |> 
-  totalytd(quantity,order_date) # returns dataframe
-- easier to deploy  but miss custom print function
+s custom print function
 
 ## to do list
 
