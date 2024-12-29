@@ -135,13 +135,12 @@ Option 1:
 - informs what is going on
 - complexity in execution, i need to have multiple classes and calculate for each or come up with something else
 - one class, ti_tbl() that fills in all information
-- one method per custom class
+- one method per custom class, ti_tbl,totalytd_tbl
 
 Option 2:
   sales |> 
   totalytd(quantity,order_date) # returns dataframe
-
-
+- easier to deploy  but miss custom print function
 
 ## to do list
 

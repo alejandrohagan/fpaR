@@ -1,14 +1,10 @@
 
 
 ## S7 class
-fpa <- new_class(
-  name="fpa"
-)
 
 # time unit class
 
 time_unit <- S7::new_class(
-  ,parent = fpa
   ,name="time_unit"
   ,properties = list(
     value=S7::new_property(
@@ -37,7 +33,6 @@ time_unit <- S7::new_class(
 
 action <- S7::new_class(
   name="action"
-  ,parent = fpa
   ,properties=list(
     value=S7::new_property(
       class=S7::class_character
@@ -56,9 +51,8 @@ action <- S7::new_class(
 
 ## calendar class
 
-calendar_tbl <- S7::new_class(
-  name="calendar_tbl"
-  ,parent=fpa
+ti_tbl <- S7::new_class(
+  name="ti_tbl"
   ,properties = list(
 
     data=S7::new_property(
@@ -123,7 +117,20 @@ calendar_tbl <- S7::new_class(
         x
       }
     )
+  ,value_vec=S7::new_property(class=class_character)
+  ,value_quo=S7::new_property(
+    class=S7::class_any
+    ,getter=\(self){
+      x <- rlang::parse_expr(self@value_vec)
+      x
+    }
   )
+  ,new_column_name=S7::new_property(class=S7::class_character)
+  ,sort_logic=S7::new_property(class=S7::class_logical)
+  ,fn=S7::new_property(class=S7::class_function)
+  #custom classes
+  ,action=S7::new_property(class=action)
+)
   ,validator = \(self){
 
     if(!any(self@data |>  dplyr::pull(self@date_vec) |> class() %in% c("Date"))){
@@ -131,30 +138,6 @@ calendar_tbl <- S7::new_class(
       return(cli::format_error("'{self@date_vec}' is not in Date format"))
     }
   }
-)
-
-
-ti_tbl <- S7::new_class(
-  "ti_tbl"
-  ,parent = calendar_tbl
-  ,properties =
-    list(
-      # direct inputs
-      value_vec=S7::new_property(class=class_character)
-      ,value_quo=S7::new_property(
-        class=S7::class_any
-        ,getter=\(self){
-          x <- rlang::parse_expr(self@value_vec)
-          x
-        }
-      )
-      ,new_column_name=S7::new_property(class=S7::class_character)
-      ,sort_logic=S7::new_property(class=S7::class_logical)
-      ,fn=S7::new_property(class=S7::class_function)
-      #custom classes
-      ,action=S7::new_property(class=action)
-
-    )
 )
 
 

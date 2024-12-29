@@ -104,13 +104,18 @@ totalytd <- function(.data,date,value,type){
   return(out)
 }
 
-test <- totalytd(sales,date = order_date,value = unit_price,type="standard")
 
-test |> class()
+x |> class()
+
+
+calculate <- new_generic("calculate","x")
+
+method(calculate,totalytd_tbl) <- function(x){
+
   # Aggregate data based on provided time unit
 
-  full_tbl <-  .data |>
-    make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+  full_tbl <-  x@data |>
+    make_aggregation_tbl(date_var=!!x@date_quo,value_var=!!x@value_quo,time_unit=x@time_unit@value) |>
     dplyr::mutate(
       year=lubridate::year(date)
       ,.before = 1
@@ -119,16 +124,46 @@ test |> class()
 
 
   out_tbl <- full_tbl |>
-    dplyr::group_by(year,...) |>
+    dplyr::group_by(year) |>
     dplyr::arrange(date,.by_group = TRUE) |>
     dplyr::mutate(
-      ytd=base::cumsum({{value_var}})
+      !!x@new_column_name:=base::cumsum(!!x@value_quo)
     ) |>
     dplyr::ungroup()
 
   return(out_tbl)
 
 }
+
+
+method(print,totalytd_tbl) <- function(x){
+
+  cli::cli_h1("Total Year To Date: totalytd")
+  cli::cli_h2("Description:")
+  cli::cat_bullet((paste("This will create a rolling sum of",x@value_vec,"from the beginning to the end of the year")))
+  cli::builtin_theme()
+  cli::cli_h2("Calendar:")
+  cli::cat_bullet(paste("The calendar was aggregated to the",x@time_unit@value,"time unit"))
+  cli::cat_bullet(paste("A",x@type,"calendar is used with 0 groups"))
+  cli::cat_bullet(paste("Calendar ranges from",x@min_date,"to",x@max_date))
+  cli::cli_h2("Actions:")
+
+  out <- tribble(
+    ~name,~shift,~aggregate,~compare,
+    "totalytd",NA,x@value_vec,NA
+  )
+  print(out)
+
+}
+
+
+
+
+sales|>
+  totalytd(date = order_date,value = unit_price,type="standard") |>
+  calculate()
+
+
 
 
 
