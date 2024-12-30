@@ -16,11 +16,16 @@ totalytd_dbi(.data, ..., date_var, value_var)
 \item{value_var}{column with value to aggregate}
 }
 \value{
+tibble
+
 dbi object
 }
 \description{
 Total year to date values
 }
 \examples{
+totalytd(fpaR:sales,date_var = order_date,value_var = quantity)
+Total year to date values
+
 totalytd(fpaR:sales,date_var = order_date,value_var = quantity)
 }

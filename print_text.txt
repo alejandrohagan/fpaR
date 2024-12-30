@@ -1,0 +1,23 @@
+
+Description:
+
+-	The totalytd aggregates each day's price_unit and creates a cumulative total ({field_name} starting on January 1 of the year and ending on the December 31 across {group_count} groups
+
+Groups:
+Data was aggregated across the groups:
+{groups}
+
+Calendar:
+
+-	A {standard} {time_unit} calendar is used starting on {min_date} and ending on {max_date} 
+-	{missing_dates} dates had no data and were replaced with zero	
+
+Actions:
+
+-	X compare
+-	X shift
+-	> Aggregate
+
+-	Use calculate() to return the dataframe
+
+

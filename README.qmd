@@ -129,7 +129,21 @@ make_aggregation_tbl # method
     - need to add calendar class that calculates missing dates across x groups
     - need to add group count indicator
     - need to add printing logic
-    - 
+
+2024-12-29
+-   first test existing methods to make sure they work with groups objects
+-   need to update print methods
+ 
+    -   for date aggregation var name (eg. year)
+    -   new column name eg. ytd
+
+-   need to update ti_tbl for
+  
+    -   date aggregation var name
+-   need to better way to create new classes method
+    - create all new classes upfront
+    - create all new function up front
+    - then create all new calculate methods up front (copy and paste from above)
 
 Option 1:
   sales |> # dataframe

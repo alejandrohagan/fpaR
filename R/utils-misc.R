@@ -106,3 +106,35 @@ show_in_excel <- function(.data){
 }
 
 
+#' Make Action field CLI args
+#'
+#' @param x
+#'
+#' @returns
+#'
+#' @examples
+make_action_cli <- function(x){
+
+  out <- list()
+
+  if(any(x %in% c("aggregate"))){
+    out$aggregate <- c(cli::col_green(cli::symbol$tick)," Aggregate")
+  }else{
+    out$aggregate <- c(cli::col_red(cli::symbol$cross),"Aggregate")
+  }
+
+  if(any(x %in% c("shift"))){
+    out$shift <- c(cli::col_green(cli::symbol$tick)," Shift")
+  }else{
+    out$shift <- c(cli::col_red(cli::symbol$cross)," Shift")
+  }
+
+  if(any(x %in% c("compare"))){
+    out$compare <- c(cli::col_green(cli::symbol$tick)," Compare")
+  }else{
+    out$compare <- c(cli::col_red(cli::symbol$cross)," Compare")
+  }
+
+  return(out)
+
+}

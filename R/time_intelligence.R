@@ -1,3 +1,13 @@
+
+
+
+
+
+
+
+
+
+
 #' Aggregate and expand date table
 #'
 #' @param .data tibble
@@ -341,6 +351,32 @@ make_aggregation_dbi <- function(.data, ..., date_var, value_var, time_unit){
 #
 # }
 
+totalytd <- function(.data,date,value,type){
+
+  # Validate inputs
+  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+
+
+
+  out <- totalytd_tbl(
+    calendar_tbl(
+      data=.data
+      ,type =type
+      ,date_vec = rlang::as_label(rlang::enquo(date))
+    )
+    ,time_unit = time_unit("day")
+    ,action=action("aggregate")
+    ,value_vec = rlang::as_label(rlang::enquo(value))
+    ,new_column_name = "ytd"
+    ,sort_logic = TRUE
+    ,fn="totalytd"
+  )
+
+  return(out)
+}
+
+
+
 
 #' Total year to date values
 #'
@@ -354,33 +390,33 @@ make_aggregation_dbi <- function(.data, ..., date_var, value_var, time_unit){
 #'
 #' @examples
 #' totalytd(fpaR:sales,date_var = order_date,value_var = quantity)
-totalytd <- function(.data,...,date_var,value_var){
-
-  # Validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
-
-  # Aggregate data based on provided time unit
-
-  full_tbl <-  .data |>
-    make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
-    dplyr::mutate(
-      year=lubridate::year(date)
-      ,.before = 1
-    )
-
-
-
-  out_tbl <- full_tbl |>
-    dplyr::group_by(year,...) |>
-    dplyr::arrange(date,.by_group = TRUE) |>
-    dplyr::mutate(
-    ytd=base::cumsum({{value_var}})
-  ) |>
-    dplyr::ungroup()
-
-  return(out_tbl)
-
-}
+# totalytd <- function(.data,...,date_var,value_var){
+#
+#   # Validate inputs
+#   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+#
+#   # Aggregate data based on provided time unit
+#
+#   full_tbl <-  .data |>
+#     make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+#     dplyr::mutate(
+#       year=lubridate::year(date)
+#       ,.before = 1
+#     )
+#
+#
+#
+#   out_tbl <- full_tbl |>
+#     dplyr::group_by(year,...) |>
+#     dplyr::arrange(date,.by_group = TRUE) |>
+#     dplyr::mutate(
+#     ytd=base::cumsum({{value_var}})
+#   ) |>
+#     dplyr::ungroup()
+#
+#   return(out_tbl)
+#
+# }
 
 #' Total year to date values
 #'
