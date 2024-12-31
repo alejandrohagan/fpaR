@@ -174,6 +174,10 @@ ti_tbl <- S7::new_class(
     )
     ,new_column_name=S7::new_property(class=S7::class_character)
     ,new_date_column_name=S7::new_property(class=S7::class_character)
+    ,lag_n=new_property(
+      class=class_numeric
+      ,default = 0
+    )
     ,sort_logic=S7::new_property(class=S7::class_logical)
 
     #custom classes
@@ -223,27 +227,27 @@ totalatd_tbl <- S7::new_class(
 )
 
 
-dod <- S7::new_class(
-  "dod"
+dod_tbl <- S7::new_class(
+  "dod_tbl"
   ,parent = ti_tbl
   ,package = "fpaR"
 )
 
-wow <- S7::new_class(
-  "wow"
+wow_tbl <- S7::new_class(
+  "wow_tbl"
   ,parent = ti_tbl
   ,package = "fpaR"
 )
 
-mom <- S7::new_class(
-  "mom"
+mom_tbl <- S7::new_class(
+  "mom_tbl"
   ,parent = ti_tbl
   ,package = "fpaR"
 )
 
 
-yoy<- S7::new_class(
-  "yoy"
+yoy_tbl<- S7::new_class(
+  "yoy_tbl"
   ,parent = ti_tbl
   ,package = "fpaR"
 )

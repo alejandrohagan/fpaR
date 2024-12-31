@@ -2,13 +2,13 @@
 % Please edit documentation in R/time_intelligence.R
 \name{dod}
 \alias{dod}
-\title{Day over day valus}
+\title{Title}
 \usage{
-dod(.data, ..., date_var, value_var, lag_n = 1, time_unit = "day")
+dod(.data, date, value, type, lag_n)
 }
 \arguments{
-\item{time_unit}{}
+\item{type}{}
 }
 \description{
-Day over day valus
+Title
 }

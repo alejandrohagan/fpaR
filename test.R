@@ -4,7 +4,6 @@ library(S7)
 devtools::document()
 devtools::load_all()
 
-options(error=NULL)
 
 # sales |> # dataframe
 #   target(value) |> # an function that retuns a factor_tbl class
@@ -12,6 +11,48 @@ options(error=NULL)
 #   factor(price~lag(net_price)*quantity) |> # a method that returns a factor_tlb class and prints what it is doing
 #   factor(price~lag(net_price)*quantity) |> # a method that returns a factor_tlb class and prints what it is doing
 #   calculate() # returns the ouput
+
+
+
+x <- dod(sales,date = order_date,value = quantity,type = "standard",lag_n = 1)
+
+
+
+
+full_tbl <-  create_calendar(x)|>
+  arrange(date)
+
+
+## multiplication factor
+
+  # Calculate difference and proportional change
+library(tidyverse)
+
+  full_tbl|>
+    dplyr::group_by(!!!x@calendar_tbl@group_quo) |>
+    arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      date_lag=date %m+% lubridate::days(x@lag_n)
+      ,x@new_column_name:=!!x@value_quo
+    )
+    dplyr::select(-c(date,!x@value_quo)) |>
+    dplyr::ungroup()
+
+  out_tbl <-  dplyr::left_join(
+    full_tbl
+    ,lag_tbl
+    ,by=dplyr::join_by(date==date_lag,...)
+  ) |>
+    mutate(
+      ,"!!x@value_vec_dod":= dplyr::coalesce(.data[[rlang::englue("!!x@value_vec_dod")]],0)
+    )
+  return(out_tbl)
+
+}
+
+
+
+
 
 
 

@@ -530,10 +530,46 @@ totalatd <- function(.data,date,value,type){
 
 
   return(out)
+
 }
 
 
+#' Title
+#'
+#' @param .data
+#' @param date
+#' @param value
+#' @param type
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+dod <- function(.data,date,value,type,lag_n){
 
+
+  out <- dod_tbl(
+    calendar_tbl(
+      data=.data
+      ,type =type
+      ,date_vec = rlang::as_label(rlang::enquo(date))
+    )
+    ,time_unit = time_unit("day")
+    ,action=action(c("aggregate","shift","compare"))
+    ,value_vec = rlang::as_label(rlang::enquo(value))
+    ,new_column_name = "dod"
+    ,sort_logic = TRUE
+    ,fn="dod"
+    ,new_date_column_name = NA_character_
+    ,lag_n=lag_n
+  )
+
+
+  return(out)
+
+
+
+}
 
 #' Total year to date values
 #'
@@ -964,69 +1000,69 @@ totalatd_dbi <- function(.data,...,date_var,value_var){
 #' @export
 #'
 #' @examples
-dod <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){
-
-  # Validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
-  assertthat::assert_that(time_unit %in% base::c("day","quarter","month", "year"), msg = "Time frame must be one of 'day', 'month',;quarter' or 'year'.")
-  # Aggregate data based on provided time unit
-
-  full_tbl <-  .data |>
-    make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit=time_unit) |>
-    arrange(
-      date
-    )
-
-
-  ## multiplication factor
-
-  multiply_options <- c("day"=1,"month"=12,"quarter"=4,"year"=1)
-
-
-
-  multiply_vec <- multiply_options[time_unit] |> base::unname()
-
-
-
-  if(time_unit %in% c("day")){
-
-    # Calculate difference and proportional change
-
-
-    lag_tbl <- full_tbl |>
-      dplyr::group_by(...) |>
-      dplyr::mutate(
-        date_lag=date %m+% lubridate::years(lag_n)
-        ,"{{value_var}}_dod":={{value_var}}
-      ) |>
-      dplyr::select(-c(date,{{value_var}})) |>
-      dplyr::ungroup()
-
-    out_tbl <-  dplyr::left_join(
-      full_tbl
-      ,lag_tbl
-      ,by=dplyr::join_by(date==date_lag,...)
-    ) |>
-      mutate(
-        "{{value_var}}_dod" := dplyr::coalesce(.data[[rlang::englue("{{value_var}}_dod")]],0)
-      )
-    return(out_tbl)
-
-  } else {
-
-    out_tbl <-  full_tbl |>
-      group_by(...) |>
-      dplyr::mutate(
-        "{{value_var}}_dod":=dplyr::lag({{value_var}},n=(lag_n*multiply_vec))
-      ) |>
-      dplyr::ungroup()
-
-    return(out_tbl)
-
-  }
-
-
-}
+# dod <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){
+#
+#   # Validate inputs
+#   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+#   assertthat::assert_that(time_unit %in% base::c("day","quarter","month", "year"), msg = "Time frame must be one of 'day', 'month',;quarter' or 'year'.")
+#   # Aggregate data based on provided time unit
+#
+#   full_tbl <-  .data |>
+#     make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit=time_unit) |>
+#     arrange(
+#       date
+#     )
+#
+#
+#   ## multiplication factor
+#
+#   multiply_options <- c("day"=1,"month"=12,"quarter"=4,"year"=1)
+#
+#
+#
+#   multiply_vec <- multiply_options[time_unit] |> base::unname()
+#
+#
+#
+#   if(time_unit %in% c("day")){
+#
+#     # Calculate difference and proportional change
+#
+#
+#     lag_tbl <- full_tbl |>
+#       dplyr::group_by(...) |>
+#       dplyr::mutate(
+#         date_lag=date %m+% lubridate::years(lag_n)
+#         ,"{{value_var}}_dod":={{value_var}}
+#       ) |>
+#       dplyr::select(-c(date,{{value_var}})) |>
+#       dplyr::ungroup()
+#
+#     out_tbl <-  dplyr::left_join(
+#       full_tbl
+#       ,lag_tbl
+#       ,by=dplyr::join_by(date==date_lag,...)
+#     ) |>
+#       mutate(
+#         "{{value_var}}_dod" := dplyr::coalesce(.data[[rlang::englue("{{value_var}}_dod")]],0)
+#       )
+#     return(out_tbl)
+#
+#   } else {
+#
+#     out_tbl <-  full_tbl |>
+#       group_by(...) |>
+#       dplyr::mutate(
+#         "{{value_var}}_dod":=dplyr::lag({{value_var}},n=(lag_n*multiply_vec))
+#       ) |>
+#       dplyr::ungroup()
+#
+#     return(out_tbl)
+#
+#   }
+#
+#
+# }
 
 #' calculate day over day values on a complete calendar table
 #'

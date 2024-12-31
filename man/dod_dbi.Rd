@@ -2,13 +2,19 @@
 % Please edit documentation in R/time_intelligence.R
 \name{dod_dbi}
 \alias{dod_dbi}
-\title{calculate day over day values on a complete calendar table}
+\title{Day over day valus}
 \usage{
 dod_dbi(.data, ..., date_var, value_var, lag_n = 1)
 }
 \arguments{
 \item{lag_n}{}
+
+\item{time_unit}{}
 }
 \description{
+Day over day valus
+}
+\examples{
 calculate day over day values on a complete calendar table
+
 }

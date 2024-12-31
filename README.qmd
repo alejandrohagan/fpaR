@@ -163,7 +163,10 @@ s custom print function
 -   then documentation
 -   switched to new S7 branch
 -   test
+-   need to address new_column_name logic
 
+      -   prefix plus value_vec
+      -   also understand how predefined column names can help with the tot logic
 
 ## to do list
 
