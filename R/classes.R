@@ -1,7 +1,13 @@
 
 
+.onLoad <- function(...) {
+  S7::methods_register()
+}
+
+
 time_unit <- S7::new_class(
   ,name="time_unit"
+  ,package = "fpaR"
   ,properties = list(
     value=S7::new_property(
       class=S7::class_character
@@ -26,6 +32,7 @@ time_unit <- S7::new_class(
 
 action <- S7::new_class(
   name="action"
+  ,package = "fpaR"
   ,properties=list(
     value=S7::new_property(
       class=S7::class_any
@@ -42,6 +49,7 @@ action <- S7::new_class(
 
 calendar_tbl <- new_class(
   name="calendar_tbl"
+  ,package = "fpaR"
   ,properties =
     list(
       data=S7::new_property(
@@ -152,6 +160,7 @@ calendar_tbl <- new_class(
 
 ti_tbl <- S7::new_class(
   name="ti_tbl"
+  ,package = "fpaR"
   ,properties = list(
     calendar_tbl=calendar_tbl
     ,time_unit=time_unit
@@ -164,7 +173,9 @@ ti_tbl <- S7::new_class(
       }
     )
     ,new_column_name=S7::new_property(class=S7::class_character)
+    ,new_date_column_name=S7::new_property(class=S7::class_character)
     ,sort_logic=S7::new_property(class=S7::class_logical)
+
     #custom classes
     ,action=S7::new_property(class=action)
     ,fn=class_character
@@ -182,5 +193,58 @@ ti_tbl <- S7::new_class(
 totalytd_tbl <- S7::new_class(
   "totalytd_tbl"
   ,parent = ti_tbl
+  ,package = "fpaR"
   )
+
+
+totalqtd_tbl <- S7::new_class(
+  "totalqtd_tbl"
+  ,parent = ti_tbl
+  ,package = "fpaR"
+)
+
+totalmtd_tbl <- S7::new_class(
+  "totalmtd_tbl"
+  ,parent = ti_tbl
+  ,package = "fpaR"
+)
+
+totalwtd_tbl <- S7::new_class(
+  "totalwtd_tbl"
+  ,parent = ti_tbl
+  ,package = "fpaR"
+)
+
+
+totalatd_tbl <- S7::new_class(
+  "totalatd_tbl"
+  ,parent = ti_tbl
+  ,package = "fpaR"
+)
+
+
+dod <- S7::new_class(
+  "dod"
+  ,parent = ti_tbl
+  ,package = "fpaR"
+)
+
+wow <- S7::new_class(
+  "wow"
+  ,parent = ti_tbl
+  ,package = "fpaR"
+)
+
+mom <- S7::new_class(
+  "mom"
+  ,parent = ti_tbl
+  ,package = "fpaR"
+)
+
+
+yoy<- S7::new_class(
+  "yoy"
+  ,parent = ti_tbl
+  ,package = "fpaR"
+)
 

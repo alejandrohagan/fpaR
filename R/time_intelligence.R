@@ -1,13 +1,4 @@
 
-
-
-
-
-
-
-
-
-
 #' Aggregate and expand date table
 #'
 #' @param .data tibble
@@ -20,29 +11,32 @@
 #' @export
 #'
 #' @examples
-#' make_aggregation_tbl(fpaR::sales,date_var=date,value_var=quantity,time_unit="day")
-make_aggregation_tbl <- function(.data,...,date_var,value_var, time_unit) {
+#' make_aggregation_tbl(fpaR::sales,date=date,value=quantity,time_unit="day")
+make_aggregation_tbl <- function(.data,date,value,time_unit) {
 
 
   assertthat::assert_that(base::is.data.frame(.data), msg = "Data must be a data frame.")
   assertthat::assert_that(base::is.character(time_unit), msg = "Time unit must be a character string.")
   assertthat::assert_that(time_unit %in% base::c("day", "week","quarter","semester","month", "year"), msg = "Time frame must be one of 'day', 'week','semester', 'month', or 'year'.")
-  assertthat::assert_that(lubridate::is.Date(.data |> pull({{date_var}})), msg = "The date column is not in Date format.")
+  assertthat::assert_that(lubridate::is.Date(.data |> pull({{date}})), msg = "The date column is not in Date format.")
   #
   # # # Check if the column follows the yyyy-mm-dd format
-  # formatted_dates <- format(date_var, "%Y-%m-%d")
-  # assertthat::assert_that(base::all(date_var == base::as.Date(formatted_dates)), msg = "The date column does not follow the yyyy-mm-dd format.")
+  # formatted_dates <- format(date, "%Y-%m-%d")
+  # assertthat::assert_that(base::all(date == base::as.Date(formatted_dates)), msg = "The date column does not follow the yyyy-mm-dd format.")
   #
+
+  existing_groups <- dplyr::groups(.data) |>
+    map(\(x) rlang::as_label(x)) |> purrr::simplify()
 
   # Floor the date to the specified time frame
   summary_tbl <- .data |>
     dplyr::mutate(
-      date = lubridate::floor_date({{date_var}}, time_unit)
+      date = lubridate::floor_date({{date}},time_unit)
       ,time_unit=time_unit
     ) |>
-    dplyr::group_by(date,...) |>
+    dplyr::group_by(date,!!!existing_groups) |>
     dplyr::summarise(
-      "{{value_var}}":= sum({{value_var}},na.rm=TRUE)
+      "{{value}}":= sum({{value}},na.rm=TRUE)
       ,.groups = "drop"
     )
 
@@ -54,10 +48,10 @@ make_aggregation_tbl <- function(.data,...,date_var,value_var, time_unit) {
 
   # create crossing table of groups
 
-  if(!missing(...)){
+  if(!existing_groups|> is_empty()){
 
     calendar_tbl <- dplyr::left_join(
-      summary_tbl |> dplyr::distinct(...) |> dplyr::mutate(id="id")
+      summary_tbl |> dplyr::distinct(pick(existing_groups)) |> dplyr::mutate(id="id")
       ,calendar_tbl |> dplyr::mutate(id="id")
       ,by=dplyr::join_by(id)
       ,relationship = "many-to-many"
@@ -70,11 +64,11 @@ make_aggregation_tbl <- function(.data,...,date_var,value_var, time_unit) {
   full_tbl <- dplyr::full_join(
     calendar_tbl
     ,summary_tbl
-    ,by = dplyr::join_by(date,...)
+    ,by = dplyr::join_by(date,!!!existing_groups)
   ) |>
     dplyr::mutate(
       # dplyr::across(dplyr::where(\(x) base::is.numeric(x)),\(x) tidyr::replace_na(x,0))
-      "{{value_var}}":= dplyr::coalesce({{value_var}}, 0)
+      "{{value}}":= dplyr::coalesce({{value}}, 0)
     )
 
 
@@ -351,6 +345,17 @@ make_aggregation_dbi <- function(.data, ..., date_var, value_var, time_unit){
 #
 # }
 
+#' Title
+#'
+#' @param .data
+#' @param date
+#' @param value
+#' @param type
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 totalytd <- function(.data,date,value,type){
 
   # Validate inputs
@@ -370,7 +375,83 @@ totalytd <- function(.data,date,value,type){
     ,new_column_name = "ytd"
     ,sort_logic = TRUE
     ,fn="totalytd"
+    ,new_date_column_name = "Year"
   )
+
+}
+
+
+#' Title
+#'
+#' @param .data
+#' @param date
+#' @param value
+#' @param type
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+totalqtd <- function(.data,date,value,type){
+
+  # Validate inputs
+  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+
+  # Aggregate data based on provided time unit
+
+
+  out <- totalqtd_tbl(
+    calendar_tbl(
+      data      = .data
+      ,type     = type
+      ,date_vec = rlang::as_label(rlang::enquo(date))
+    )
+    ,time_unit  = time_unit("day")
+    ,action     = action("aggregate")
+    ,value_vec  = rlang::as_label(rlang::enquo(value))
+    ,new_column_name = "qtd"
+    ,sort_logic = TRUE
+    ,fn         = "totalqtd"
+    ,new_date_column_name = c("year","quarter")
+  )
+
+  return(out)
+
+}
+
+
+#' Title
+#'
+#' @param .data
+#' @param date
+#' @param value
+#' @param type
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+totalmtd <- function(.data,date,value,type){
+
+    # Validate inputs
+    assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+
+
+
+    out <- totalmtd_tbl(
+      calendar_tbl(
+        data=.data
+        ,type =type
+        ,date_vec = rlang::as_label(rlang::enquo(date))
+      )
+      ,time_unit = time_unit("day")
+      ,action=action("aggregate")
+      ,value_vec = rlang::as_label(rlang::enquo(value))
+      ,new_column_name = "mtd"
+      ,sort_logic = TRUE
+      ,fn="totalmtd"
+    )
+
 
   return(out)
 }
@@ -472,33 +553,33 @@ totalytd_dbi <- function(.data,...,date_var,value_var){
 #'
 #' @examples
 #' totalqtd(fpaR:sales,date_var = order_date,value_var = quantity)
-totalqtd <- function(.data,...,date_var,value_var){
-
-  # Validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
-
-  # Aggregate data based on provided time unit
-
-  full_tbl <-  .data |>
-    make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
-    dplyr::mutate(
-      year=lubridate::year(date)
-      ,quarter=lubridate::quarter(date)
-      ,.before = 1
-    )
-
-
-
-  out_tbl <- full_tbl |>
-    dplyr::group_by(year,quarter,...) |>
-    dplyr::mutate(
-      qtd=base::cumsum({{value_var}})
-    ) |>
-    dplyr::ungroup()
-
-  return(out_tbl)
-
-}
+# totalqtd <- function(.data,...,date_var,value_var){
+#
+#   # Validate inputs
+#   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+#
+#   # Aggregate data based on provided time unit
+#
+#   full_tbl <-  .data |>
+#     make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+#     dplyr::mutate(
+#       year=lubridate::year(date)
+#       ,quarter=lubridate::quarter(date)
+#       ,.before = 1
+#     )
+#
+#
+#
+#   out_tbl <- full_tbl |>
+#     dplyr::group_by(year,quarter,...) |>
+#     dplyr::mutate(
+#       qtd=base::cumsum({{value_var}})
+#     ) |>
+#     dplyr::ungroup()
+#
+#   return(out_tbl)
+#
+# }
 
 #' Total quarter to date values
 #'
@@ -1342,137 +1423,5 @@ yoy_dbi <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){
     arrange(date)
 
   return(out_tbl)
-
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#'
-#' #' Augment time attributes
-#' #'
-#' #' @param .data
-#' #' @param date_var
-#' #'
-#' #' @return
-#' #' @export
-#' #'
-#' #' @examples
-#' augment_time_attributes <- function(.data,date_var){
-#'
-#'
-#'   # set up variables
-#'
-#'
-#'   date_var <- enquo(date_var)
-#'
-#'   #create new vars
-#'
-#'   .data <-   .data %>%
-#'     mutate(
-#'       year=lubridate::year(!!date_var)
-#'       ,year_abb=stringr::str_sub(as.character(year),start=3,end=4)
-#'       ,quarter=lubridate::quarter(!!date_var)
-#'       ,month_number=lubridate::month(!!date_var)
-#'       ,month_number_padded=if_else(str_length(month_number)<2,paste0("0",month_number),as.character(month_number))
-#'       ,month_name_short=lubridate::month(!!date_var,abbr = TRUE,label=TRUE)
-#'       ,month_name_long=lubridate::month(!!date_var,label=TRUE,abbr = FALSE)
-#'       ,day_of_week_number=wday(!!date_var,label=FALSE)
-#'       ,day_of_week_label=lubridate::wday(!!date_var,label=TRUE)
-#'       ,day_of_month=lubridate::day(!!date_var)
-#'       ,days_in_month=lubridate::days_in_month(!!date_var)
-#'       ,week_number_of_year=lubridate::week(!!date_var)
-#'       ,leap_year_indicator=lubridate::leap_year(!!date_var)
-#'       ,semester=lubridate::semester(!!date_var)
-#'       ,semester_year=lubridate::semester(!!date_var,with_year=TRUE)
-#'       ,year_month=paste0(year,"_",month_number)
-#'       ,year_month_padded=paste0(year,"_",month_number_padded)
-#'       ,year_wk=base::paste0(year,"_",1)
-#'       ,year_quarter=lubridate::quarter(!!date_var,with_year = TRUE)
-#'       ,quarter_year_full=base::paste0(quarter,"Q",year)
-#'       ,quarter_year_abb=base::paste0(quarter,"Q",year_abb)
-#'      )
-#'   #returning object
-#' return(.data)
-#'
-#' }
-#'
-#'
-#' #' create 554 calendar
-#' #'
-#' #' @return
-#' #' @export
-#' #'
-#' #' @examples
-#' make_554_cal <- function(start_date,end_date){
-#'
-#' calendar_raw <- tibble(date=seq.Date(from=ymd("2018-02-04"),to=ymd("2023-12-31"),by="days"))
-#'
-#' calendar_tbl <- calendar_raw %>%
-#'   mutate(
-#'     date_id=row_number()
-#'    ,year_id=
-#'
-#'   case_when(
-#'     date < ymd("2019-02-03") ~ tibble(yr_key=1,yr_label=2018)
-#'     ,date < ymd("2020-02-02") ~ tibble(yr_key=2,yr_label=2019)
-#'     ,date < ymd("2021-01-31") ~ tibble(yr_key=3,yr_label=2020)
-#'     ,date < ymd("2022-01-30") ~ tibble(yr_key=4,yr_label=2021)
-#'     ,date < ymd("2023-01-29") ~ tibble(yr_key=5,yr_label=2022)
-#'     ,TRUE ~ tibble(yr_key=6,yr_label=2023)
-#'   )
-#' ) %>%
-#'   group_by(
-#'     year_id
-#'   ) %>%
-#'   mutate(
-#'     day_id=row_number()
-#'     ,wk_period=
-#'       # cumsum(
-#'         case_when(
-#'           day_id%%7==0 ~ day_id
-#'           ,TRUE ~NA_integer_
-#'           )
-#'       # )+1
-#'   ) %>%
-#'   fill(wk_period,.direction = "up") %>%
-#'   mutate(
-#'     wk_period=wk_period/7
-#'   ) %>%
-#'   ungroup()
-#' return(calendar_tbl)
-#' }

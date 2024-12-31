@@ -2,8 +2,10 @@
 % Please edit documentation in R/time_intelligence.R
 \name{totalmtd}
 \alias{totalmtd}
-\title{Total month to date values}
+\title{Title}
 \usage{
+totalmtd(.data, ..., date_var, value_var)
+
 totalmtd(.data, ..., date_var, value_var)
 }
 \arguments{
@@ -14,11 +16,15 @@ totalmtd(.data, ..., date_var, value_var)
 \item{date_var}{column with date var to aggregate by}
 
 \item{value_var}{column with value to aggregate}
+
+\item{type}{}
 }
 \value{
 tibble
 }
 \description{
+Title
+
 Total month to date values
 }
 \examples{

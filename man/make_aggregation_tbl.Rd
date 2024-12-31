@@ -4,18 +4,18 @@
 \alias{make_aggregation_tbl}
 \title{Aggregate and expand date table}
 \usage{
-make_aggregation_tbl(.data, ..., date_var, value_var, time_unit)
+make_aggregation_tbl(.data, date, value, time_unit)
 }
 \arguments{
 \item{.data}{tibble}
+
+\item{time_unit}{which time unit to aggregate to}
 
 \item{...}{dimensions to group by}
 
 \item{date_var}{dimension with main date column}
 
 \item{value_var}{dimension with values to aggregate by}
-
-\item{time_unit}{which time unit to aggregate to}
 }
 \value{
 tibble
@@ -24,5 +24,5 @@ tibble
 Aggregate and expand date table
 }
 \examples{
-make_aggregation_tbl(fpaR::sales,date_var=date,value_var=quantity,time_unit="day")
+make_aggregation_tbl(fpaR::sales,date=date,value=quantity,time_unit="day")
 }
