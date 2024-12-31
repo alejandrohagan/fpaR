@@ -151,6 +151,19 @@ Option 1:
   calculate() # returns data.frame
 s custom print function
 
+2024-12-30
+-   completed total_td functions
+-   need to update the print functions for the total_td functions
+-   then need to repeat classes for tot functions
+-   then need to create function for tot functions
+-   then need to apply print methods for tot functions
+-   then work on business logic for factor analysis
+-   then work on print function
+-   then sql lm
+-   then documentation
+
+
+
 ## to do list
 
 -   finalize time intelligence functions

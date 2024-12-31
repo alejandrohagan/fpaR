@@ -2,7 +2,7 @@
 % Please edit documentation in R/time_intelligence.R
 \name{totalwtd_dbi}
 \alias{totalwtd_dbi}
-\title{Total week to date values}
+\title{Total Week to date values}
 \usage{
 totalwtd_dbi(.data, ..., date_var, value_var)
 }
@@ -15,6 +15,14 @@ totalwtd_dbi(.data, ..., date_var, value_var)
 
 \item{value_var}{column with value to aggregate}
 }
+\value{
+tibble
+}
 \description{
+Total Week to date values
+}
+\examples{
+totalwtd(fpaR:sales,date_var = order_date,value_var = quantity)
 Total week to date values
+
 }

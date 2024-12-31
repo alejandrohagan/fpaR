@@ -154,11 +154,107 @@ full_tbl <-  create_calendar(x) |>
 
 out_tbl <- full_tbl |>
   dplyr::group_by(year,quarter,!!!x@calendar_tbl@group_quo) |>
+  dplyr::arrange(date,.by_group = TRUE) |>
   dplyr::mutate(
     !!x@new_column_name:=base::cumsum(!!x@value_quo)
   ) |>
   dplyr::ungroup()
 
 return(out_tbl)
+
+}
+
+
+
+#' Title
+#'
+#' @param x
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+method(calculate,totalmtd_tbl) <- function(x){
+
+
+  full_tbl <-  create_calendar(x) |>
+    dplyr::mutate(
+      year=lubridate::year(date)
+      ,month=lubridate::month(date)
+      ,.before = 1
+    )
+
+
+
+  out_tbl <- full_tbl |>
+    dplyr::group_by(year,month,!!!x@calendar_tbl@group_quo) |>
+    dplyr::arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      !!x@new_column_name:=base::cumsum(!!x@value_quo)
+    ) |>
+    dplyr::ungroup()
+
+  return(out_tbl)
+
+}
+
+
+#' Title
+#'
+#' @param x
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+method(calculate,totalwtd_tbl) <- function(x){
+
+
+  full_tbl <-  create_calendar(x) |>
+    dplyr::mutate(
+      year=lubridate::year(date)
+      ,month=lubridate::month(date)
+      ,week=lubridate::week(date)
+      ,.before = 1
+    )
+
+
+
+  out_tbl <- full_tbl |>
+    dplyr::group_by(year,month,week,!!!x@calendar_tbl@group_quo) |>
+    dplyr::arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      !!x@new_column_name:=base::cumsum(!!x@value_quo)
+    ) |>
+    dplyr::ungroup()
+
+  return(out_tbl)
+
+}
+
+
+
+#' Title
+#'
+#' @param x
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+method(calculate,totalatd_tbl) <- function(x){
+
+
+  full_tbl <-  create_calendar(x)
+
+  out_tbl <- full_tbl |>
+    dplyr::group_by(!!!x@calendar_tbl@group_quo) |>
+    dplyr::arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      !!x@new_column_name:=base::cumsum(!!x@value_quo)
+    ) |>
+    dplyr::ungroup()
+
+  return(out_tbl)
 
 }

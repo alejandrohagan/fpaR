@@ -4,29 +4,11 @@
 \alias{totalmtd}
 \title{Title}
 \usage{
-totalmtd(.data, ..., date_var, value_var)
-
-totalmtd(.data, ..., date_var, value_var)
+totalmtd(.data, date, value, type)
 }
 \arguments{
-\item{.data}{tibble of values}
-
-\item{...}{optional columns to group by}
-
-\item{date_var}{column with date var to aggregate by}
-
-\item{value_var}{column with value to aggregate}
-
 \item{type}{}
-}
-\value{
-tibble
 }
 \description{
 Title
-
-Total month to date values
-}
-\examples{
-totalmtd(fpaR:sales,date_var = order_date,value_var = quantity)
 }

@@ -450,7 +450,83 @@ totalmtd <- function(.data,date,value,type){
       ,new_column_name = "mtd"
       ,sort_logic = TRUE
       ,fn="totalmtd"
+      ,new_date_column_name = c("year","month")
     )
+
+
+  return(out)
+}
+
+#' Title
+#'
+#' @param .data
+#' @param date
+#' @param value
+#' @param type
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+totalwtd <- function(.data,date,value,type){
+
+  # Validate inputs
+  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+
+
+
+  out <- totalwtd_tbl(
+    calendar_tbl(
+      data=.data
+      ,type =type
+      ,date_vec = rlang::as_label(rlang::enquo(date))
+    )
+    ,time_unit = time_unit("day")
+    ,action=action("aggregate")
+    ,value_vec = rlang::as_label(rlang::enquo(value))
+    ,new_column_name = "wtd"
+    ,sort_logic = TRUE
+    ,fn="totalwtd"
+    ,new_date_column_name = c("year","month","week")
+  )
+
+
+  return(out)
+}
+
+
+#' Title
+#'
+#' @param .data
+#' @param date
+#' @param value
+#' @param type
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+totalatd <- function(.data,date,value,type){
+
+  # Validate inputs
+  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+
+
+
+  out <- totalatd_tbl(
+    calendar_tbl(
+      data=.data
+      ,type =type
+      ,date_vec = rlang::as_label(rlang::enquo(date))
+    )
+    ,time_unit = time_unit("day")
+    ,action=action("aggregate")
+    ,value_vec = rlang::as_label(rlang::enquo(value))
+    ,new_column_name = "atd"
+    ,sort_logic = TRUE
+    ,fn="totalatd"
+    ,new_date_column_name = NA_character_
+  )
 
 
   return(out)
@@ -636,37 +712,37 @@ totalqtd_dbi <- function(.data,...,date_var,value_var){
 #'
 #' @examples
 #' totalmtd(fpaR:sales,date_var = order_date,value_var = quantity)
-totalmtd <- function(.data,...,date_var,value_var){
-
-  # Validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
-
-  # Aggregate data based on provided time unit
-
-  full_tbl <-  .data |>
-    make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
-    dplyr::mutate(
-      month=lubridate::month(date)
-      ,year=lubridate::year(date)
-      ,.before=1
-    ) |>
-    arrnage(date)
-
-  # Determine label for the time unit
-
-
-  # Calculate difference and proportional change
-
-  out_tbl <- full_tbl |>
-    dplyr::group_by(year,month,...) |>
-    dplyr::mutate(
-      mtd=base::cumsum({{value_var}})
-    ) |>
-    dplyr::ungroup()
-
-  return(out_tbl)
-
-}
+# totalmtd <- function(.data,...,date_var,value_var){
+#
+#   # Validate inputs
+#   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+#
+#   # Aggregate data based on provided time unit
+#
+#   full_tbl <-  .data |>
+#     make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+#     dplyr::mutate(
+#       month=lubridate::month(date)
+#       ,year=lubridate::year(date)
+#       ,.before=1
+#     ) |>
+#     arrange(date)
+#
+#   # Determine label for the time unit
+#
+#
+#   # Calculate difference and proportional change
+#
+#   out_tbl <- full_tbl |>
+#     dplyr::group_by(year,month,...) |>
+#     dplyr::mutate(
+#       mtd=base::cumsum({{value_var}})
+#     ) |>
+#     dplyr::ungroup()
+#
+#   return(out_tbl)
+#
+# }
 
 #' Total month to date values
 #'
@@ -723,37 +799,37 @@ totalmtd_dbi <- function(.data,...,date_var,value_var){
 #'
 #' @examples
 #' totalwtd(fpaR:sales,date_var = order_date,value_var = quantity)
-totalwtd <- function(.data,...,date_var,value_var){
-
-  # Validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
-
-  # Aggregate data based on provided time unit
-
-  full_tbl <-  .data |>
-    make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
-    mutate(
-      week=lubridate::week(date)
-      ,month=lubridate::month(date)
-      ,year=lubridate::year(date)
-      ,.before = 1
-    )
-
-  # Determine label for the time unit
-
-
-  # Calculate difference and proportional change
-
-  out_tbl <- full_tbl |>
-    dplyr::group_by(week,month,year,... ) |>
-    dplyr::mutate(
-      wtd=base::cumsum({{value_var}})
-    ) |>
-    dplyr::ungroup()
-
-  return(out_tbl)
-
-}
+# totalwtd <- function(.data,...,date_var,value_var){
+#
+#   # Validate inputs
+#   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+#
+#   # Aggregate data based on provided time unit
+#
+#   full_tbl <-  .data |>
+#     make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+#     mutate(
+#       week=lubridate::week(date)
+#       ,month=lubridate::month(date)
+#       ,year=lubridate::year(date)
+#       ,.before = 1
+#     )
+#
+#   # Determine label for the time unit
+#
+#
+#   # Calculate difference and proportional change
+#
+#   out_tbl <- full_tbl |>
+#     dplyr::group_by(week,month,year,... ) |>
+#     dplyr::mutate(
+#       wtd=base::cumsum({{value_var}})
+#     ) |>
+#     dplyr::ungroup()
+#
+#   return(out_tbl)
+#
+# }
 
 #' Total week to date values
 #'
@@ -810,31 +886,31 @@ totalwtd_dbi <- function(.data,...,date_var,value_var){
 #'
 #' @examples
 #' totalatd(fpaR:sales,date_var = order_date,value_var = quantity)
-totalatd <- function(.data,...,date_var,value_var){
-
-  # Validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
-
-  # Aggregate data based on provided time unit
-
-  full_tbl <-  .data |>
-    make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
-    dplyr::arrange(date)
-
-  # Determine label for the time unit
-
-
-  # Calculate difference and proportional change
-
-  out_tbl <- full_tbl |>
-    group_by(...) |>
-    dplyr::mutate(
-      atd=base::cumsum({{value_var}})
-    )
-
-  return(out_tbl)
-
-}
+# totalatd <- function(.data,...,date_var,value_var){
+#
+#   # Validate inputs
+#   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+#
+#   # Aggregate data based on provided time unit
+#
+#   full_tbl <-  .data |>
+#     make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day") |>
+#     dplyr::arrange(date)
+#
+#   # Determine label for the time unit
+#
+#
+#   # Calculate difference and proportional change
+#
+#   out_tbl <- full_tbl |>
+#     group_by(...) |>
+#     dplyr::mutate(
+#       atd=base::cumsum({{value_var}})
+#     )
+#
+#   return(out_tbl)
+#
+# }
 
 #' Total since inception
 #'

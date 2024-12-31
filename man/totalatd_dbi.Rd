@@ -15,6 +15,14 @@ totalatd_dbi(.data, ..., date_var, value_var)
 
 \item{value_var}{column with value to aggregate}
 }
+\value{
+tibble
+}
 \description{
 Total since inception
+}
+\examples{
+totalatd(fpaR:sales,date_var = order_date,value_var = quantity)
+Total since inception
+
 }

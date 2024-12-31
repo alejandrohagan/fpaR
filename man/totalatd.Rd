@@ -2,25 +2,13 @@
 % Please edit documentation in R/time_intelligence.R
 \name{totalatd}
 \alias{totalatd}
-\title{Total since inception}
+\title{Title}
 \usage{
-totalatd(.data, ..., date_var, value_var)
+totalatd(.data, date, value, type)
 }
 \arguments{
-\item{.data}{tibble of values}
-
-\item{...}{optional columns to group by}
-
-\item{date_var}{column with date var to aggregate by}
-
-\item{value_var}{column with value to aggregate}
-}
-\value{
-tibble
+\item{type}{}
 }
 \description{
-Total since inception
-}
-\examples{
-totalatd(fpaR:sales,date_var = order_date,value_var = quantity)
+Title
 }

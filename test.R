@@ -70,18 +70,18 @@ out <-   factor_tbl(data=x@data,target=x@target,formula=x@formula)
 out
 }
 
+
 test <- sales |>
   target(store_key) |>
   factor(vs~mpg+help) |>
   factor(mpg~vs+help)
-browe
 
-x <- sales |>
-  group_by(store_key) |>
-    totalqtd(order_date,quantity,"standard")
 
-x |>
+
+sales |>
+  totalwtd(date = order_date,quantity,type = "standard")
   calculate()
+
 
 #'
 #' #' Augment time attributes

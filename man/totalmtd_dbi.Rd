@@ -15,6 +15,14 @@ totalmtd_dbi(.data, ..., date_var, value_var)
 
 \item{value_var}{column with value to aggregate}
 }
+\value{
+tibble
+}
 \description{
 Total month to date values
+}
+\examples{
+totalmtd(fpaR:sales,date_var = order_date,value_var = quantity)
+Total month to date values
+
 }

@@ -2,25 +2,13 @@
 % Please edit documentation in R/time_intelligence.R
 \name{totalwtd}
 \alias{totalwtd}
-\title{Total Week to date values}
+\title{Title}
 \usage{
-totalwtd(.data, ..., date_var, value_var)
+totalwtd(.data, date, value, type)
 }
 \arguments{
-\item{.data}{tibble of values}
-
-\item{...}{optional columns to group by}
-
-\item{date_var}{column with date var to aggregate by}
-
-\item{value_var}{column with value to aggregate}
-}
-\value{
-tibble
+\item{type}{}
 }
 \description{
-Total Week to date values
-}
-\examples{
-totalwtd(fpaR:sales,date_var = order_date,value_var = quantity)
+Title
 }
