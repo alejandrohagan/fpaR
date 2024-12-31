@@ -161,7 +161,7 @@ s custom print function
 -   then work on print function
 -   then sql lm
 -   then documentation
-
+-   switched to new S7 branch
 
 
 ## to do list
