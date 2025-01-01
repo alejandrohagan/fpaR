@@ -372,7 +372,7 @@ totalytd <- function(.data,date,value,type){
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
     ,value_vec = rlang::as_label(rlang::enquo(value))
-    ,new_column_name = "ytd"
+    ,new_column_name_prefix = "ytd"
     ,sort_logic = TRUE
     ,fn="totalytd"
     ,new_date_column_name = "Year"
@@ -409,7 +409,7 @@ totalqtd <- function(.data,date,value,type){
     ,time_unit  = time_unit("day")
     ,action     = action("aggregate")
     ,value_vec  = rlang::as_label(rlang::enquo(value))
-    ,new_column_name = "qtd"
+    ,new_column_name_prefix = "qtd"
     ,sort_logic = TRUE
     ,fn         = "totalqtd"
     ,new_date_column_name = c("year","quarter")
@@ -447,7 +447,7 @@ totalmtd <- function(.data,date,value,type){
       ,time_unit = time_unit("day")
       ,action=action("aggregate")
       ,value_vec = rlang::as_label(rlang::enquo(value))
-      ,new_column_name = "mtd"
+      ,new_column_name_prefix = "mtd"
       ,sort_logic = TRUE
       ,fn="totalmtd"
       ,new_date_column_name = c("year","month")
@@ -484,7 +484,7 @@ totalwtd <- function(.data,date,value,type){
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
     ,value_vec = rlang::as_label(rlang::enquo(value))
-    ,new_column_name = "wtd"
+    ,new_column_name_prefix = "wtd"
     ,sort_logic = TRUE
     ,fn="totalwtd"
     ,new_date_column_name = c("year","month","week")
@@ -522,7 +522,7 @@ totalatd <- function(.data,date,value,type){
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
     ,value_vec = rlang::as_label(rlang::enquo(value))
-    ,new_column_name = "atd"
+    ,new_column_name_prefix = "atd"
     ,sort_logic = TRUE
     ,fn="totalatd"
     ,new_date_column_name = NA_character_
@@ -557,9 +557,38 @@ dod <- function(.data,date,value,type,lag_n){
     ,time_unit = time_unit("day")
     ,action=action(c("aggregate","shift","compare"))
     ,value_vec = rlang::as_label(rlang::enquo(value))
-    ,new_column_name = "dod"
+    ,new_column_name_prefix = "dod"
     ,sort_logic = TRUE
     ,fn="dod"
+    ,new_date_column_name = NA_character_
+    ,lag_n=lag_n
+  )
+
+
+  return(out)
+
+
+
+}
+
+
+
+
+dod <- function(.data,date,value,type,lag_n){
+
+
+  out <- dod_tbl(
+    calendar_tbl(
+      data=.data
+      ,type =type
+      ,date_vec = rlang::as_label(rlang::enquo(date))
+    )
+    ,time_unit = time_unit("day")
+    ,action=action(c("aggregate","shift","compare"))
+    ,value_vec = rlang::as_label(rlang::enquo(value))
+    ,new_column_name_prefix = "wow"
+    ,sort_logic = TRUE
+    ,fn="wow"
     ,new_date_column_name = NA_character_
     ,lag_n=lag_n
   )

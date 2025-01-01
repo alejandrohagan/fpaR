@@ -12,45 +12,38 @@ devtools::load_all()
 #   factor(price~lag(net_price)*quantity) |> # a method that returns a factor_tlb class and prints what it is doing
 #   calculate() # returns the ouput
 
+library(rlang)
 
+x <- dod(sales |> group_by(currency_code),date = order_date,value = quantity,type = "standard",lag_n = 1)
 
-x <- dod(sales,date = order_date,value = quantity,type = "standard",lag_n = 1)
-
-
+library(tidyverse)
+x |>
+  calculate()
 
 
 full_tbl <-  create_calendar(x)|>
-  arrange(date)
+  arrange(date,.by_group = TRUE)
 
-
-## multiplication factor
-
-  # Calculate difference and proportional change
-library(tidyverse)
-
-  full_tbl|>
-    dplyr::group_by(!!!x@calendar_tbl@group_quo) |>
-    arrange(date,.by_group = TRUE) |>
+lag_tbl <- full_tbl|>
     dplyr::mutate(
       date_lag=date %m+% lubridate::days(x@lag_n)
-      ,x@new_column_name:=!!x@value_quo
-    )
-    dplyr::select(-c(date,!x@value_quo)) |>
+      ,!!x@new_column_name:=!!x@value_quo
+    ) |>
+    dplyr::select(-c(date,!!x@value_quo)) |>
     dplyr::ungroup()
 
-  out_tbl <-  dplyr::left_join(
+out_tbl <-   dplyr::left_join(
     full_tbl
     ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,...)
-  ) |>
-    mutate(
-      ,"!!x@value_vec_dod":= dplyr::coalesce(.data[[rlang::englue("!!x@value_vec_dod")]],0)
-    )
-  return(out_tbl)
-
-}
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+  )
+    # mutate(
+      # !!x@new_column_name:= dplyr::coalesce(.data[[rlang::englue(x@new_column_name)]],0)
+    # )
 
 
+test_tbl |>
+  arrange(currency_code) |> view()
 
 
 

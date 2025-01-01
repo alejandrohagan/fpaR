@@ -258,3 +258,33 @@ method(calculate,totalatd_tbl) <- function(x){
   return(out_tbl)
 
 }
+
+
+method(calculate,dod_tbl) <- function(x){
+
+
+  full_tbl <-  create_calendar(x)
+
+
+  lag_tbl <- full_tbl|>
+    arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      date_lag=date %m+% lubridate::days(x@lag_n)
+      ,!!x@new_column_name:=!!x@value_quo
+    ) |>
+    dplyr::select(-c(date,!!x@value_quo)) |>
+    dplyr::ungroup()
+
+  out_tbl <-   dplyr::left_join(
+    full_tbl
+    ,lag_tbl
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+  )
+  # mutate(
+  # !!x@new_column_name:= dplyr::coalesce(.data[[rlang::englue(x@new_column_name)]],0)
+  # )
+
+  return(out_tbl)
+
+}
+

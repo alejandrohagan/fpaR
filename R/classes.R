@@ -172,7 +172,16 @@ ti_tbl <- S7::new_class(
         x
       }
     )
-    ,new_column_name=S7::new_property(class=S7::class_character)
+    ,new_column_name_prefix=S7::new_property(class=S7::class_character)
+    ,new_column_name=S7::new_property(
+      class=class_character
+      ,getter = \(self){
+
+        x <- paste0(self@new_column_name_prefix,"_",self@value_vec)
+        x
+
+      }
+    )
     ,new_date_column_name=S7::new_property(class=S7::class_character)
     ,lag_n=new_property(
       class=class_numeric
