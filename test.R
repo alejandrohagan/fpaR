@@ -16,10 +16,6 @@ library(rlang)
 
 x <- dod(sales |> group_by(currency_code),date = order_date,value = quantity,type = "standard",lag_n = 1)
 
-library(tidyverse)
-x |>
-  calculate()
-
 
 full_tbl <-  create_calendar(x)|>
   arrange(date,.by_group = TRUE)
