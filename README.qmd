@@ -168,6 +168,26 @@ s custom print function
       -   prefix plus value_vec
       -   also understand how predefined column names can help with the tot logic
 
+2024-1-6
+- need to reconsider the api approach
+  
+    - For example, "mom" can mean this time last month or it can mean month-to-date vs. last month-to-date
+    - option 1: mom can mean this time last month and mtdomtd can mean month to date vs last month to date
+      - this would be cumbersome 
+    - option 2: simplify the menu offering so mom just means mtd vs. pmtd with a key and mom can be done with other functions
+    - option 3: leverage the aggregate, shift, compare framework to come up with our own API
+    
+      - sales |> 
+        aggregate(quantity,month) |> 
+        shift(month) |> 
+        compare()
+      - this basicallyi replicates dplyr with only shift() and compare() being easy to understand and aggregate being a confusion function because you are actually aggregating multiple times with different aggregation methods 
+- redoing the api with aggregate, shift, compare solves some problems but introduces new ones -- in short there is no standard convention here, so its better to retain the current api and just establish convention (eg. mom over month means X)
+
+- create table that defines each function, its action(shift, aggregate, compare)
+- then act on that basis 
+         
+        
 ## to do list
 
 -   finalize time intelligence functions
