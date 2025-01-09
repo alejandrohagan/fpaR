@@ -187,6 +187,9 @@ s custom print function
 - create table that defines each function, its action(shift, aggregate, compare)
 - then act on that basis 
 
+[reference website](https://www.daxpatterns.com/custom-time-related-calculations/)
+
+
 
 ```{r}
 #| echo: false
@@ -200,13 +203,17 @@ tibble::tribble(
     "QTD", 	"Quarter-to-date",	 
     "MTD",  "Month-to-date",
     "WTD",  "Week-to-date",
-    "MoM",  "Month over Month",
+    "MoM",  "full Month over full Month",
+    "MoMTD", "month to date over this time last month to date"
     "WoW",  "Week over Week",
     "YoY",  "Year over Year",
     "PMTD", "Prior month's MTD amount",
     "PYTD", "Prior year MTD amount",
     "PWTD", "Prior month's MTD amount",
-    "MAT", 	"Moving annual total", 	  		 
+    "MTDOPM", "Month-to-date over Previous Month",
+     "QTDOPQ","Quarter-to-date over Previous Quarter",
+     "YTDOPY","Year-to-date over Previous Year",
+    "MAT", 	"Moving annual total of previous 342 days", 	  		 
     "PYC", 	"Previous year complete", 		  	 
     "PQC", 	"Previous quarter complete", 		  	 
     "PMC", 	"Previous month complete", 		  	 
