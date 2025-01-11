@@ -197,38 +197,38 @@ s custom print function
 #| message: false
 #| error: false
 
+
 tibble::tribble(
-   ~"Short Name",~"Description",
-    "YTD", 	"Year-to-date",	
-    "QTD", 	"Quarter-to-date",	 
-    "MTD",  "Month-to-date",
-    "WTD",  "Week-to-date",
-    "MoM",  "full Month over full Month",
-    "MoMTD", "month to date over this time last month to date"
-    "WoW",  "Week over Week",
-    "YoY",  "Year over Year",
-    "PMTD", "Prior month's MTD amount",
-    "PYTD", "Prior year MTD amount",
-    "PWTD", "Prior month's MTD amount",
-    "MTDOPM", "Month-to-date over Previous Month",
-     "QTDOPQ","Quarter-to-date over Previous Quarter",
-     "YTDOPY","Year-to-date over Previous Year",
-    "MAT", 	"Moving annual total of previous 342 days", 	  		 
-    "PYC", 	"Previous year complete", 		  	 
-    "PQC", 	"Previous quarter complete", 		  	 
-    "PMC", 	"Previous month complete", 		  	 
-    "PP", 	"Previous period; automatically selects year, quarter, or month" , 	 
-    "PYMAT", 	"Previous year moving annual total" ,			 
-    "MATG", 	"Moving annual total growth", 			
-    "POP", 	"Period-over-period; automatically selects year, quarter, or month", 	  	  	
-    "PYTD", 	"Previous year-to-date", 			 
-    "PQTD",	"Previous quarter-to-date", 			 
-    "YOYTD", 	"Year-over-year-to-date" ,			
-    "QOQTD", "	Quarter-over-quarter-to-date", 			
-    "YTDOPY", 	"Year-to-date-over-previous-year", 			
-    "QTDOPQ", 	"Quarter-to-date-over-previous-quarter", 	
-      
-  )
+   ~"short_name", ~"description", ~"shift", ~"aggregate", ~"compare",
+   "YoY", "Full Year over Year", "", "", "X",
+   "YTD", "Year-to-Date", "", "X", "",
+   "PYTD", "Prior Year-to-Date amount", "X", "X", "",
+   "YoYTD", "Current Year-to-Date over Prior Year-to-Date", "X", "X", "X",
+   "YTDOPY", "Year-to-Date over Full Previous Year", "X", "X", "X",
+   "PYMAT", "Previous Year Moving Annual Total", "X", "X", "X",
+   "QoQ", "Full Quarter over Quarter", "", "", "X",
+   "QTD", "Quarter-to-Date", "", "X", "",
+   "PQTD", "Prior Quarter-to-Date", "X", "X", "",
+   "QOQTD", "Quarter-over-Quarter-to-Date", "X", "X", "X",
+   "QTDOPQ", "Quarter-to-Date over Full Previous Quarter", "X", "X", "X",
+   "MTD", "Month-to-Date", "", "X", "",
+   "MoM", "Full Month over Full Month", "", "", "X",
+   "MoMTD", "Current Month-to-Date over Prior Month-to-Date", "X", "X", "X",
+   "PMTD", "Prior Month's MTD amount", "X", "X", "",
+   "MTDOPM", "Month-to-Date over Full Previous Month", "X", "X", "X",
+   "WTD", "Week-to-Date", "", "X", "",
+   "WoW", "Full Week over Full Week", "", "", "X",
+   "WoWTD", "Current Week-to-Date over Prior Week-to-Date", "X", "X", "X",
+   "PWTD", "Prior Week-to-Date", "X", "X", "",
+   "WTDOPW", "Week-to-Date over Full Previous Week", "X", "X", "X",
+   "MAT", "Moving Annual Total of Previous X Days", "X", "X", ""
+) |> 
+  dplyr::mutate(
+    id=dplyr::row_number()
+  ) |> 
+  dplyr::arrange(id) |> 
+  gt::gt()
+
 ```
 
 
