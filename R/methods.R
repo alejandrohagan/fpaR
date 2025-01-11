@@ -101,17 +101,21 @@ method(print,ytd_tbl) <- function(x){
   value_chr <- x@value_vec
   show <- cli::cli_div(theme = cli::simple_theme())
 
+
+
   cli::cli_h1("Year To Date:")
   cli::cli_code("ytd()")
   cli::cli_h2("Description:")
   cli::cli_par()
-  cli::cli_text("This will create a rolling sum of {.field {value_chr}}, froms January 1st till December 31st")
+  cli::cli_text("This will create a cumulative sum of {.field {value_chr}}, from ",cli::col_blue("January 1st")," till ",cli::col_blue("December 31st"))
 
   cli::builtin_theme()
 
   cli::cli_h2("Calendar:")
   cli::cat_bullet(paste("The calendar was aggregated to the",cli::col_yellow(x@time_unit@value),"time unit"))
-  cli::cli_text("A ",cli::bg_br_white(cli::col_br_red(x@calendar_tbl@type))," calendar is created with {group_count} group{?s}")
+
+  cli::cli_text("A ",cli::col_br_red(x@calendar_tbl@calendar_type)," calendar is created with ",cli::col_green("{group_count} group{?s}"))
+
   cli::cat_bullet(paste("Calendar ranges from",cli::col_br_green(x@calendar_tbl@min_date),"to",cli::col_br_green(x@calendar_tbl@max_date)))
   cli::cat_bullet(paste(cli::col_blue(x@calendar_tbl@date_missing),"days were missing and replaced with 0"))
   cli::cli_text("New date column ",cli::col_br_red(x@new_date_column_name)," was created")
