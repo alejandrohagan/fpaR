@@ -4,7 +4,6 @@ library(S7)
 devtools::document()
 devtools::load_all()
 
-
 # sales |> # dataframe
 #   target(value) |> # an function that retuns a factor_tbl class
 #   factor(price~lag(net_price)*quantity) |> # a method that returns a factor_tlb class and prints what it is doing
@@ -14,7 +13,14 @@ devtools::load_all()
 
 library(rlang)
 
+
+sales
 x <- dod(sales |> group_by(currency_code),date = order_date,value = quantity,type = "standard",lag_n = 1)
+
+x <- sales |> ytd(order_date,quantity,"standard")
+
+x
+
 
 
 full_tbl <-  create_calendar(x)|>

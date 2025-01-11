@@ -4,7 +4,7 @@
 \alias{dod}
 \title{Title}
 \usage{
-dod(.data, date, value, type, lag_n)
+dod(.data, date, value, calendar_type, lag_n)
 }
 \arguments{
 \item{type}{}

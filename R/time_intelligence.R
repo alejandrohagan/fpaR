@@ -345,28 +345,28 @@ make_aggregation_dbi <- function(.data, ..., date_var, value_var, time_unit){
 #
 # }
 
-#' Title
+#' Year-to-date
 #'
-#' @param .data
-#' @param date
-#' @param value
-#' @param type
+#' @param .data either a dataframe or lazy DBI object
+#' @param date the date column to aggregate
+#' @param value the value column to summarize
+#' @param calendar_type either 'standard' or '5-5-4' calendar
 #'
 #' @returns
 #' @export
 #'
 #' @examples
-totalytd <- function(.data,date,value,type){
+ytd <- function(.data,date,value,calendar_type){
 
   # Validate inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
 
 
-  out <- totalytd_tbl(
+  out <- ytd_tbl(
     calendar_tbl(
       data=.data
-      ,type =type
+      ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
@@ -374,7 +374,7 @@ totalytd <- function(.data,date,value,type){
     ,value_vec = rlang::as_label(rlang::enquo(value))
     ,new_column_name_prefix = "ytd"
     ,sort_logic = TRUE
-    ,fn="totalytd"
+    ,fn="ytd"
     ,new_date_column_name = "Year"
   )
 
@@ -392,7 +392,7 @@ totalytd <- function(.data,date,value,type){
 #' @export
 #'
 #' @examples
-totalqtd <- function(.data,date,value,type){
+qtd <- function(.data,date,value,calendar_type){
 
   # Validate inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
@@ -400,10 +400,10 @@ totalqtd <- function(.data,date,value,type){
   # Aggregate data based on provided time unit
 
 
-  out <- totalqtd_tbl(
+  out <- qtd_tbl(
     calendar_tbl(
       data      = .data
-      ,type     = type
+      ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit  = time_unit("day")
@@ -431,17 +431,17 @@ totalqtd <- function(.data,date,value,type){
 #' @export
 #'
 #' @examples
-totalmtd <- function(.data,date,value,type){
+mtd <- function(.data,date,value,calendar_type){
 
     # Validate inputs
     assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
 
 
-    out <- totalmtd_tbl(
+    out <- mtd_tbl(
       calendar_tbl(
         data=.data
-        ,type =type
+        ,calendar_type=calendar_type
         ,date_vec = rlang::as_label(rlang::enquo(date))
       )
       ,time_unit = time_unit("day")
@@ -468,17 +468,17 @@ totalmtd <- function(.data,date,value,type){
 #' @export
 #'
 #' @examples
-totalwtd <- function(.data,date,value,type){
+wtd <- function(.data,date,value,calendar_type){
 
   # Validate inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
 
 
-  out <- totalwtd_tbl(
+  out <- wtd_tbl(
     calendar_tbl(
       data=.data
-      ,type =type
+      ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
@@ -506,17 +506,17 @@ totalwtd <- function(.data,date,value,type){
 #' @export
 #'
 #' @examples
-totalatd <- function(.data,date,value,type){
+atd <- function(.data,date,value,calendar_type){
 
   # Validate inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
 
 
-  out <- totalatd_tbl(
+  out <- atd_tbl(
     calendar_tbl(
       data=.data
-      ,type =type
+      ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
@@ -545,13 +545,13 @@ totalatd <- function(.data,date,value,type){
 #' @export
 #'
 #' @examples
-dod <- function(.data,date,value,type,lag_n){
+dod <- function(.data,date,value,calendar_type,lag_n){
 
 
   out <- dod_tbl(
     calendar_tbl(
       data=.data
-      ,type =type
+      ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
@@ -572,33 +572,6 @@ dod <- function(.data,date,value,type,lag_n){
 }
 
 
-
-
-dod <- function(.data,date,value,type,lag_n){
-
-
-  out <- dod_tbl(
-    calendar_tbl(
-      data=.data
-      ,type =type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
-    )
-    ,time_unit = time_unit("day")
-    ,action=action(c("aggregate","shift","compare"))
-    ,value_vec = rlang::as_label(rlang::enquo(value))
-    ,new_column_name_prefix = "wow"
-    ,sort_logic = TRUE
-    ,fn="wow"
-    ,new_date_column_name = NA_character_
-    ,lag_n=lag_n
-  )
-
-
-  return(out)
-
-
-
-}
 
 #' Total year to date values
 #'

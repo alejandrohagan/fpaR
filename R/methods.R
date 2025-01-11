@@ -68,7 +68,7 @@ method(create_calendar,ti_tbl) <- function(x){
 #' @export
 #' @name totalytd_tbl
 #' @examples
-method(calculate,totalytd_tbl) <- function(x){
+method(calculate,ytd_tbl) <- function(x){
 
   # Aggregate data based on provided time unit
 
@@ -93,26 +93,28 @@ method(calculate,totalytd_tbl) <- function(x){
 }
 
 
-method(print,totalytd_tbl) <- function(x){
+method(print,ytd_tbl) <- function(x){
+
+  x@fn
 
   group_count <- x@calendar_tbl@group_count
   value_chr <- x@value_vec
   show <- cli::cli_div(theme = cli::simple_theme())
 
-  cli::cli_h1("Total Year To Date:")
-  cli::cli_code("totalytd()")
+  cli::cli_h1("Year To Date:")
+  cli::cli_code("ytd()")
   cli::cli_h2("Description:")
   cli::cli_par()
-  cli::cli_text("This will create a rolling sum of {.field {value_chr}}, from January 1st till December 31st")
+  cli::cli_text("This will create a rolling sum of {.field {value_chr}}, froms January 1st till December 31st")
 
   cli::builtin_theme()
 
   cli::cli_h2("Calendar:")
   cli::cat_bullet(paste("The calendar was aggregated to the",cli::col_yellow(x@time_unit@value),"time unit"))
-  cli::cat_bullet(cli::cli_text("A ",cli::bg_br_white(cli::col_br_red(x@calendar_tbl@type))," calendar is created with {group_count} group{?s}"))
+  cli::cli_text("A ",cli::bg_br_white(cli::col_br_red(x@calendar_tbl@type))," calendar is created with {group_count} group{?s}")
   cli::cat_bullet(paste("Calendar ranges from",cli::col_br_green(x@calendar_tbl@min_date),"to",cli::col_br_green(x@calendar_tbl@max_date)))
   cli::cat_bullet(paste(cli::col_blue(x@calendar_tbl@date_missing),"days were missing and replaced with 0"))
-  cli::cat_bullet(cli::cli_text("New date column ",cli::col_br_red(x@new_date_column_name)," was created"))
+  cli::cli_text("New date column ",cli::col_br_red(x@new_date_column_name)," was created")
   cli::cli_h2("Actions:")
 
   cli::cli_text(x@action@value[1])
@@ -120,10 +122,11 @@ method(print,totalytd_tbl) <- function(x){
   cli::cli_text(x@action@value[3])
 
   if(x@calendar_tbl@group_indicator){
+
   cli::cli_text("{stringr::str_flatten_comma(x@calendar_tbl@group_vec,last = ' and ')} groups are in the table")
+
   }
 
-  # cli::cli_par()
   cli::cli_rule()
 
   cli::cli_li("Use {.code calculate()} to return the results")
@@ -140,7 +143,7 @@ method(print,totalytd_tbl) <- function(x){
 #' @export
 #'
 #' @examples
-method(calculate,totalqtd_tbl) <- function(x){
+method(calculate,qtd_tbl) <- function(x){
 
 
 full_tbl <-  create_calendar(x) |>
@@ -174,7 +177,7 @@ return(out_tbl)
 #' @export
 #'
 #' @examples
-method(calculate,totalmtd_tbl) <- function(x){
+method(calculate,mtd_tbl) <- function(x){
 
 
   full_tbl <-  create_calendar(x) |>
@@ -207,7 +210,7 @@ method(calculate,totalmtd_tbl) <- function(x){
 #' @export
 #'
 #' @examples
-method(calculate,totalwtd_tbl) <- function(x){
+method(calculate,wtd_tbl) <- function(x){
 
 
   full_tbl <-  create_calendar(x) |>
@@ -242,7 +245,7 @@ method(calculate,totalwtd_tbl) <- function(x){
 #' @export
 #'
 #' @examples
-method(calculate,totalatd_tbl) <- function(x){
+method(calculate,atd_tbl) <- function(x){
 
 
   full_tbl <-  create_calendar(x)

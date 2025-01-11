@@ -221,7 +221,10 @@ tibble::tribble(
    "WoWTD", "Current Week-to-Date over Prior Week-to-Date", "X", "X", "X",
    "PWTD", "Prior Week-to-Date", "X", "X", "",
    "WTDOPW", "Week-to-Date over Full Previous Week", "X", "X", "X",
-   "MAT", "Moving Annual Total of Previous X Days", "X", "X", ""
+   "MAT", "Moving Annual Total of Previous X Days", "X", "X", "",
+   "ATD","cumlaitve total from inception to date","","x","",
+   "DoD", "Full Day over Full Day", "", "", "X",
+   
 ) |> 
   dplyr::mutate(
     id=dplyr::row_number()

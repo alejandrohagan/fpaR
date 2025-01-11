@@ -1,5 +1,4 @@
 
-
 .onLoad <- function(...) {
   S7::methods_register()
 }
@@ -55,14 +54,14 @@ calendar_tbl <- new_class(
       data=S7::new_property(
         class=class_data.frame
       )
-      ,type=S7::new_property(
+      ,calendar_type=S7::new_property(
         class=S7::class_character
         ,validator = \(value){
           if(!any(value %in% c("standard","554"))) return(cli::format_error("Please return either 'standard' or '554'"))
         }
         ,setter=\(self,value){
           value <- stringr::str_to_lower(value)
-          self@type <- value
+          self@calendar_type <- value
           self
         }
       )
@@ -203,33 +202,32 @@ ti_tbl <- S7::new_class(
 )
 
 
-totalytd_tbl <- S7::new_class(
-  "totalytd_tbl"
+ytd_tbl <- S7::new_class(
+  "ytd_tbl"
   ,parent = ti_tbl
-  ,package = "fpaR"
   )
 
 
-totalqtd_tbl <- S7::new_class(
-  "totalqtd_tbl"
+qtd_tbl <- S7::new_class(
+  "qtd_tbl"
   ,parent = ti_tbl
   ,package = "fpaR"
 )
 
-totalmtd_tbl <- S7::new_class(
-  "totalmtd_tbl"
+mtd_tbl <- S7::new_class(
+  "mtd_tbl"
   ,parent = ti_tbl
   ,package = "fpaR"
 )
 
-totalwtd_tbl <- S7::new_class(
+wtd_tbl <- S7::new_class(
   "totalwtd_tbl"
   ,parent = ti_tbl
   ,package = "fpaR"
 )
 
 
-totalatd_tbl <- S7::new_class(
+atd_tbl <- S7::new_class(
   "totalatd_tbl"
   ,parent = ti_tbl
   ,package = "fpaR"
