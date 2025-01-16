@@ -187,6 +187,9 @@ s custom print function
 - create table that defines each function, its action(shift, aggregate, compare)
 - then act on that basis 
 
+2025-1-15
+- api completed, now just neded to write queries with new api
+
 [reference website](https://www.daxpatterns.com/custom-time-related-calculations/)
 
 
@@ -197,6 +200,7 @@ s custom print function
 #| message: false
 #| error: false
 
+usethis::use_data_raw("functions")
 
 tibble::tribble(
    ~"short_name", ~"description", ~"shift", ~"aggregate", ~"compare",

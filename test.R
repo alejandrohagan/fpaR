@@ -4,6 +4,55 @@ library(S7)
 devtools::document()
 devtools::load_all()
 
+
+fn_name <- "yoy"
+
+function_tbl <- fpaR::functions |>
+  dplyr::filter(
+    fn_name_lower==!!fn_name
+  )
+
+
+
+test <- function(x){
+
+  cli::cli_h1("Year To Date:")
+  cli::cli_code("ytd()")
+  cli::cli_h2("Description:")
+  cli::cli_par()
+  cli::cli_text("This will create a cumulative sum of {.field {value_chr}}, from ",cli::col_blue("January 1st")," till ",cli::col_blue("December 31st"))
+
+  cli::builtin_theme()
+
+  cli::cli_h2("Calendar:")
+  cli::cat_bullet(paste("The calendar was aggregated to the",cli::col_yellow(x@time_unit@value),"time unit"))
+
+  cli::cli_text("A ",cli::col_br_red(x@calendar_tbl@calendar_type)," calendar is created with ",cli::col_green("{group_count} group{?s}"))
+
+  cli::cat_bullet(paste("Calendar ranges from",cli::col_br_green(x@calendar_tbl@min_date),"to",cli::col_br_green(x@calendar_tbl@max_date)))
+  cli::cat_bullet(paste(cli::col_blue(x@calendar_tbl@date_missing),"days were missing and replaced with 0"))
+  cli::cli_text("New date column ",cli::col_br_red(x@new_date_column_name)," was created")
+  cli::cli_h2("Actions:")
+
+  cli::cli_text(x@action@value[1])
+  cli::cli_text(x@action@value[2])
+  cli::cli_text(x@action@value[3])
+
+  if(x@calendar_tbl@group_indicator){
+
+  cli::cli_text("{stringr::str_flatten_comma(x@calendar_tbl@group_vec,last = ' and ')} groups are in the table")
+
+  }
+
+  cli::cli_rule()
+
+  cli::cli_li("Use {.code calculate()} to return the results")
+
+  cli::cli_end(show)
+
+
+}
+
 # sales |> # dataframe
 #   target(value) |> # an function that retuns a factor_tbl class
 #   factor(price~lag(net_price)*quantity) |> # a method that returns a factor_tlb class and prints what it is doing

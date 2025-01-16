@@ -346,7 +346,7 @@ make_aggregation_dbi <- function(.data, ..., date_var, value_var, time_unit){
 # }
 
 #' Year-to-date
-#'
+#ea
 #' @param .data either a dataframe or lazy DBI object
 #' @param date the date column to aggregate
 #' @param value the value column to summarize
