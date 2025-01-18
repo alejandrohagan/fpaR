@@ -148,6 +148,7 @@ make_action_cli <- function(x){
 #' @examples
 make_print_message <- function(x){
 
+  x <- fpaR::ytd(fpaR::sales,date = order_date,value=quantity,calendar_type = "standard")
 
   ## subset function descriptions from table
 
@@ -159,9 +160,10 @@ make_print_message <- function(x){
   ## prep variables for use later on
 
   value_chr <- x@value_vec
-  start_date <- "January 1st"
+  current_date <- "January 1st"
   end_date <- "December 31"
   group_count <- x@calendar_tbl@group_count
+  current_calendar_year <- "Current calendar year"
 
 
   ## start print message
@@ -172,7 +174,15 @@ make_print_message <- function(x){
   cli::cli_code(function_tbl$fn_name_lower)
   cli::cli_h2("Description:")
   cli::cli_par()
+
   cli::cli_text(function_tbl$method)
+
+
+
+  cli::cli_text("This will create a sum of quantity, from the beginning of the calendar year to the {cli::col_green('current date')}")
+
+
+  cli::cli_text(test)
 
   cli::builtin_theme()
 

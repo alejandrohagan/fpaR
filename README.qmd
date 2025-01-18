@@ -192,7 +192,12 @@ s custom print function
 - then act on that basis 
 
 2025-1-15
+
 - api completed, now just needed to write queries with new api
+
+2025-01-18
+
+- updating format of function description and piloted working format
 
 [reference website](https://www.daxpatterns.com/custom-time-related-calculations/)
 
