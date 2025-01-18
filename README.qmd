@@ -146,12 +146,14 @@ make_aggregation_tbl # method
     - then create all new calculate methods up front (copy and paste from above)
 
 Option 1:
+
   sales |> # dataframe
   totalytd(quantity,order_date) |> # returns ti object with printed instructions
   calculate() # returns data.frame
 s custom print function
 
 2024-12-30
+
 -   completed total_td functions
 -   need to update the print functions for the total_td functions
 -   then need to repeat classes for tot functions
@@ -169,6 +171,7 @@ s custom print function
       -   also understand how predefined column names can help with the tot logic
 
 2024-1-6
+
 - need to reconsider the api approach
   
     - For example, "mom" can mean this time last month or it can mean month-to-date vs. last month-to-date
@@ -181,6 +184,7 @@ s custom print function
         aggregate(quantity,month) |> 
         shift(month) |> 
         compare()
+        
       - this basicallyi replicates dplyr with only shift() and compare() being easy to understand and aggregate being a confusion function because you are actually aggregating multiple times with different aggregation methods 
 - redoing the api with aggregate, shift, compare solves some problems but introduces new ones -- in short there is no standard convention here, so its better to retain the current api and just establish convention (eg. mom over month means X)
 
@@ -188,7 +192,7 @@ s custom print function
 - then act on that basis 
 
 2025-1-15
-- api completed, now just neded to write queries with new api
+- api completed, now just needed to write queries with new api
 
 [reference website](https://www.daxpatterns.com/custom-time-related-calculations/)
 
