@@ -13,14 +13,28 @@ function_tbl <- fpaR::functions |>
   )
 
 
+x <- dod(sales |> group_by(currency_code),date = order_date,value = quantity,calendar_type = "standard",lag_n = 1)
 
-test <- function(x){
 
-  cli::cli_h1("Year To Date:")
-  cli::cli_code("ytd()")
+
+make_print_message <- function(x){
+
+  function_tbl <- fpaR::functions |>
+    dplyr::filter(
+      fn_name_lower==!!x@fn
+    )
+   value_chr <- x@calendar_tbl@min_date
+   start_date <- "January 1st"
+   end_date <- "December 31"
+   group_count <- x@calendar_tbl@group_count
+
+
+
+  cli::cli_h1(function_tbl$short_name)
+  cli::cli_code(function_tbl$fn_name_lower)
   cli::cli_h2("Description:")
   cli::cli_par()
-  cli::cli_text("This will create a cumulative sum of {.field {value_chr}}, from ",cli::col_blue("January 1st")," till ",cli::col_blue("December 31st"))
+  cli::cli_text(function_tbl$method)
 
   cli::builtin_theme()
 
@@ -52,6 +66,8 @@ test <- function(x){
 
 
 }
+
+
 
 # sales |> # dataframe
 #   target(value) |> # an function that retuns a factor_tbl class

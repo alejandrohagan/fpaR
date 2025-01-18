@@ -138,6 +138,21 @@ method(print,ytd_tbl) <- function(x){
   cli::cli_end(show)
 }
 
+method(print,dod_tbl) <- function(x){
+
+  make_print_message(x)
+
+
+}
+
+
+
+
+
+
+
+
+
 
 #' Title
 #'

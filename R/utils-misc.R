@@ -138,3 +138,83 @@ make_action_cli <- function(x){
   return(out)
 
 }
+
+#' Make print message
+#'
+#' @param x ti_tbl class object
+#'
+#' @returns print message
+#'
+#' @examples
+make_print_message <- function(x){
+
+
+  ## subset function descriptions from table
+
+  function_tbl <- fpaR::functions |>
+    dplyr::filter(
+      fn_name_lower==!!x@fn
+    )
+
+  ## prep variables for use later on
+
+  value_chr <- x@value_vec
+  start_date <- "January 1st"
+  end_date <- "December 31"
+  group_count <- x@calendar_tbl@group_count
+
+
+  ## start print message
+
+  ### generatl informatoin
+
+  cli::cli_h1(function_tbl$short_name)
+  cli::cli_code(function_tbl$fn_name_lower)
+  cli::cli_h2("Description:")
+  cli::cli_par()
+  cli::cli_text(function_tbl$method)
+
+  cli::builtin_theme()
+
+  ### Calendar information
+
+
+  cli::cli_h2("Calendar:")
+  cli::cat_bullet(paste("The calendar was aggregated to the",cli::col_yellow(x@time_unit@value),"time unit"))
+
+  cli::cli_text("A ",cli::col_br_red(x@calendar_tbl@calendar_type)," calendar is created with ",cli::col_green("{group_count} group{?s}"))
+
+  cli::cat_bullet(paste("Calendar ranges from",cli::col_br_green(x@calendar_tbl@min_date),"to",cli::col_br_green(x@calendar_tbl@max_date)))
+  cli::cat_bullet(paste(cli::col_blue(x@calendar_tbl@date_missing),"days were missing and replaced with 0"))
+  cli::cli_text("New date column ",cli::col_br_red(x@new_date_column_name)," was created")
+
+  ## Action information
+
+  cli::cli_h2("Actions:")
+
+  cli::cli_text(x@action@value[1])
+  cli::cli_text(x@action@value[2])
+  cli::cli_text(x@action@value[3])
+
+ ## print groups if groups exist
+
+
+  if(x@calendar_tbl@group_indicator){
+
+    cli::cli_text("{stringr::str_flatten_comma(x@calendar_tbl@group_vec,last = ' and ')} groups are in the table")
+
+  }
+
+  ## Next Steps information
+
+  cli::cli_h2("Next Steps:")
+
+  cli::cli_rule()
+
+  cli::cli_li("Use {.code calculate()} to return the results")
+
+  cli::cli_end()
+
+}
+
+
