@@ -2,27 +2,13 @@
 % Please edit documentation in R/time_intelligence.R
 \name{wow}
 \alias{wow}
-\title{Week over week values}
+\title{Title}
 \usage{
-wow(.data, ..., date_var, value_var, lag_n = 1)
+wow(.data, date, value, calendar_type, lag_n)
 }
 \arguments{
-\item{.data}{tibble of values}
-
-\item{...}{optional columns to group by}
-
-\item{date_var}{column with date var to aggregate by}
-
-\item{value_var}{column with value to aggregate}
-
-\item{lag_n}{the number of weeks to lag}
-}
-\value{
-tibble
+\item{type}{}
 }
 \description{
-For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
-}
-\examples{
-wow(fpaR:sales,date_var = order_date,value_var = quantity)
+Title
 }

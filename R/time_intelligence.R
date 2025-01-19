@@ -563,11 +563,107 @@ dod <- function(.data,date,value,calendar_type,lag_n){
     ,new_date_column_name = NA_character_
     ,lag_n=lag_n
   )
+  return(out)
+}
 
+#' Title
+#'
+#' @param .data
+#' @param date
+#' @param value
+#' @param type
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+wow <- function(.data,date,value,calendar_type,lag_n){
+
+
+  out <- wow_tbl(
+    calendar_tbl(
+      data=.data
+      ,calendar_type=calendar_type
+      ,date_vec = rlang::as_label(rlang::enquo(date))
+    )
+    ,time_unit = time_unit("week")
+    ,action=action(c("aggregate","shift","compare"))
+    ,value_vec = rlang::as_label(rlang::enquo(value))
+    ,new_column_name_prefix = "wow"
+    ,sort_logic = TRUE
+    ,fn="wow"
+    ,new_date_column_name = NA_character_
+    ,lag_n=lag_n
+  )
+  return(out)
+}
+
+
+
+
+#' Title
+#'
+#' @param .data
+#' @param date
+#' @param value
+#' @param type
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+mom <- function(.data,date,value,calendar_type,lag_n){
+
+
+  out <- mom_tbl(
+    calendar_tbl(
+      data=.data
+      ,calendar_type=calendar_type
+      ,date_vec = rlang::as_label(rlang::enquo(date))
+    )
+    ,time_unit = time_unit("month")
+    ,action=action(c("aggregate","shift","compare"))
+    ,value_vec = rlang::as_label(rlang::enquo(value))
+    ,new_column_name_prefix = "mom"
+    ,sort_logic = TRUE
+    ,fn="mom"
+    ,new_date_column_name = NA_character_
+    ,lag_n=lag_n
+  )
+  return(out)
+}
+
+
+#' Title
+#'
+#' @param .data
+#' @param date
+#' @param value
+#' @param type
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+yoy <- function(.data,date,value,calendar_type,lag_n){
+
+  out <- yoy_tbl(
+    calendar_tbl(
+      data=.data
+      ,calendar_type=calendar_type
+      ,date_vec = rlang::as_label(rlang::enquo(date))
+    )
+    ,time_unit = time_unit("year")
+    ,action=action(c("aggregate","shift","compare"))
+    ,value_vec = rlang::as_label(rlang::enquo(value))
+    ,new_column_name_prefix = "yoy"
+    ,sort_logic = TRUE
+    ,fn="yoy"
+    ,new_date_column_name = NA_character_
+    ,lag_n=lag_n
+  )
 
   return(out)
-
-
 
 }
 
@@ -624,7 +720,6 @@ dod <- function(.data,date,value,calendar_type,lag_n){
 #' @export
 #'
 #' @examples
-#' totalytd(fpaR:sales,date_var = order_date,value_var = quantity)
 totalytd_dbi <- function(.data,...,date_var,value_var){
 
   # Validate inputs
@@ -1135,60 +1230,60 @@ dod_dbi <- function(.data,...,date_var,value_var,lag_n=1){
 
 }
 
-
-
-#' Week over week values
-#' @description
-#' For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
 #'
-#' @param .data tibble of values
-#' @param ... optional columns to group by
-#' @param date_var column with date var to aggregate by
-#' @param value_var column with value to aggregate
-#' @param lag_n the number of weeks to lag
 #'
-#' @return tibble
-#' @export
+#' #' Week over week values
+#' #' @description
+#' #' For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
+#' #'
+#' #' @param .data tibble of values
+#' #' @param ... optional columns to group by
+#' #' @param date_var column with date var to aggregate by
+#' #' @param value_var column with value to aggregate
+#' #' @param lag_n the number of weeks to lag
+#' #'
+#' #' @return tibble
+#' #' @export
+#' #'
+#' #' @examples
+#' #' wow(fpaR:sales,date_var = order_date,value_var = quantity)
+#' wow <- function(.data,...,date_var,value_var,lag_n=1){
 #'
-#' @examples
-#' wow(fpaR:sales,date_var = order_date,value_var = quantity)
-wow <- function(.data,...,date_var,value_var,lag_n=1){
-
-  # Validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
-
-  # Aggregate data based on provided time unit
-
-  full_tbl <-  .data |>
-    make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day")
-
-  # Determine label for the time unit
-
-
-  # Calculate difference and proportional change
-
-  lag_table <- full_tbl |>
-    dplyr::group_by(...) |>
-    dplyr::mutate(
-      date_lag=date %m+% lubridate::weeks(lag_n)
-      ,"{{value_var}}_wow":={{value_var}}
-    ) |>
-    dplyr::select(-c(date,{{value_var}})) |>
-    dplyr::ungroup()
-
-
-  out_tbl <-  dplyr::left_join(
-    full_tbl
-    ,lag_table
-    ,by=dplyr::join_by(date==date_lag,...)
-  ) |>
-    mutate(
-      "{{value_var}}_wow" := dplyr::coalesce(.data[[rlang::englue("{{value_var}}_wow")]],0)
-    )
-
-  return(out_tbl)
-
-}
+#'   # Validate inputs
+#'   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+#'
+#'   # Aggregate data based on provided time unit
+#'
+#'   full_tbl <-  .data |>
+#'     make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day")
+#'
+#'   # Determine label for the time unit
+#'
+#'
+#'   # Calculate difference and proportional change
+#'
+#'   lag_table <- full_tbl |>
+#'     dplyr::group_by(...) |>
+#'     dplyr::mutate(
+#'       date_lag=date %m+% lubridate::weeks(lag_n)
+#'       ,"{{value_var}}_wow":={{value_var}}
+#'     ) |>
+#'     dplyr::select(-c(date,{{value_var}})) |>
+#'     dplyr::ungroup()
+#'
+#'
+#'   out_tbl <-  dplyr::left_join(
+#'     full_tbl
+#'     ,lag_table
+#'     ,by=dplyr::join_by(date==date_lag,...)
+#'   ) |>
+#'     mutate(
+#'       "{{value_var}}_wow" := dplyr::coalesce(.data[[rlang::englue("{{value_var}}_wow")]],0)
+#'     )
+#'
+#'   return(out_tbl)
+#'
+#' }
 
 
 #' week over week comparison for DBI objects
@@ -1259,61 +1354,61 @@ out_tbl <-  dplyr::left_join(
   return(out_tbl)
 
 }
-
-
-#' Month over month values
-#' @description
-#' For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
 #'
-#' @param .data tibble of values
-#' @param ... optional columns to group by
-#' @param date_var column with date var to aggregate by
-#' @param value_var column with value to aggregate
-#' @param lag_n the number of weeks to lag
 #'
-#' @return tibble
-#' @export
+#' #' Month over month values
+#' #' @description
+#' #' For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
+#' #'
+#' #' @param .data tibble of values
+#' #' @param ... optional columns to group by
+#' #' @param date_var column with date var to aggregate by
+#' #' @param value_var column with value to aggregate
+#' #' @param lag_n the number of weeks to lag
+#' #'
+#' #' @return tibble
+#' #' @export
+#' #'
+#' #' @examples
+#' #' mom(sales_tbl,date_var = order_date,value_var = quantity)
+#' mom <- function(.data,...,date_var,value_var,lag_n=1){
 #'
-#' @examples
-#' mom(sales_tbl,date_var = order_date,value_var = quantity)
-mom <- function(.data,...,date_var,value_var,lag_n=1){
-
-  # Validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
-  # Aggregate data based on provided time unit
-
-  full_tbl <-  .data |>
-    make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day")
-
-  # Determine label for the time unit
-
-
-  # Calculate difference and proportional change
-
-  lag_table <- full_tbl |>
-    dplyr::group_by(...) |>
-    dplyr::mutate(
-      date_lag=date %m+% base::months(lag_n)
-      ,"{{value_var}}_mom":={{value_var}}
-    ) |>
-    dplyr::select(-c(date,{{value_var}})) |>
-    dplyr::ungroup()
-
-  print(full_tbl)
-
-
- out_tbl <-  dplyr::left_join(
-    full_tbl
-    ,lag_table
-    ,by=dplyr::join_by(date==date_lag,...)
-  ) |>
-   mutate(
-     "{{value_var}}_mom" := dplyr::coalesce(.data[[rlang::englue("{{value_var}}_mom")]],0)
-   )
-
-  return(out_tbl)
-
-}
+#'   # Validate inputs
+#'   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+#'   # Aggregate data based on provided time unit
+#'
+#'   full_tbl <-  .data |>
+#'     make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day")
+#'
+#'   # Determine label for the time unit
+#'
+#'
+#'   # Calculate difference and proportional change
+#'
+#'   lag_table <- full_tbl |>
+#'     dplyr::group_by(...) |>
+#'     dplyr::mutate(
+#'       date_lag=date %m+% base::months(lag_n)
+#'       ,"{{value_var}}_mom":={{value_var}}
+#'     ) |>
+#'     dplyr::select(-c(date,{{value_var}})) |>
+#'     dplyr::ungroup()
+#'
+#'   print(full_tbl)
+#'
+#'
+#'  out_tbl <-  dplyr::left_join(
+#'     full_tbl
+#'     ,lag_table
+#'     ,by=dplyr::join_by(date==date_lag,...)
+#'   ) |>
+#'    mutate(
+#'      "{{value_var}}_mom" := dplyr::coalesce(.data[[rlang::englue("{{value_var}}_mom")]],0)
+#'    )
+#'
+#'   return(out_tbl)
+#'
+#' }
 
 
 #' Month over month values
@@ -1387,88 +1482,88 @@ mom_dbi <- function(.data,...,date_var,value_var,lag_n=1){
 
 
 
-
-
-
-#' Year over year values
-#' @description
-#' For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
 #'
-#' @param .data tibble of values
-#' @param ... optional columns to group by
-#' @param date_var column with date var to aggregate by
-#' @param value_var column with value to aggregate
-#' @param lag_n
-#' @param time_unit
 #'
-#' @return tibble
-#' @export
 #'
-#' @examples
-#' yoy(fpaR::sales,date_var = order_date,value_var = quantity)
-yoy <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){
-
-  # Validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
-  assertthat::assert_that(time_unit %in% base::c("day","quarter","month", "year"), msg = "Time frame must be one of 'day', 'month',;quarter' or 'year'.")
-  # Aggregate data based on provided time unit
-
-  full_tbl <-  .data |>
-    make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit=time_unit) |>
-    arrange(
-      date
-    )
-
-
-  ## multiplication factor
-
-  multiply_options <- c("day"=1,"month"=12,"quarter"=4,"year"=1)
-
-
-
-  multiply_vec <- multiply_options[time_unit] |> base::unname()
-
-
-
-  if(time_unit %in% c("day")){
-
-  # Calculate difference and proportional change
-
-
-  lag_tbl <- full_tbl |>
-    dplyr::group_by(...) |>
-    dplyr::mutate(
-      date_lag=date %m+% lubridate::years(lag_n)
-      ,"{{value_var}}_yoy":={{value_var}}
-    ) |>
-    dplyr::select(-c(date,{{value_var}})) |>
-    dplyr::ungroup()
-
-  out_tbl <-  dplyr::left_join(
-    full_tbl
-    ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,...)
-  ) |>
-    mutate(
-      "{{value_var}}_yoy" := dplyr::coalesce(.data[[rlang::englue("{{value_var}}_yoy")]],0)
-    )
-    return(out_tbl)
-
-  } else {
-
-    out_tbl <-  full_tbl |>
-      group_by(...) |>
-      dplyr::mutate(
-        "{{value_var}}_yoy":=dplyr::lag({{value_var}},n=(lag_n*multiply_vec))
-      ) |>
-      dplyr::ungroup()
-
-    return(out_tbl)
-
-  }
-
-
-}
+#' #' Year over year values
+#' #' @description
+#' #' For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
+#' #'
+#' #' @param .data tibble of values
+#' #' @param ... optional columns to group by
+#' #' @param date_var column with date var to aggregate by
+#' #' @param value_var column with value to aggregate
+#' #' @param lag_n
+#' #' @param time_unit
+#' #'
+#' #' @return tibble
+#' #' @export
+#' #'
+#' #' @examples
+#' #' yoy(fpaR::sales,date_var = order_date,value_var = quantity)
+#' yoy <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){
+#'
+#'   # Validate inputs
+#'   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+#'   assertthat::assert_that(time_unit %in% base::c("day","quarter","month", "year"), msg = "Time frame must be one of 'day', 'month',;quarter' or 'year'.")
+#'   # Aggregate data based on provided time unit
+#'
+#'   full_tbl <-  .data |>
+#'     make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit=time_unit) |>
+#'     arrange(
+#'       date
+#'     )
+#'
+#'
+#'   ## multiplication factor
+#'
+#'   multiply_options <- c("day"=1,"month"=12,"quarter"=4,"year"=1)
+#'
+#'
+#'
+#'   multiply_vec <- multiply_options[time_unit] |> base::unname()
+#'
+#'
+#'
+#'   if(time_unit %in% c("day")){
+#'
+#'   # Calculate difference and proportional change
+#'
+#'
+#'   lag_tbl <- full_tbl |>
+#'     dplyr::group_by(...) |>
+#'     dplyr::mutate(
+#'       date_lag=date %m+% lubridate::years(lag_n)
+#'       ,"{{value_var}}_yoy":={{value_var}}
+#'     ) |>
+#'     dplyr::select(-c(date,{{value_var}})) |>
+#'     dplyr::ungroup()
+#'
+#'   out_tbl <-  dplyr::left_join(
+#'     full_tbl
+#'     ,lag_tbl
+#'     ,by=dplyr::join_by(date==date_lag,...)
+#'   ) |>
+#'     mutate(
+#'       "{{value_var}}_yoy" := dplyr::coalesce(.data[[rlang::englue("{{value_var}}_yoy")]],0)
+#'     )
+#'     return(out_tbl)
+#'
+#'   } else {
+#'
+#'     out_tbl <-  full_tbl |>
+#'       group_by(...) |>
+#'       dplyr::mutate(
+#'         "{{value_var}}_yoy":=dplyr::lag({{value_var}},n=(lag_n*multiply_vec))
+#'       ) |>
+#'       dplyr::ungroup()
+#'
+#'     return(out_tbl)
+#'
+#'   }
+#'
+#'
+#' }
 
 #' Year over year values for DBI objects
 #'

@@ -2,7 +2,22 @@
 % Please edit documentation in R/time_intelligence.R
 \name{mom_dbi}
 \alias{mom_dbi}
-\title{Month over month values}
+\title{#' Month over month values
+#' @description
+#' For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
+#'
+#' @param .data tibble of values
+#' @param ... optional columns to group by
+#' @param date_var column with date var to aggregate by
+#' @param value_var column with value to aggregate
+#' @param lag_n the number of weeks to lag
+#'
+#' @return tibble
+#' @export
+#'
+#' @examples
+#' mom(sales_tbl,date_var = order_date,value_var = quantity)
+mom <- function(.data,...,date_var,value_var,lag_n=1){}
 \usage{
 mom_dbi(.data, ..., date_var, value_var, lag_n = 1)
 }
@@ -18,5 +33,19 @@ mom_dbi(.data, ..., date_var, value_var, lag_n = 1)
 \item{lag_n}{the number of months to lag}
 }
 \description{
-Month over month values
+# Validate inputs
+  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+  # Aggregate data based on provided time unit
 }
+\details{
+full_tbl <-  .data |>
+make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day")
+}
+\section{Determine label for the time unit}{
+
+}
+
+\section{Calculate difference and proportional change}{
+
+}
+

@@ -2,7 +2,23 @@
 % Please edit documentation in R/time_intelligence.R
 \name{yoy_dbi}
 \alias{yoy_dbi}
-\title{Year over year values for DBI objects}
+\title{#' Year over year values
+#' @description
+#' For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
+#'
+#' @param .data tibble of values
+#' @param ... optional columns to group by
+#' @param date_var column with date var to aggregate by
+#' @param value_var column with value to aggregate
+#' @param lag_n
+#' @param time_unit
+#'
+#' @return tibble
+#' @export
+#'
+#' @examples
+#' yoy(fpaR::sales,date_var = order_date,value_var = quantity)
+yoy <- function(.data,...,date_var,value_var,lag_n=1,time_unit="day"){}
 \usage{
 yoy_dbi(.data, ..., date_var, value_var, lag_n = 1, time_unit = "day")
 }
@@ -20,5 +36,12 @@ yoy_dbi(.data, ..., date_var, value_var, lag_n = 1, time_unit = "day")
 \item{time_unit}{to return aggregate data by 'day','week','month','quarter' or 'year'}
 }
 \description{
-Year over year values for DBI objects
+# Validate inputs
+  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+  assertthat::assert_that(time_unit %in% base::c("day","quarter","month", "year"), msg = "Time frame must be one of 'day', 'month',;quarter' or 'year'.")
+  # Aggregate data based on provided time unit
 }
+\section{Calculate difference and proportional change}{
+
+}
+

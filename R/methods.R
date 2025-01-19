@@ -62,11 +62,10 @@ method(create_calendar,ti_tbl) <- function(x){
 
 #' Title
 #'
-#' @param x totalytd_tbl object
+#' @param x ytd_tbl object
 #'
 #' @returns
 #' @export
-#' @name totalytd_tbl
 #' @examples
 method(calculate,ytd_tbl) <- function(x){
 
@@ -308,5 +307,85 @@ method(calculate,dod_tbl) <- function(x){
 
   return(out_tbl)
 
+}
+
+
+
+method(calculate,wow_tbl) <- function(x){
+
+
+  full_tbl <-  create_calendar(x)
+
+
+  lag_tbl <- full_tbl|>
+    arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      date_lag=dplyr::lead(date,n = x@lag_n)
+      ,!!x@new_column_name:=!!x@value_quo
+    ) |>
+    dplyr::select(-c(date,!!x@value_quo)) |>
+    dplyr::ungroup()
+
+  out_tbl <-   dplyr::left_join(
+    full_tbl
+    ,lag_tbl
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+  )
+
+
+  return(out_tbl)
+
+}
+
+
+method(calculate,mom_tbl) <- function(x){
+
+
+  full_tbl <-  create_calendar(x)
+
+
+  lag_tbl <- full_tbl|>
+    dplyr::arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      date_lag=dplyr::lead(date,n = x@lag_n)
+      ,!!x@new_column_name:=!!x@value_quo
+    ) |>
+    dplyr::select(-c(date,!!x@value_quo)) |>
+    dplyr::ungroup()
+
+  out_tbl <-   dplyr::left_join(
+    full_tbl
+    ,lag_tbl
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+  )
+
+
+  return(out_tbl)
+
+}
+
+
+method(calculate,yoy_tbl) <- function(x){
+
+
+  full_tbl <-  create_calendar(x)
+
+
+  lag_tbl <- full_tbl|>
+    arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      date_lag=dplyr::lead(date,n = x@lag_n)
+      ,!!x@new_column_name:=!!x@value_quo
+    ) |>
+    dplyr::select(-c(date,!!x@value_quo)) |>
+    dplyr::ungroup()
+
+  out_tbl <-   dplyr::left_join(
+    full_tbl
+    ,lag_tbl
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+  )
+
+  return(out_tbl)
 }
 

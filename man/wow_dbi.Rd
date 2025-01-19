@@ -2,7 +2,22 @@
 % Please edit documentation in R/time_intelligence.R
 \name{wow_dbi}
 \alias{wow_dbi}
-\title{week over week comparison for DBI objects}
+\title{#' Week over week values
+#' @description
+#' For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
+#'
+#' @param .data tibble of values
+#' @param ... optional columns to group by
+#' @param date_var column with date var to aggregate by
+#' @param value_var column with value to aggregate
+#' @param lag_n the number of weeks to lag
+#'
+#' @return tibble
+#' @export
+#'
+#' @examples
+#' wow(fpaR:sales,date_var = order_date,value_var = quantity)
+wow <- function(.data,...,date_var,value_var,lag_n=1){}
 \usage{
 wow_dbi(.data, ..., date_var, value_var, lag_n = 1)
 }
@@ -21,5 +36,37 @@ wow_dbi(.data, ..., date_var, value_var, lag_n = 1)
 DBI object
 }
 \description{
-week over week comparison for DBI objects
+#' Week over week values
+#' @description
+#' For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
+#'
+#' @param .data tibble of values
+#' @param ... optional columns to group by
+#' @param date_var column with date var to aggregate by
+#' @param value_var column with value to aggregate
+#' @param lag_n the number of weeks to lag
+#'
+#' @return tibble
+#' @export
+#'
+#' @examples
+#' wow(fpaR:sales,date_var = order_date,value_var = quantity)
+wow <- function(.data,...,date_var,value_var,lag_n=1){
 }
+\section{Validate inputs}{
+assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+}
+
+\section{Aggregate data based on provided time unit}{
+full_tbl <-  .data |>
+make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit="day")
+}
+
+\section{Determine label for the time unit}{
+
+}
+
+\section{Calculate difference and proportional change}{
+
+}
+

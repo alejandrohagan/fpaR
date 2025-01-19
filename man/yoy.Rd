@@ -2,27 +2,13 @@
 % Please edit documentation in R/time_intelligence.R
 \name{yoy}
 \alias{yoy}
-\title{Year over year values}
+\title{Title}
 \usage{
-yoy(.data, ..., date_var, value_var, lag_n = 1, time_unit = "day")
+yoy(.data, date, value, calendar_type, lag_n)
 }
 \arguments{
-\item{.data}{tibble of values}
-
-\item{...}{optional columns to group by}
-
-\item{date_var}{column with date var to aggregate by}
-
-\item{value_var}{column with value to aggregate}
-
-\item{time_unit}{}
-}
-\value{
-tibble
+\item{type}{}
 }
 \description{
-For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
-}
-\examples{
-yoy(fpaR::sales,date_var = order_date,value_var = quantity)
+Title
 }

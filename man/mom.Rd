@@ -2,27 +2,13 @@
 % Please edit documentation in R/time_intelligence.R
 \name{mom}
 \alias{mom}
-\title{Month over month values}
+\title{Title}
 \usage{
-mom(.data, ..., date_var, value_var, lag_n = 1)
+mom(.data, date, value, calendar_type, lag_n)
 }
 \arguments{
-\item{.data}{tibble of values}
-
-\item{...}{optional columns to group by}
-
-\item{date_var}{column with date var to aggregate by}
-
-\item{value_var}{column with value to aggregate}
-
-\item{lag_n}{the number of weeks to lag}
-}
-\value{
-tibble
+\item{type}{}
 }
 \description{
-For datasets with daily granularity, this will calculate year over year values with some simple descriptive functions
-}
-\examples{
-mom(sales_tbl,date_var = order_date,value_var = quantity)
+Title
 }

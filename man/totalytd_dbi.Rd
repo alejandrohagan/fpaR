@@ -27,5 +27,4 @@ Total year to date values
 totalytd(fpaR:sales,date_var = order_date,value_var = quantity)
 Total year to date values
 
-totalytd(fpaR:sales,date_var = order_date,value_var = quantity)
 }
