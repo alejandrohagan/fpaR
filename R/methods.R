@@ -25,7 +25,7 @@ method(create_calendar,ti_tbl) <- function(x){
     )
 
   calendar_tbl <- tibble::tibble(
-    date = base::seq.Date(from = x@calendar_tbl@min_date, to = x@calendar_tbl@max_date, by = x@time_unit@value)
+    date = base::seq.Date(from = min(summary_tbl$date), to = max(summary_tbl$date), by = x@time_unit@value)
   )
 
   # Create a calendar table with all the dates in the specified time frame

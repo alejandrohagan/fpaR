@@ -1,14 +1,21 @@
 
 #' Aggregate and expand date table
 #'
-#' @param .data tibble
-#' @param ... dimensions to group by
-#' @param date_var dimension with main date column
-#' @param value_var dimension with values to aggregate by
-#' @param time_unit which time unit to aggregate to
-#'
+#' @param .data data either grouped or ungrouped
+#' @param time_unit the time unit to aggregate the date column by: 'day', 'week', 'month', 'quarter' or 'year'
+#' @param date  the date column
+#' @param value  the value column to aggregate
+#' @seealso [fpar::make_aggregation_dbi()] which is the dbi equivalent of this function
+#' @description
+#' `make_aggregation_tbl()` summarizes a tibble to target time unit and completes the calendar to ensure
+#' no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
+#' for each combination of the group
+#' @details
+#' This is in internal function to make it easier to ensure data has no missing dates to
+#'  simplify the use of time intelligence functions downstream of the application.
+#' If you want to summarize to a particular group, simply pass the tibble through to the `group_by()` argument
+#' prior to function and the function will make summarize and make a complete calendar for each group item.
 #' @return tibble
-#' @export
 #'
 #' @examples
 #' make_aggregation_tbl(fpaR::sales,date=date,value=quantity,time_unit="day")
@@ -89,16 +96,15 @@ make_aggregation_tbl <- function(.data,date,value,time_unit) {
 #' Aggregate and expand date table
 #'
 #' @param .data dbi object
-#' @param ... dimensions to group by
-#' @param date_var dimension with main date column
-#' @param value_var dimension with values to aggregate by
 #' @param time_unit which time unit to aggregate to
+#' @param date
+#' @param value
 #'
 #' @return list of dbi and sql object
 #' @export
 #'
 #' @examples
-make_aggregation_dbi <- function(.data, ..., date_var, value_var, time_unit){
+make_aggregation_dbi <- function(.data,date,value,time_unit){
 
   ## create inputs----------
   original_query <- fpaR::capture_original_query(.data)
@@ -311,57 +317,29 @@ make_aggregation_dbi <- function(.data, ..., date_var, value_var, time_unit){
 
 
 
-# calculate <- function(.data,...,date_var,value_var,time_unit){
-#
-#   # Validate inputs
-#   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
-#   assertthat::assert_that(base::is.character(time_unit), msg = "time_unit must be a character")
-#
-#   # Aggregate data based on provided time unit
-#
-#   full_tbl <-  .data |>
-#     make_aggregation_tbl(...,date_var={{date_var}},value_var={{value_var}},time_unit=time_unit)
-#
-#   # Determine label for the time unit
-#
-#   lbl <-   base::names(
-#     base::match.arg(
-#       "week"
-#       ,choices = c("mom"="month","yoy"="year","wow"="week","dod"="day")
-#       ,several.ok = FALSE
-#     )
-#   )
-#
-#
-#   # Calculate difference and proportional change
-#
-#   out_tbl <- full_tbl |>
-#     dplyr::mutate(
-#       !!lbl:= {{value_var}} - lag({{value_var}}, 1)
-#       ,prop_delta=  .data[[!!lbl]]/{{value_var}}
-#     )
-#
-#   return(out_tbl)
-#
-# }
-
 #' Year-to-date
-#ea
-#' @param .data either a dataframe or lazy DBI object
+#' @param .data either a tibble or  DBI object
 #' @param date the date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @description
+#' This calculates the annual cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with `dplyr::group_by()`.
 #'
-#' @returns
+#' Use `calculate()` to return the results
+#'
+#' @returns ytd_tbl or ytd_dbi object depending on what is passed through
 #' @export
 #'
 #' @examples
+#' ytd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
 ytd <- function(.data,date,value,calendar_type){
 
   # Validate inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
 
+  # assigns inputs to ytd_tbl class
 
   out <- ytd_tbl(
     calendar_tbl(
@@ -381,17 +359,23 @@ ytd <- function(.data,date,value,calendar_type){
 }
 
 
-#' Title
+#' Quarter-to-date
 #'
-#' @param .data
-#' @param date
-#' @param value
-#' @param type
+#' @param .data either a tibble or  DBI object
+#' @param date the date column to aggregate
+#' @param value the value column to summarize
+#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @description
+#' This calculates the quarterly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with `dplyr::group_by()`.
 #'
-#' @returns
+#' Use `calculate()` to return the results
+#'
+#' @returns qtd_tbl or qtd_dbi object depending on what is passed through
 #' @export
 #'
 #' @examples
+#' qtd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
 qtd <- function(.data,date,value,calendar_type){
 
   # Validate inputs
@@ -420,17 +404,23 @@ qtd <- function(.data,date,value,calendar_type){
 }
 
 
-#' Title
+#' Month-to-date
 #'
-#' @param .data
-#' @param date
-#' @param value
-#' @param type
+#' @param .data either a tibble or  DBI object
+#' @param date the date column to aggregate
+#' @param value the value column to summarize
+#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @description
+#' This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with `dplyr::group_by()`.
 #'
-#' @returns
+#' Use `calculate()` to return the results
+#'
+#' @returns mtd_tbl or mtd_dbi object depending on what is passed through
 #' @export
 #'
 #' @examples
+#' mtd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
 mtd <- function(.data,date,value,calendar_type){
 
     # Validate inputs
@@ -457,17 +447,23 @@ mtd <- function(.data,date,value,calendar_type){
   return(out)
 }
 
-#' Title
+#' Week-to-date
 #'
-#' @param .data
-#' @param date
-#' @param value
-#' @param type
+#' @param .data either a tibble or  DBI object
+#' @param date the date column to aggregate
+#' @param value the value column to summarize
+#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @description
+#' This calculates the weekly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with `dplyr::group_by()`.
 #'
-#' @returns
+#' Use `calculate()` to return the results
+#'
+#' @returns wtd_tbl or wtd_dbi object depending on what is passed through
 #' @export
 #'
 #' @examples
+#' wtd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
 wtd <- function(.data,date,value,calendar_type){
 
   # Validate inputs
@@ -495,17 +491,23 @@ wtd <- function(.data,date,value,calendar_type){
 }
 
 
-#' Title
+#' All-to-date
 #'
-#' @param .data
-#' @param date
-#' @param value
-#' @param type
+#' @param .data either a tibble or  DBI object
+#' @param date the date column to aggregate
+#' @param value the value column to summarize
+#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @description
+#' This calculates the total cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with `dplyr::group_by()`.
 #'
-#' @returns
+#' Use `calculate()` to return the results
+#'
+#' @returns atd_tbl or atd_dbi object depending on what is passed through
 #' @export
 #'
 #' @examples
+#' atd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
 atd <- function(.data,date,value,calendar_type){
 
   # Validate inputs
@@ -524,10 +526,9 @@ atd <- function(.data,date,value,calendar_type){
     ,value_vec = rlang::as_label(rlang::enquo(value))
     ,new_column_name_prefix = "atd"
     ,sort_logic = TRUE
-    ,fn="totalatd"
+    ,fn="atd"
     ,new_date_column_name = NA_character_
   )
-
 
   return(out)
 
@@ -536,16 +537,18 @@ atd <- function(.data,date,value,calendar_type){
 
 #' Title
 #'
-#' @param .data
-#' @param date
-#' @param value
-#' @param type
+#' @param .data tibble or DBI object
+#' @param date the date column to aggregate
+#' @param value the value column to summarize
+#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @param lag_n the number of periods to lag, default is 1
 #'
-#' @returns
+#' @returns dod_tbl or dbi_tbl
 #' @export
 #'
 #' @examples
-dod <- function(.data,date,value,calendar_type,lag_n){
+#' dod(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
+dod <- function(.data,date,value,calendar_type,lag_n=1){
 
 
   out <- dod_tbl(
@@ -563,21 +566,26 @@ dod <- function(.data,date,value,calendar_type,lag_n){
     ,new_date_column_name = NA_character_
     ,lag_n=lag_n
   )
+
   return(out)
+
+
 }
 
-#' Title
+#' Week-over-Week
 #'
-#' @param .data
-#' @param date
-#' @param value
-#' @param type
+#' @param .data tibble or DBI object
+#' @param date the date column to aggregate
+#' @param value the value column to summarize
+#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @param lag_n the number of weeks to lag, default is 1
 #'
-#' @returns
+#' @returns wow_tbl or wow_dbi
 #' @export
 #'
 #' @examples
-wow <- function(.data,date,value,calendar_type,lag_n){
+#' wow(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
+wow <- function(.data,date,value,calendar_type,lag_n=1){
 
 
   out <- wow_tbl(
@@ -601,18 +609,21 @@ wow <- function(.data,date,value,calendar_type,lag_n){
 
 
 
-#' Title
+
+#' Month-over-month
 #'
-#' @param .data
-#' @param date
-#' @param value
-#' @param type
+#' @param .data tibble or DBI object
+#' @param date the date column to aggregate
+#' @param value the value column to summarize
+#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @param lag_n the number of months to lag, default is 1
 #'
-#' @returns
+#' @returns mom_tbl or mom_dbi
 #' @export
 #'
 #' @examples
-mom <- function(.data,date,value,calendar_type,lag_n){
+#' mom(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
+mom <- function(.data,date,value,calendar_type,lag_n=1){
 
 
   out <- mom_tbl(
@@ -634,18 +645,20 @@ mom <- function(.data,date,value,calendar_type,lag_n){
 }
 
 
-#' Title
+#' Year-over-year
 #'
-#' @param .data
-#' @param date
-#' @param value
-#' @param type
+#' @param .data tibble or DBI object
+#' @param date the date column to aggregate
+#' @param value the value column to summarize
+#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @param lag_n the number of months to lag, default is 1
 #'
-#' @returns
+#' @returns mom_tbl or mom_dbi
 #' @export
 #'
 #' @examples
-yoy <- function(.data,date,value,calendar_type,lag_n){
+#' yoy(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
+yoy <- function(.data,date,value,calendar_type,lag_n=1){
 
   out <- yoy_tbl(
     calendar_tbl(

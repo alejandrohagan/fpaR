@@ -6,57 +6,6 @@ devtools::document()
 devtools::load_all()
 
 
-x <- sales |> ytd(order_date,quantity,"standard")
-
-
- sales |>
-   filter(
-     year(order_date)!=2018
-   ) |>
-  yoy(date = order_date,value = quantity,calendar_type = "standard",lag_n = 1) |>
-  calculate()
-
-
-x@calendar_tbl@data |>
-  dplyr::mutate(
-    date = lubridate::floor_date(!!x@calendar_tbl@date_quo,unit = x@time_unit@value)
-    ,time_unit=x@time_unit@value
-  ) |>
-  relocate(date,last_col()) |>
-  count(date,time_unit,order_date) |>
-  mutate(
-    dow=lubridate::wday(order_date,label = TRUE)
-  ) |> view()
-  dplyr::group_by(date,.add=TRUE) |>
-  dplyr::summarise(
-    !!x@value_vec:= sum(!!x@value_quo,na.rm=TRUE)
-    ,.groups = "drop"
-  )
-
-calendar_tbl <- tibble::tibble(
-  date = base::seq.Date(from = x@calendar_tbl@min_date, to = x@calendar_tbl@max_date, by = x@time_unit@value)
-)
-
-lag_tbl <- full_tbl|>
-    dplyr::mutate(
-      date_lag=date %m+% lubridate::days(x@lag_n)
-      ,!!x@new_column_name:=!!x@value_quo
-    ) |>
-    dplyr::select(-c(date,!!x@value_quo)) |>
-    dplyr::ungroup()
-
-out_tbl <-   dplyr::left_join(
-    full_tbl
-    ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
-  )
-    # mutate(
-      # !!x@new_column_name:= dplyr::coalesce(.data[[rlang::englue(x@new_column_name)]],0)
-    # )
-
-
-test_tbl |>
-  arrange(currency_code) |> view()
 
 
 

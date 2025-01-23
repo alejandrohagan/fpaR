@@ -2,13 +2,27 @@
 % Please edit documentation in R/time_intelligence.R
 \name{wow}
 \alias{wow}
-\title{Title}
+\title{Week-over-Week}
 \usage{
-wow(.data, date, value, calendar_type, lag_n)
+wow(.data, date, value, calendar_type, lag_n = 1)
 }
 \arguments{
-\item{type}{}
+\item{.data}{tibble or DBI object}
+
+\item{date}{the date column to aggregate}
+
+\item{value}{the value column to summarize}
+
+\item{calendar_type}{either 'standard' or '5-5-4' calendar}
+
+\item{lag_n}{the number of weeks to lag, default is 1}
+}
+\value{
+wow_tbl or wow_dbi
 }
 \description{
-Title
+Week-over-Week
+}
+\examples{
+wow(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
 }

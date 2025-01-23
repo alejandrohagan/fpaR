@@ -7,7 +7,7 @@
 ytd(.data, date, value, calendar_type)
 }
 \arguments{
-\item{.data}{either a dataframe or lazy DBI object}
+\item{.data}{either a tibble or  DBI object}
 
 \item{date}{the date column to aggregate}
 
@@ -15,6 +15,15 @@ ytd(.data, date, value, calendar_type)
 
 \item{calendar_type}{either 'standard' or '5-5-4' calendar}
 }
+\value{
+ytd_tbl or ytd_dbi object depending on what is passed through
+}
 \description{
-Year-to-date
+This calculates the annual cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+any groups that are passed through with \code{dplyr::group_by()}.
+
+Use \code{calculate()} to return the results
+}
+\examples{
+ytd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
 }

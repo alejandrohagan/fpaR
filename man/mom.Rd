@@ -2,13 +2,27 @@
 % Please edit documentation in R/time_intelligence.R
 \name{mom}
 \alias{mom}
-\title{Title}
+\title{Month-over-month}
 \usage{
-mom(.data, date, value, calendar_type, lag_n)
+mom(.data, date, value, calendar_type, lag_n = 1)
 }
 \arguments{
-\item{type}{}
+\item{.data}{tibble or DBI object}
+
+\item{date}{the date column to aggregate}
+
+\item{value}{the value column to summarize}
+
+\item{calendar_type}{either 'standard' or '5-5-4' calendar}
+
+\item{lag_n}{the number of months to lag, default is 1}
+}
+\value{
+mom_tbl or mom_dbi
 }
 \description{
-Title
+Month-over-month
+}
+\examples{
+mom(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
 }

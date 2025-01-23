@@ -3,7 +3,6 @@
 #' @param x date column
 #'
 #' @return logical
-#' @export
 #'
 #' @examples
 #' is_yyyy_mm_dd("2024-01-01")
@@ -23,7 +22,6 @@ return(out)
 #' @param x quoted or unquoted input
 #'
 #' @return string
-#' @export
 #'
 #' @examples
 #' convert_input_to_string(hello)
@@ -56,7 +54,6 @@ convert_input_to_string <- function(x) {
 #' @param ... dot args
 #'
 #' @return strings
-#' @export
 #'
 #' @examples
 #' convert_dots_to_string(hello,how,are,you)
@@ -110,7 +107,7 @@ show_in_excel <- function(.data){
 #'
 #' @param x
 #'
-#' @returns
+#' @returns list
 #'
 #' @examples
 make_action_cli <- function(x){

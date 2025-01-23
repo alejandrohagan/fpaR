@@ -7,22 +7,31 @@
 make_aggregation_tbl(.data, date, value, time_unit)
 }
 \arguments{
-\item{.data}{tibble}
+\item{.data}{data either grouped or ungrouped}
 
-\item{time_unit}{which time unit to aggregate to}
+\item{date}{the date column}
 
-\item{...}{dimensions to group by}
+\item{value}{the value column to aggregate}
 
-\item{date_var}{dimension with main date column}
-
-\item{value_var}{dimension with values to aggregate by}
+\item{time_unit}{the time unit to aggregate the date column by: 'day', 'week', 'month', 'quarter' or 'year'}
 }
 \value{
 tibble
 }
 \description{
-Aggregate and expand date table
+\code{make_aggregation_tbl()} summarizes a tibble to target time unit and completes the calendar to ensure
+no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
+for each combination of the group
+}
+\details{
+This is in internal function to make it easier to ensure data has no missing dates to
+simplify the use of time intelligence functions downstream of the application.
+If you want to summarize to a particular group, simply pass the tibble through to the \code{group_by()} argument
+prior to function and the function will make summarize and make a complete calendar for each group item.
 }
 \examples{
 make_aggregation_tbl(fpaR::sales,date=date,value=quantity,time_unit="day")
+}
+\seealso{
+\code{\link[fpar:make_aggregation_dbi]{fpar::make_aggregation_dbi()}} which is the dbi equivalent of this function
 }

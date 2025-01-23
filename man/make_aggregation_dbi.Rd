@@ -4,18 +4,20 @@
 \alias{make_aggregation_dbi}
 \title{Aggregate and expand date table}
 \usage{
-make_aggregation_dbi(.data, ..., date_var, value_var, time_unit)
+make_aggregation_dbi(.data, date, value, time_unit)
 }
 \arguments{
 \item{.data}{dbi object}
+
+\item{value}{}
+
+\item{time_unit}{which time unit to aggregate to}
 
 \item{...}{dimensions to group by}
 
 \item{date_var}{dimension with main date column}
 
 \item{value_var}{dimension with values to aggregate by}
-
-\item{time_unit}{which time unit to aggregate to}
 }
 \value{
 list of dbi and sql object

@@ -4,11 +4,25 @@
 \alias{dod}
 \title{Title}
 \usage{
-dod(.data, date, value, calendar_type, lag_n)
+dod(.data, date, value, calendar_type, lag_n = 1)
 }
 \arguments{
-\item{type}{}
+\item{.data}{tibble or DBI object}
+
+\item{date}{the date column to aggregate}
+
+\item{value}{the value column to summarize}
+
+\item{calendar_type}{either 'standard' or '5-5-4' calendar}
+
+\item{lag_n}{the number of periods to lag, default is 1}
+}
+\value{
+dod_tbl or dbi_tbl
 }
 \description{
 Title
+}
+\examples{
+dod(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
 }

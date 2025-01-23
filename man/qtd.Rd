@@ -2,13 +2,28 @@
 % Please edit documentation in R/time_intelligence.R
 \name{qtd}
 \alias{qtd}
-\title{Title}
+\title{Quarter-to-date}
 \usage{
 qtd(.data, date, value, calendar_type)
 }
 \arguments{
-\item{type}{}
+\item{.data}{either a tibble or  DBI object}
+
+\item{date}{the date column to aggregate}
+
+\item{value}{the value column to summarize}
+
+\item{calendar_type}{either 'standard' or '5-5-4' calendar}
+}
+\value{
+qtd_tbl or qtd_dbi object depending on what is passed through
 }
 \description{
-Title
+This calculates the quarterly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+any groups that are passed through with \code{dplyr::group_by()}.
+
+Use \code{calculate()} to return the results
+}
+\examples{
+qtd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
 }

@@ -9,6 +9,9 @@ make_action_cli(x)
 \arguments{
 \item{x}{}
 }
+\value{
+list
+}
 \description{
 Make Action field CLI args
 }

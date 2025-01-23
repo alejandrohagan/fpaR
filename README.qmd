@@ -201,6 +201,16 @@ s custom print function
 
 [reference website](https://www.daxpatterns.com/custom-time-related-calculations/)
 
+2025-1-22
+
+- updated tests
+- fixed wow issue
+- need to update print methods for time intelligence functions
+- consider if we need all of these classes or just a ti_class 
+    
+    - compare the different calculate methodologies and see if there are common themes
+- create remaining ti functions 
+
 
 
 ```{r}
