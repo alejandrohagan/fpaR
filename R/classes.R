@@ -190,7 +190,7 @@ ti_tbl <- S7::new_class(
 
     #custom classes
     ,action=S7::new_property(class=action)
-    ,fn=class_character
+    ,fn=class_function
   )
   ,validator = \(self){
 

@@ -5,7 +5,7 @@
 #' @param time_unit the time unit to aggregate the date column by: 'day', 'week', 'month', 'quarter' or 'year'
 #' @param date  the date column
 #' @param value  the value column to aggregate
-#' @seealso [fpar::make_aggregation_dbi()] which is the dbi equivalent of this function
+#' @seealso [fpar::make_aggregation_dbi()] which is the DBI equivalent of this function
 #' @description
 #' `make_aggregation_tbl()` summarizes a tibble to target time unit and completes the calendar to ensure
 #' no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
@@ -20,7 +20,6 @@
 #' @examples
 #' make_aggregation_tbl(fpaR::sales,date=date,value=quantity,time_unit="day")
 make_aggregation_tbl <- function(.data,date,value,time_unit) {
-
 
   assertthat::assert_that(base::is.data.frame(.data), msg = "Data must be a data frame.")
   assertthat::assert_that(base::is.character(time_unit), msg = "Time unit must be a character string.")
@@ -314,7 +313,33 @@ make_aggregation_dbi <- function(.data,date,value,time_unit){
 
 
 
+#' Title
+#'
+#' @param x ti_tbl object
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+ytd_tbl_2 <- function(x){
 
+  full_tbl <- create_calendar(x) |>
+    dplyr::mutate(
+      year=lubridate::year(date)
+      ,.before = 1
+    )
+
+  out_tbl <- full_tbl |>
+    dplyr::group_by(year,!!!x@calendar_tbl@group_quo) |>
+    dplyr::arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      !!x@new_column_name:=base::cumsum(!!x@value_quo)
+    ) |>
+    dplyr::ungroup()
+
+  return(out_tbl)
+
+}
 
 
 #' Year-to-date
@@ -341,7 +366,7 @@ ytd <- function(.data,date,value,calendar_type){
 
   # assigns inputs to ytd_tbl class
 
-  out <- ytd_tbl(
+  out <- ti_tbl(
     calendar_tbl(
       data=.data
       ,calendar_type=calendar_type
@@ -352,11 +377,12 @@ ytd <- function(.data,date,value,calendar_type){
     ,value_vec = rlang::as_label(rlang::enquo(value))
     ,new_column_name_prefix = "ytd"
     ,sort_logic = TRUE
-    ,fn="ytd"
+    ,fn=ytd_tbl_2
     ,new_date_column_name = "Year"
   )
 
 }
+
 
 
 #' Quarter-to-date
