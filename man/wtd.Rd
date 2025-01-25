@@ -16,7 +16,7 @@ wtd(.data, date, value, calendar_type)
 \item{calendar_type}{either 'standard' or '5-5-4' calendar}
 }
 \value{
-wtd_tbl or wtd_dbi object depending on what is passed through
+wtd_tbl or wtd_dbi
 }
 \description{
 This calculates the weekly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting

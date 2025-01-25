@@ -6,13 +6,18 @@ devtools::document()
 devtools::load_all()
 
 
-x <- ytd(sales,order_date,quantity,"standard")
+x <- pytd(sales,order_date,quantity,"standard",1)
+
 
 x@fn(x)
 
-rm(list = c("ytd", "ytd_tbl"))
-fpaR::ytd_tbl()
 
+y <- ytd(sales,order_date,quantity,"standard")
+
+
+y@fn(y)
+
+x |> class()
 
 rm(list = c("ytd", "ytd_tbl"))
 factor_tbl <- new_class(

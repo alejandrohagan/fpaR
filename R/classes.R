@@ -206,55 +206,55 @@ ti_tbl <- S7::new_class(
 #   ,parent = ti_tbl
 #   )
 
-
-qtd_tbl <- S7::new_class(
-  "qtd_tbl"
-  ,parent = ti_tbl
-  ,package = "fpaR"
-)
-
-mtd_tbl <- S7::new_class(
-  "mtd_tbl"
-  ,parent = ti_tbl
-  ,package = "fpaR"
-)
-
-wtd_tbl <- S7::new_class(
-  "totalwtd_tbl"
-  ,parent = ti_tbl
-  ,package = "fpaR"
-)
-
-
-atd_tbl <- S7::new_class(
-  "totalatd_tbl"
-  ,parent = ti_tbl
-  ,package = "fpaR"
-)
-
-
-dod_tbl <- S7::new_class(
-  "dod_tbl"
-  ,parent = ti_tbl
-  ,package = "fpaR"
-)
-
-wow_tbl <- S7::new_class(
-  "wow_tbl"
-  ,parent = ti_tbl
-  ,package = "fpaR"
-)
-
-mom_tbl <- S7::new_class(
-  "mom_tbl"
-  ,parent = ti_tbl
-  ,package = "fpaR"
-)
-
-
-yoy_tbl<- S7::new_class(
-  "yoy_tbl"
-  ,parent = ti_tbl
-  ,package = "fpaR"
-)
-
+#
+# qtd_tbl <- S7::new_class(
+#   "qtd_tbl"
+#   ,parent = ti_tbl
+#   ,package = "fpaR"
+# )
+#
+# mtd_tbl <- S7::new_class(
+#   "mtd_tbl"
+#   ,parent = ti_tbl
+#   ,package = "fpaR"
+# )
+#
+# wtd_tbl <- S7::new_class(
+#   "totalwtd_tbl"
+#   ,parent = ti_tbl
+#   ,package = "fpaR"
+# )
+#
+#
+# atd_tbl <- S7::new_class(
+#   "totalatd_tbl"
+#   ,parent = ti_tbl
+#   ,package = "fpaR"
+# )
+#
+#
+# dod_tbl <- S7::new_class(
+#   "dod_tbl"
+#   ,parent = ti_tbl
+#   ,package = "fpaR"
+# )
+#
+# wow_tbl <- S7::new_class(
+#   "wow_tbl"
+#   ,parent = ti_tbl
+#   ,package = "fpaR"
+# )
+#
+# mom_tbl <- S7::new_class(
+#   "mom_tbl"
+#   ,parent = ti_tbl
+#   ,package = "fpaR"
+# )
+#
+#
+# yoy_tbl<- S7::new_class(
+#   "yoy_tbl"
+#   ,parent = ti_tbl
+#   ,package = "fpaR"
+# )
+#

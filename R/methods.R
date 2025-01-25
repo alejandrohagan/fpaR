@@ -58,334 +58,334 @@ method(create_calendar,ti_tbl) <- function(x){
   return(full_tbl)
 }
 
-
-
-#' Title
 #'
-#' @param x ytd_tbl object
 #'
-#' @returns
-#' @export
-#' @examples
-method(calculate,ytd_tbl) <- function(x){
-
-  # Aggregate data based on provided time unit
-
-  full_tbl <- create_calendar(x) |>
-    dplyr::mutate(
-      year=lubridate::year(date)
-      ,.before = 1
-    )
-
-
-
-  out_tbl <- full_tbl |>
-    dplyr::group_by(year,!!!x@calendar_tbl@group_quo) |>
-    dplyr::arrange(date,.by_group = TRUE) |>
-    dplyr::mutate(
-      !!x@new_column_name:=base::cumsum(!!x@value_quo)
-    ) |>
-    dplyr::ungroup()
-
-  return(out_tbl)
-
-}
-
-
-method(print,ytd_tbl) <- function(x){
-
-  x@fn
-
-  group_count <- x@calendar_tbl@group_count
-  value_chr <- x@value_vec
-  show <- cli::cli_div(theme = cli::simple_theme())
-
-
-
-  cli::cli_h1("Year To Date:")
-  cli::cli_code("ytd()")
-  cli::cli_h2("Description:")
-  cli::cli_par()
-  cli::cli_text("This will create a cumulative sum of {.field {value_chr}}, from ",cli::col_blue("January 1st")," till ",cli::col_blue("December 31st"))
-
-  cli::builtin_theme()
-
-  cli::cli_h2("Calendar:")
-  cli::cat_bullet(paste("The calendar was aggregated to the",cli::col_yellow(x@time_unit@value),"time unit"))
-
-  cli::cli_text("A ",cli::col_br_red(x@calendar_tbl@calendar_type)," calendar is created with ",cli::col_green("{group_count} group{?s}"))
-
-  cli::cat_bullet(paste("Calendar ranges from",cli::col_br_green(x@calendar_tbl@min_date),"to",cli::col_br_green(x@calendar_tbl@max_date)))
-  cli::cat_bullet(paste(cli::col_blue(x@calendar_tbl@date_missing),"days were missing and replaced with 0"))
-  cli::cli_text("New date column ",cli::col_br_red(x@new_date_column_name)," was created")
-  cli::cli_h2("Actions:")
-
-  cli::cli_text(x@action@value[1])
-  cli::cli_text(x@action@value[2])
-  cli::cli_text(x@action@value[3])
-
-  if(x@calendar_tbl@group_indicator){
-
-  cli::cli_text("{stringr::str_flatten_comma(x@calendar_tbl@group_vec,last = ' and ')} groups are in the table")
-
-  }
-
-  cli::cli_rule()
-
-  cli::cli_li("Use {.code calculate()} to return the results")
-
-  cli::cli_end(show)
-}
-
-method(print,dod_tbl) <- function(x){
-
-  make_print_message(x)
-
-
-}
-
-
-
-
-
-
-
-
-
-
-#' Title
+#' #' Title
+#' #'
+#' #' @param x ytd_tbl object
+#' #'
+#' #' @returns
+#' #' @export
+#' #' @examples
+#' method(calculate,ytd_tbl) <- function(x){
 #'
-#' @param x
+#'   # Aggregate data based on provided time unit
 #'
-#' @returns
-#' @export
+#'   full_tbl <- create_calendar(x) |>
+#'     dplyr::mutate(
+#'       year=lubridate::year(date)
+#'       ,.before = 1
+#'     )
 #'
-#' @examples
-method(calculate,qtd_tbl) <- function(x){
-
-
-full_tbl <-  create_calendar(x) |>
-  dplyr::mutate(
-    year=lubridate::year(date)
-    ,quarter=lubridate::quarter(date)
-    ,.before = 1
-  )
-
-
-
-out_tbl <- full_tbl |>
-  dplyr::group_by(year,quarter,!!!x@calendar_tbl@group_quo) |>
-  dplyr::arrange(date,.by_group = TRUE) |>
-  dplyr::mutate(
-    !!x@new_column_name:=base::cumsum(!!x@value_quo)
-  ) |>
-  dplyr::ungroup()
-
-return(out_tbl)
-
-}
-
-
-
-#' Title
 #'
-#' @param x
 #'
-#' @returns
-#' @export
+#'   out_tbl <- full_tbl |>
+#'     dplyr::group_by(year,!!!x@calendar_tbl@group_quo) |>
+#'     dplyr::arrange(date,.by_group = TRUE) |>
+#'     dplyr::mutate(
+#'       !!x@new_column_name:=base::cumsum(!!x@value_quo)
+#'     ) |>
+#'     dplyr::ungroup()
 #'
-#' @examples
-method(calculate,mtd_tbl) <- function(x){
-
-
-  full_tbl <-  create_calendar(x) |>
-    dplyr::mutate(
-      year=lubridate::year(date)
-      ,month=lubridate::month(date)
-      ,.before = 1
-    )
-
-
-
-  out_tbl <- full_tbl |>
-    dplyr::group_by(year,month,!!!x@calendar_tbl@group_quo) |>
-    dplyr::arrange(date,.by_group = TRUE) |>
-    dplyr::mutate(
-      !!x@new_column_name:=base::cumsum(!!x@value_quo)
-    ) |>
-    dplyr::ungroup()
-
-  return(out_tbl)
-
-}
-
-
-#' Title
+#'   return(out_tbl)
 #'
-#' @param x
+#' }
 #'
-#' @returns
-#' @export
 #'
-#' @examples
-method(calculate,wtd_tbl) <- function(x){
-
-
-  full_tbl <-  create_calendar(x) |>
-    dplyr::mutate(
-      year=lubridate::year(date)
-      ,month=lubridate::month(date)
-      ,week=lubridate::week(date)
-      ,.before = 1
-    )
-
-
-
-  out_tbl <- full_tbl |>
-    dplyr::group_by(year,month,week,!!!x@calendar_tbl@group_quo) |>
-    dplyr::arrange(date,.by_group = TRUE) |>
-    dplyr::mutate(
-      !!x@new_column_name:=base::cumsum(!!x@value_quo)
-    ) |>
-    dplyr::ungroup()
-
-  return(out_tbl)
-
-}
-
-
-
-#' Title
+#' method(print,ytd_tbl) <- function(x){
 #'
-#' @param x
+#'   x@fn
 #'
-#' @returns
-#' @export
+#'   group_count <- x@calendar_tbl@group_count
+#'   value_chr <- x@value_vec
+#'   show <- cli::cli_div(theme = cli::simple_theme())
 #'
-#' @examples
-method(calculate,atd_tbl) <- function(x){
-
-
-  full_tbl <-  create_calendar(x)
-
-  out_tbl <- full_tbl |>
-    dplyr::group_by(!!!x@calendar_tbl@group_quo) |>
-    dplyr::arrange(date,.by_group = TRUE) |>
-    dplyr::mutate(
-      !!x@new_column_name:=base::cumsum(!!x@value_quo)
-    ) |>
-    dplyr::ungroup()
-
-  return(out_tbl)
-
-}
-
-
-method(calculate,dod_tbl) <- function(x){
-
-
-  full_tbl <-  create_calendar(x)
-
-
-  lag_tbl <- full_tbl|>
-    arrange(date,.by_group = TRUE) |>
-    dplyr::mutate(
-      date_lag=date %m+% lubridate::days(x@lag_n)
-      ,!!x@new_column_name:=!!x@value_quo
-    ) |>
-    dplyr::select(-c(date,!!x@value_quo)) |>
-    dplyr::ungroup()
-
-  out_tbl <-   dplyr::left_join(
-    full_tbl
-    ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
-  )
-  # mutate(
-  # !!x@new_column_name:= dplyr::coalesce(.data[[rlang::englue(x@new_column_name)]],0)
-  # )
-
-  return(out_tbl)
-
-}
-
-
-
-method(calculate,wow_tbl) <- function(x){
-
-
-  full_tbl <-  create_calendar(x)
-
-
-  lag_tbl <- full_tbl|>
-    arrange(date,.by_group = TRUE) |>
-    dplyr::mutate(
-      date_lag=dplyr::lead(date,n = x@lag_n)
-      ,!!x@new_column_name:=!!x@value_quo
-    ) |>
-    dplyr::select(-c(date,!!x@value_quo)) |>
-    dplyr::ungroup()
-
-  out_tbl <-   dplyr::left_join(
-    full_tbl
-    ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
-  )
-
-
-  return(out_tbl)
-
-}
-
-
-method(calculate,mom_tbl) <- function(x){
-
-
-  full_tbl <-  create_calendar(x)
-
-
-  lag_tbl <- full_tbl|>
-    dplyr::arrange(date,.by_group = TRUE) |>
-    dplyr::mutate(
-      date_lag=dplyr::lead(date,n = x@lag_n)
-      ,!!x@new_column_name:=!!x@value_quo
-    ) |>
-    dplyr::select(-c(date,!!x@value_quo)) |>
-    dplyr::ungroup()
-
-  out_tbl <-   dplyr::left_join(
-    full_tbl
-    ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
-  )
-
-
-  return(out_tbl)
-
-}
-
-
-method(calculate,yoy_tbl) <- function(x){
-
-
-  full_tbl <-  create_calendar(x)
-
-
-  lag_tbl <- full_tbl|>
-    arrange(date,.by_group = TRUE) |>
-    dplyr::mutate(
-      date_lag=dplyr::lead(date,n = x@lag_n)
-      ,!!x@new_column_name:=!!x@value_quo
-    ) |>
-    dplyr::select(-c(date,!!x@value_quo)) |>
-    dplyr::ungroup()
-
-  out_tbl <-   dplyr::left_join(
-    full_tbl
-    ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
-  )
-
-  return(out_tbl)
-}
-
+#'
+#'
+#'   cli::cli_h1("Year To Date:")
+#'   cli::cli_code("ytd()")
+#'   cli::cli_h2("Description:")
+#'   cli::cli_par()
+#'   cli::cli_text("This will create a cumulative sum of {.field {value_chr}}, from ",cli::col_blue("January 1st")," till ",cli::col_blue("December 31st"))
+#'
+#'   cli::builtin_theme()
+#'
+#'   cli::cli_h2("Calendar:")
+#'   cli::cat_bullet(paste("The calendar was aggregated to the",cli::col_yellow(x@time_unit@value),"time unit"))
+#'
+#'   cli::cli_text("A ",cli::col_br_red(x@calendar_tbl@calendar_type)," calendar is created with ",cli::col_green("{group_count} group{?s}"))
+#'
+#'   cli::cat_bullet(paste("Calendar ranges from",cli::col_br_green(x@calendar_tbl@min_date),"to",cli::col_br_green(x@calendar_tbl@max_date)))
+#'   cli::cat_bullet(paste(cli::col_blue(x@calendar_tbl@date_missing),"days were missing and replaced with 0"))
+#'   cli::cli_text("New date column ",cli::col_br_red(x@new_date_column_name)," was created")
+#'   cli::cli_h2("Actions:")
+#'
+#'   cli::cli_text(x@action@value[1])
+#'   cli::cli_text(x@action@value[2])
+#'   cli::cli_text(x@action@value[3])
+#'
+#'   if(x@calendar_tbl@group_indicator){
+#'
+#'   cli::cli_text("{stringr::str_flatten_comma(x@calendar_tbl@group_vec,last = ' and ')} groups are in the table")
+#'
+#'   }
+#'
+#'   cli::cli_rule()
+#'
+#'   cli::cli_li("Use {.code calculate()} to return the results")
+#'
+#'   cli::cli_end(show)
+#' }
+#'
+#' method(print,dod_tbl) <- function(x){
+#'
+#'   make_print_message(x)
+#'
+#'
+#' }
+#'
+#'
+#'
+#'
+#'
+#'
+#'
+#'
+#'
+#'
+#' #' Title
+#' #'
+#' #' @param x
+#' #'
+#' #' @returns
+#' #' @export
+#' #'
+#' #' @examples
+#' method(calculate,qtd_tbl) <- function(x){
+#'
+#'
+#' full_tbl <-  create_calendar(x) |>
+#'   dplyr::mutate(
+#'     year=lubridate::year(date)
+#'     ,quarter=lubridate::quarter(date)
+#'     ,.before = 1
+#'   )
+#'
+#'
+#'
+#' out_tbl <- full_tbl |>
+#'   dplyr::group_by(year,quarter,!!!x@calendar_tbl@group_quo) |>
+#'   dplyr::arrange(date,.by_group = TRUE) |>
+#'   dplyr::mutate(
+#'     !!x@new_column_name:=base::cumsum(!!x@value_quo)
+#'   ) |>
+#'   dplyr::ungroup()
+#'
+#' return(out_tbl)
+#'
+#' }
+#'
+#'
+#'
+#' #' Title
+#' #'
+#' #' @param x
+#' #'
+#' #' @returns
+#' #' @export
+#' #'
+#' #' @examples
+#' method(calculate,mtd_tbl) <- function(x){
+#'
+#'
+#'   full_tbl <-  create_calendar(x) |>
+#'     dplyr::mutate(
+#'       year=lubridate::year(date)
+#'       ,month=lubridate::month(date)
+#'       ,.before = 1
+#'     )
+#'
+#'
+#'
+#'   out_tbl <- full_tbl |>
+#'     dplyr::group_by(year,month,!!!x@calendar_tbl@group_quo) |>
+#'     dplyr::arrange(date,.by_group = TRUE) |>
+#'     dplyr::mutate(
+#'       !!x@new_column_name:=base::cumsum(!!x@value_quo)
+#'     ) |>
+#'     dplyr::ungroup()
+#'
+#'   return(out_tbl)
+#'
+#' }
+#'
+#'
+#' #' Title
+#' #'
+#' #' @param x
+#' #'
+#' #' @returns
+#' #' @export
+#' #'
+#' #' @examples
+#' method(calculate,wtd_tbl) <- function(x){
+#'
+#'
+#'   full_tbl <-  create_calendar(x) |>
+#'     dplyr::mutate(
+#'       year=lubridate::year(date)
+#'       ,month=lubridate::month(date)
+#'       ,week=lubridate::week(date)
+#'       ,.before = 1
+#'     )
+#'
+#'
+#'
+#'   out_tbl <- full_tbl |>
+#'     dplyr::group_by(year,month,week,!!!x@calendar_tbl@group_quo) |>
+#'     dplyr::arrange(date,.by_group = TRUE) |>
+#'     dplyr::mutate(
+#'       !!x@new_column_name:=base::cumsum(!!x@value_quo)
+#'     ) |>
+#'     dplyr::ungroup()
+#'
+#'   return(out_tbl)
+#'
+#' }
+#'
+#'
+#'
+#' #' Title
+#' #'
+#' #' @param x
+#' #'
+#' #' @returns
+#' #' @export
+#' #'
+#' #' @examples
+#' method(calculate,atd_tbl) <- function(x){
+#'
+#'
+#'   full_tbl <-  create_calendar(x)
+#'
+#'   out_tbl <- full_tbl |>
+#'     dplyr::group_by(!!!x@calendar_tbl@group_quo) |>
+#'     dplyr::arrange(date,.by_group = TRUE) |>
+#'     dplyr::mutate(
+#'       !!x@new_column_name:=base::cumsum(!!x@value_quo)
+#'     ) |>
+#'     dplyr::ungroup()
+#'
+#'   return(out_tbl)
+#'
+#' }
+#'
+#'
+#' method(calculate,dod_tbl) <- function(x){
+#'
+#'
+#'   full_tbl <-  create_calendar(x)
+#'
+#'
+#'   lag_tbl <- full_tbl|>
+#'     arrange(date,.by_group = TRUE) |>
+#'     dplyr::mutate(
+#'       date_lag=date %m+% lubridate::days(x@lag_n)
+#'       ,!!x@new_column_name:=!!x@value_quo
+#'     ) |>
+#'     dplyr::select(-c(date,!!x@value_quo)) |>
+#'     dplyr::ungroup()
+#'
+#'   out_tbl <-   dplyr::left_join(
+#'     full_tbl
+#'     ,lag_tbl
+#'     ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+#'   )
+#'   # mutate(
+#'   # !!x@new_column_name:= dplyr::coalesce(.data[[rlang::englue(x@new_column_name)]],0)
+#'   # )
+#'
+#'   return(out_tbl)
+#'
+#' }
+#'
+#'
+#'
+#' method(calculate,wow_tbl) <- function(x){
+#'
+#'
+#'   full_tbl <-  create_calendar(x)
+#'
+#'
+#'   lag_tbl <- full_tbl|>
+#'     arrange(date,.by_group = TRUE) |>
+#'     dplyr::mutate(
+#'       date_lag=dplyr::lead(date,n = x@lag_n)
+#'       ,!!x@new_column_name:=!!x@value_quo
+#'     ) |>
+#'     dplyr::select(-c(date,!!x@value_quo)) |>
+#'     dplyr::ungroup()
+#'
+#'   out_tbl <-   dplyr::left_join(
+#'     full_tbl
+#'     ,lag_tbl
+#'     ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+#'   )
+#'
+#'
+#'   return(out_tbl)
+#'
+#' }
+#'
+#'
+#' method(calculate,mom_tbl) <- function(x){
+#'
+#'
+#'   full_tbl <-  create_calendar(x)
+#'
+#'
+#'   lag_tbl <- full_tbl|>
+#'     dplyr::arrange(date,.by_group = TRUE) |>
+#'     dplyr::mutate(
+#'       date_lag=dplyr::lead(date,n = x@lag_n)
+#'       ,!!x@new_column_name:=!!x@value_quo
+#'     ) |>
+#'     dplyr::select(-c(date,!!x@value_quo)) |>
+#'     dplyr::ungroup()
+#'
+#'   out_tbl <-   dplyr::left_join(
+#'     full_tbl
+#'     ,lag_tbl
+#'     ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+#'   )
+#'
+#'
+#'   return(out_tbl)
+#'
+#' }
+#' #
+#' #
+#' # method(calculate,yoy_tbl) <- function(x){
+#' #
+#' #
+#' #   full_tbl <-  create_calendar(x)
+#' #
+#' #
+#' #   lag_tbl <- full_tbl|>
+#' #     arrange(date,.by_group = TRUE) |>
+#' #     dplyr::mutate(
+#' #       date_lag=dplyr::lead(date,n = x@lag_n)
+#' #       ,!!x@new_column_name:=!!x@value_quo
+#' #     ) |>
+#' #     dplyr::select(-c(date,!!x@value_quo)) |>
+#' #     dplyr::ungroup()
+#' #
+#' #   out_tbl <-   dplyr::left_join(
+#' #     full_tbl
+#' #     ,lag_tbl
+#' #     ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+#' #   )
+#' #
+#' #   return(out_tbl)
+#' # }
+#' #
