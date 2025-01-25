@@ -321,7 +321,7 @@ make_aggregation_dbi <- function(.data,date,value,time_unit){
 #' @export
 #'
 #' @examples
-ytd_tbl_2 <- function(x){
+ytd_tbl <- function(x){
 
   full_tbl <- create_calendar(x) |>
     dplyr::mutate(
@@ -341,6 +341,139 @@ ytd_tbl_2 <- function(x){
 
 }
 
+
+#' Title
+#'
+#' @param x ti_tbl object
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+qtd_tbl <- function(x){
+
+
+  full_tbl <-  create_calendar(x) |>
+    dplyr::mutate(
+      year=lubridate::year(date)
+      ,quarter=lubridate::quarter(date)
+      ,.before = 1
+    )
+
+
+
+  out_tbl <- full_tbl |>
+    dplyr::group_by(year,quarter,!!!x@calendar_tbl@group_quo) |>
+    dplyr::arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      !!x@new_column_name:=base::cumsum(!!x@value_quo)
+    ) |>
+    dplyr::ungroup()
+
+  return(out_tbl)
+
+}
+
+
+
+mtd_tbl <- function(x){
+
+
+  full_tbl <-  create_calendar(x) |>
+    dplyr::mutate(
+      year=lubridate::year(date)
+      ,month=lubridate::month(date)
+      ,.before = 1
+    )
+
+
+
+  out_tbl <- full_tbl |>
+    dplyr::group_by(year,month,!!!x@calendar_tbl@group_quo) |>
+    dplyr::arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      !!x@new_column_name:=base::cumsum(!!x@value_quo)
+    ) |>
+    dplyr::ungroup()
+
+  return(out_tbl)
+
+
+
+
+
+}
+
+
+
+wtd_tbl <- function(x){
+
+  full_tbl <-  create_calendar(x) |>
+    dplyr::mutate(
+      year=lubridate::year(date)
+      ,month=lubridate::month(date)
+      ,week=lubridate::week(date)
+      ,.before = 1
+    )
+
+
+
+  out_tbl <- full_tbl |>
+    dplyr::group_by(year,month,week,!!!x@calendar_tbl@group_quo) |>
+    dplyr::arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      !!x@new_column_name:=base::cumsum(!!x@value_quo)
+    ) |>
+    dplyr::ungroup()
+
+  return(out_tbl)
+}
+
+
+atd_tbl <- function(x){
+
+  full_tbl <-  create_calendar(x)
+
+  out_tbl <- full_tbl |>
+    dplyr::group_by(!!!x@calendar_tbl@group_quo) |>
+    dplyr::arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      !!x@new_column_name:=base::cumsum(!!x@value_quo)
+    ) |>
+    dplyr::ungroup()
+
+  return(out_tbl)
+
+
+
+
+}
+
+dod_tbl <- function(x){
+
+  full_tbl <-  create_calendar(x)
+
+
+  lag_tbl <- full_tbl|>
+    arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      date_lag=date %m+% lubridate::days(x@lag_n)
+      ,!!x@new_column_name:=!!x@value_quo
+    ) |>
+    dplyr::select(-c(date,!!x@value_quo)) |>
+    dplyr::ungroup()
+
+  out_tbl <-   dplyr::left_join(
+    full_tbl
+    ,lag_tbl
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+  )
+  # mutate(
+  # !!x@new_column_name:= dplyr::coalesce(.data[[rlang::englue(x@new_column_name)]],0)
+  # )
+
+  return(out_tbl)
+}
 
 #' Year-to-date
 #' @param .data either a tibble or  DBI object

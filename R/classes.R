@@ -5,6 +5,7 @@
 
 
 time_unit <- S7::new_class(
+
   ,name="time_unit"
   ,package = "fpaR"
   ,properties = list(
@@ -46,7 +47,7 @@ action <- S7::new_class(
 
 ## calendar class
 
-calendar_tbl <- new_class(
+calendar_tbl <- S7::new_class(
   name="calendar_tbl"
   ,package = "fpaR"
   ,properties =
@@ -175,10 +176,8 @@ ti_tbl <- S7::new_class(
     ,new_column_name=S7::new_property(
       class=class_character
       ,getter = \(self){
-
         x <- paste0(self@new_column_name_prefix,"_",self@value_vec)
         x
-
       }
     )
     ,new_date_column_name=S7::new_property(class=S7::class_character)
@@ -202,10 +201,10 @@ ti_tbl <- S7::new_class(
 )
 
 
-ytd_tbl <- S7::new_class(
-  "ytd_tbl"
-  ,parent = ti_tbl
-  )
+# ytd_tbl <- S7::new_class(
+#   "ytd_tbl"
+#   ,parent = ti_tbl
+#   )
 
 
 qtd_tbl <- S7::new_class(
