@@ -5,7 +5,7 @@
 #' @param time_unit the time unit to aggregate the date column by: 'day', 'week', 'month', 'quarter' or 'year'
 #' @param date  the date column
 #' @param value  the value column to aggregate
-#' @seealso [fpar::make_aggregation_dbi()] which is the DBI equivalent of this function
+#' @seealso [fpaR::make_aggregation_dbi()] which is the DBI equivalent of this function
 #' @description
 #' `make_aggregation_tbl()` summarizes a tibble to target time unit and completes the calendar to ensure
 #' no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
@@ -125,20 +125,71 @@ ytd_tbl <- function(x){
 pytd_tbl <- function(x){
 
 
-  full_tbl <-  create_calendar(x)
-
+  full_tbl <-  create_calendar(x) |>
+    dplyr::mutate(
+      year=lubridate::year(date)
+      ,.before = 1
+    )
 
   lag_tbl <- full_tbl|>
+    dplyr::group_by(year,!!!x@calendar_tbl@group_quo) |>
+    dplyr::arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      ,date_lag=date +years(1)
+      ,!!x@new_column_name:=cumsum(!!x@value_quo)
+    ) |>
+    ungroup() |>
+    dplyr::select(-c(date,year,!!x@value_quo))
+
+  out_tbl <-   dplyr::left_join(
+    full_tbl
+    ,lag_tbl
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+  ) |>
+    select(-c(!!x@value_quo))
+
+  return(out_tbl)
+}
+
+
+
+#' Previous year-to-date for tibble objects
+#'
+#' @param x ti_tbl
+#'
+#' @returns tibble
+#'
+yoytd_tbl <- function(x){
+
+
+ full_tbl <-  create_calendar(x) |>
+    mutate(
+      year=lubridate::year(date)
+      ,.before = 1
+    ) |>
+   group_by(year,!!!x@calendar_tbl@group_quo) |>
+   mutate(
+     !!paste0("ytd_",x@value_quo):=cumsum(!!x@value_quo)
+   )
+
+  lag_tbl <- full_tbl|>
+    group_by(year,!!!x@calendar_tbl@group_quo) |>
     arrange(date,.by_group = TRUE) |>
     dplyr::mutate(
-      date_lag=dplyr::lead(date,n = x@lag_n)
-      ,!!x@new_column_name:=!!x@value_quo
+      ,date_lag=date +years(1)
+      ,!!x@new_column_name:=cumsum(!!x@value_quo)
     ) |>
-    dplyr::select(-c(date,!!x@value_quo)) |>
-    dplyr::ungroup()
+    dplyr::ungroup() |>
+    dplyr::select(-c(date,year,!!x@value_quo,!!paste0("ytd_",x@value_quo)))
 
-return(lag_tbl)
+  out_tbl <-   dplyr::left_join(
+    full_tbl
+    ,lag_tbl
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+  ) |>
+    select(-c(!!x@value_quo))
 
+  return(out_tbl)
 
 }
 
@@ -484,7 +535,47 @@ pytd <- function(.data,date,value,calendar_type,lag_n){
 
 }
 
+#' Prevoius year-to-date
+#' @param .data either a tibble or  DBI object
+#' @param date the date column to aggregate
+#' @param value the value column to summarize
+#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @description
+#' This calculates the annual cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with `dplyr::group_by()`.
+#'
+#' Use `calculate()` to return the results
+#'
+#' @returns ytd_tbl or ytd_dbi
+#' @export
+#'
+#' @examples
+#' ytd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
+yoytd <- function(.data,date,value,calendar_type,lag_n){
 
+  # Validate inputs
+  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+
+
+  # assigns inputs to ytd_tbl class
+
+  out <- ti_tbl(
+    calendar_tbl(
+      data=.data
+      ,calendar_type=calendar_type
+      ,date_vec = rlang::as_label(rlang::enquo(date))
+    )
+    ,time_unit = time_unit("day")
+    ,action=action("aggregate")
+    ,value_vec = rlang::as_label(rlang::enquo(value))
+    ,new_column_name_prefix = "pytd"
+    ,sort_logic = TRUE
+    ,fn=yoytd_tbl
+    ,lag_n = lag_n
+    ,new_date_column_name = NA_character_
+  )
+
+}
 
 
 

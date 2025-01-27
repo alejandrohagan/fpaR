@@ -8,13 +8,45 @@ devtools::load_all()
 
 x <- pytd(sales,order_date,quantity,"standard",1)
 
+x@fn(x) |>
+  filter(!is.na(pytd_quantity)) |>
+  view()
 
-x@fn(x)
+full_tbl <-  create_calendar(x)
 
 
-y <- ytd(sales,order_date,quantity,"standard")
+lag_tbl <- full_tbl|>
+  group_by()
+  arrange(date,.by_group = TRUE) |>
+  dplyr::mutate(
+    ,date_lag=date +years(1)
+    ,!!x@new_column_name:=cumsum(!!x@value_quo)
+  ) |>
+  dplyr::select(-c(date,!!x@value_quo)) |>
+  dplyr::ungroup()
+
+out_tbl <-   dplyr::left_join(
+  full_tbl
+  ,lag_tbl
+  ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+)
 
 
+
+
+sales |>
+  group_by(
+    order_date
+  ) |>
+  summarise(
+    quantity=sum(quantity)
+  ) |>
+  group_by(
+    year=year(order_date)
+  ) |>
+  mutate(
+    cumsum=cumsum(quantity)
+  )
 y@fn(y)
 
 x |> class()

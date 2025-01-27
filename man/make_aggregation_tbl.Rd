@@ -33,5 +33,5 @@ prior to function and the function will make summarize and make a complete calen
 make_aggregation_tbl(fpaR::sales,date=date,value=quantity,time_unit="day")
 }
 \seealso{
-\code{\link[fpar:make_aggregation_dbi]{fpar::make_aggregation_dbi()}} which is the DBI equivalent of this function
+\code{\link[=make_aggregation_dbi]{make_aggregation_dbi()}} which is the DBI equivalent of this function
 }
