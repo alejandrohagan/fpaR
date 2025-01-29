@@ -6,7 +6,7 @@ devtools::document()
 devtools::load_all()
 
 
-x <- pytd(sales,order_date,quantity,"standard",1)
+x <- yoytd(sales,order_date,quantity,"standard",1)
 
 x@fn(x) |>
   filter(!is.na(pytd_quantity)) |>

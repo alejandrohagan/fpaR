@@ -211,6 +211,9 @@ s custom print function
     - compare the different calculate methodologies and see if there are common themes
 - create remaining ti functions 
 
+2025-1-22
+- completed all year related ti functions
+- need to replicate to mont and quarter and day functions
 
 
 ```{r}
