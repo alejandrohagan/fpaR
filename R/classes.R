@@ -53,7 +53,7 @@ calendar_tbl <- S7::new_class(
   ,properties =
     list(
       data=S7::new_property(
-        class=class_data.frame
+        class=S7::class_data.frame
       )
       ,calendar_type=S7::new_property(
         class=S7::class_character
