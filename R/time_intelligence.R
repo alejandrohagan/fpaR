@@ -224,6 +224,81 @@ qtd_tbl <- function(x){
 
 }
 
+#' Previous quarter-to-date for tibble objects
+#'
+#' @param x ti_tbl
+#'
+#' @returns tibble
+#'
+pqtd_tbl <- function(x){
+
+
+  full_tbl <-  create_calendar(x) |>
+    dplyr::mutate(
+      year=lubridate::year(date)
+      ,quarter=lubridate::quarter(date)
+      ,.before = 1
+    )
+
+  lag_tbl <- full_tbl|>
+    dplyr::group_by(year,quarter,!!!x@calendar_tbl@group_quo) |>
+    dplyr::arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      ,date_lag=date +quarters(1)
+      ,!!x@new_column_name:=cumsum(!!x@value_quo)
+    ) |>
+    ungroup() |>
+    dplyr::select(-c(date,quarter,year,!!x@value_quo))
+
+  out_tbl <-   dplyr::left_join(
+    full_tbl
+    ,lag_tbl
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+  ) |>
+    select(-c(!!x@value_quo))
+
+  return(out_tbl)
+}
+#' Previous quarter-to-date for tibble objects
+#'
+#' @param x ti_tbl
+#'
+#' @returns tibble
+#'
+qoqtd_tbl <- function(x){
+
+
+  full_tbl <-  create_calendar(x) |>
+    mutate(
+      year=lubridate::year(date)
+      ,quarter=lubridate::quarter(date)
+      ,.before = 1
+    ) |>
+    group_by(year,quarter,!!!x@calendar_tbl@group_quo) |>
+    mutate(
+      !!paste0("qtd_",x@value_quo):=cumsum(!!x@value_quo)
+    )
+
+  lag_tbl <- full_tbl|>
+    dplyr::group_by(year,quarter,!!!x@calendar_tbl@group_quo) |>
+    dplyr::arrange(date,.by_group = TRUE) |>
+    dplyr::mutate(
+      ,date_lag=date +quarters(1)
+      ,!!x@new_column_name:=cumsum(!!x@value_quo)
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::select(-c(date,quarter,year,!!x@value_quo,!!paste0("qtd_",x@value_quo)))
+
+  out_tbl <-   dplyr::left_join(
+    full_tbl
+    ,lag_tbl
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+  ) |>
+    dplyr::select(-c(!!x@value_quo))
+
+  return(out_tbl)
+
+}
 
 
 #' Month-to-date for tibble objects

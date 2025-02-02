@@ -17,6 +17,7 @@ Imports:
     ggplot2,
     lubridate,
     magrittr,
+    S7,
     scales,
     stats,
     tidyr,
