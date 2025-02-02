@@ -213,8 +213,21 @@ s custom print function
 
 2025-1-22
 - completed all year related ti functions
-- need to replicate to mont and quarter and day functions
+- need to replicate to month and quarter and day functions
 
+2025-2-02
+
+- first create a ti_tbl class that will hold data, columns, and required function
+- then create a formula that will take ti_tbl class and do its calculation
+- then create a function that will create a  ti_tbl with the data, column names and function  
+- last create a method that will take the ti_obj and execute the embedded function against the stored data
+- another method is the print method which would print out the instructions of what it is doing
+- need to update previous tables with new ti_object arguments (1 hour)
+- create new ti_objects for quarter, day, month functions (2 hours)
+- create new functions (1 hour)
+- create new tests (1 hour)
+
+# list of all functions
 
 ```{r}
 #| echo: false

@@ -1,8 +1,13 @@
-create_calendar <- new_generic("create_calendar","x")
-
-calculate <- new_generic("calculate","x")
 
 
+# create generics -----------
+
+create_calendar <- S7::new_generic("create_calendar","x")
+
+calculate <- S7::new_generic("calculate","x")
+
+
+# create methods
 #' Title
 #'
 #' @param x

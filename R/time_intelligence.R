@@ -518,14 +518,14 @@ yoy_tbl <- function(x){
   )
 
   return(out_tbl)
-
-
-
-
-
-
-
 }
+
+
+
+# functions that assign arguments to table --------------------
+
+
+## year related functions----------
 
 #' Year-to-date
 #' @param .data either a tibble or  DBI object
@@ -565,6 +565,7 @@ ytd <- function(.data,date,value,calendar_type){
     ,fn=ytd_tbl
     ,new_date_column_name = "Year"
   )
+  return(out)
 
 }
 
@@ -608,6 +609,7 @@ pytd <- function(.data,date,value,calendar_type,lag_n){
     ,new_date_column_name = "Year"
   )
 
+  return(out)
 }
 
 #' Prevoius year-to-date
@@ -650,9 +652,10 @@ yoytd <- function(.data,date,value,calendar_type,lag_n){
     ,new_date_column_name = NA_character_
   )
 
+  return(out)
 }
 
-
+## quarter related ti_tbl-----------------------------
 
 #' Quarter-to-date
 #'
@@ -696,6 +699,51 @@ qtd <- function(.data,date,value,calendar_type){
 
   return(out)
 
+}
+
+
+
+#' Previous quarter quarter-to-date
+#' @param .data either a tibble or  DBI object
+#' @param date the date column to aggregate
+#' @param value the value column to summarize
+#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @description
+#' This calculates the annual cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with `dplyr::group_by()`.
+#'
+#' Use `calculate()` to return the results
+#'
+#' @returns ytd_tbl or ytd_dbi
+#' @export
+#'
+#' @examples
+#' ytd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
+pqtd <- function(.data,date,value,calendar_type,lag_n){
+
+  # Validate inputs
+  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+
+
+  # assigns inputs to ytd_tbl class
+
+  out <- ti_tbl(
+    calendar_tbl(
+      data=.data
+      ,calendar_type=calendar_type
+      ,date_vec = rlang::as_label(rlang::enquo(date))
+    )
+    ,time_unit = time_unit("day")
+    ,action=action("aggregate")
+    ,value_vec = rlang::as_label(rlang::enquo(value))
+    ,new_column_name_prefix = "pqtd"
+    ,sort_logic = TRUE
+    ,fn=qytd_tbl
+    ,lag_n = lag_n
+    ,new_date_column_name = "Year"
+  )
+
+  return(out)
 }
 
 

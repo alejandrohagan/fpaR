@@ -1,8 +1,12 @@
 
+
+# to register methods upon packag loading--------------
 .onLoad <- function(...) {
   S7::methods_register()
 }
 
+
+# time unit class when aggregating a date column-----------
 
 time_unit <- S7::new_class(
 
@@ -28,7 +32,7 @@ time_unit <- S7::new_class(
   }
 )
 
-# action class
+# action class to help with printing methods--------------
 
 action <- S7::new_class(
   name="action"
@@ -45,7 +49,7 @@ action <- S7::new_class(
   )
 )
 
-## calendar class
+# calendar class to create a calendar compliant table---------------
 
 calendar_tbl <- S7::new_class(
   name="calendar_tbl"
@@ -156,15 +160,28 @@ calendar_tbl <- S7::new_class(
     )
 )
 
-### ti table
+# ti class to bring everything together ----------------
 
 ti_tbl <- S7::new_class(
   name="ti_tbl"
+
   ,package = "fpaR"
+
+  #properties
   ,properties = list(
+
+
+  #see calendar class
     calendar_tbl=calendar_tbl
+  # see time unit class
     ,time_unit=time_unit
-    ,value_vec=S7::new_property(class=class_character)
+
+  # properties on the target variable
+    ,value_vec=S7::new_property(
+      class=class_character
+      ,default = NA_character_
+      )
+
     ,value_quo=S7::new_property(
       class=S7::class_any
       ,getter=\(self){
@@ -172,7 +189,12 @@ ti_tbl <- S7::new_class(
         x
       }
     )
-    ,new_column_name_prefix=S7::new_property(class=S7::class_character)
+
+  # properties on new columns created
+    ,new_column_name_prefix=S7::new_property(
+      class=S7::class_character
+      ,default = NA_character_
+      )
     ,new_column_name=S7::new_property(
       class=class_character
       ,getter = \(self){
@@ -180,8 +202,14 @@ ti_tbl <- S7::new_class(
         x
       }
     )
-    ,new_date_column_name=S7::new_property(class=S7::class_character)
-    ,second_column_name_prefix=S7::new_property(class=S7::class_character)
+    ,new_date_column_name=S7::new_property(
+      class=S7::class_character
+      ,default = NA_character_
+      )
+    ,second_column_name_prefix=S7::new_property(
+      class=S7::class_character
+      ,default=NA_character_
+      )
     ,second_column_name=S7::new_property(
       class=class_character
       ,getter = \(self){
@@ -189,16 +217,22 @@ ti_tbl <- S7::new_class(
         x
       }
     )
+  # time unit lag
     ,lag_n=new_property(
       class=class_numeric
       ,default = 0
     )
-    ,sort_logic=S7::new_property(class=S7::class_logical)
+  # sort logic for cumulative sums
+    ,sort_logic=S7::new_property(
+      class=S7::class_logical
+      ,default = TRUE
+      )
 
-    #custom classes
+  # properties to help with printing method
     ,action=S7::new_property(class=action)
     ,fn=class_function
   )
+  # validator to check if date column is in date format
   ,validator = \(self){
 
     if(!any(self@calendar_tbl@data |>  dplyr::pull(self@calendar_tbl@date_vec) |> class() %in% c("Date"))){
@@ -207,62 +241,3 @@ ti_tbl <- S7::new_class(
     }
   }
 )
-
-
-# ytd_tbl <- S7::new_class(
-#   "ytd_tbl"
-#   ,parent = ti_tbl
-#   )
-
-#
-# qtd_tbl <- S7::new_class(
-#   "qtd_tbl"
-#   ,parent = ti_tbl
-#   ,package = "fpaR"
-# )
-#
-# mtd_tbl <- S7::new_class(
-#   "mtd_tbl"
-#   ,parent = ti_tbl
-#   ,package = "fpaR"
-# )
-#
-# wtd_tbl <- S7::new_class(
-#   "totalwtd_tbl"
-#   ,parent = ti_tbl
-#   ,package = "fpaR"
-# )
-#
-#
-# atd_tbl <- S7::new_class(
-#   "totalatd_tbl"
-#   ,parent = ti_tbl
-#   ,package = "fpaR"
-# )
-#
-#
-# dod_tbl <- S7::new_class(
-#   "dod_tbl"
-#   ,parent = ti_tbl
-#   ,package = "fpaR"
-# )
-#
-# wow_tbl <- S7::new_class(
-#   "wow_tbl"
-#   ,parent = ti_tbl
-#   ,package = "fpaR"
-# )
-#
-# mom_tbl <- S7::new_class(
-#   "mom_tbl"
-#   ,parent = ti_tbl
-#   ,package = "fpaR"
-# )
-#
-#
-# yoy_tbl<- S7::new_class(
-#   "yoy_tbl"
-#   ,parent = ti_tbl
-#   ,package = "fpaR"
-# )
-#
