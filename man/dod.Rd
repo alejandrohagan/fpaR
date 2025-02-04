@@ -2,7 +2,7 @@
 % Please edit documentation in R/time_intelligence.R
 \name{dod}
 \alias{dod}
-\title{Title}
+\title{day over day calculation}
 \usage{
 dod(.data, date, value, calendar_type, lag_n = 1)
 }
@@ -21,7 +21,7 @@ dod(.data, date, value, calendar_type, lag_n = 1)
 dod_tbl or dbi_tbl
 }
 \description{
-Title
+day over day calculation
 }
 \examples{
 dod(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)

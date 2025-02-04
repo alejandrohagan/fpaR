@@ -559,7 +559,7 @@ ytd <- function(.data,date,value,calendar_type){
 
   # assigns inputs to ytd_tbl class
 
-  out <- ti_tbl(
+  out <- ?ti_tbl(
     calendar_tbl(
       data=.data
       ,calendar_type=calendar_type
@@ -572,10 +572,14 @@ ytd <- function(.data,date,value,calendar_type){
     ,sort_logic = TRUE
     ,fn=ytd_tbl
     ,new_date_column_name = "Year"
+    ,second_column_name_prefix = NA_character_
+    ,second_column_name=NA_character_
+    ,lag_n = NA_integer_
   )
   return(out)
 
 }
+
 
 #' Prevoius year-to-date
 #' @param .data either a tibble or  DBI object
@@ -615,6 +619,9 @@ pytd <- function(.data,date,value,calendar_type,lag_n){
     ,fn=pytd_tbl
     ,lag_n = lag_n
     ,new_date_column_name = "Year"
+    ,second_column_name_prefix = NA_character_
+    ,second_column_name=NA_character_
+    ,lag_n = NA_integer_
   )
 
   return(out)
@@ -657,7 +664,10 @@ yoytd <- function(.data,date,value,calendar_type,lag_n){
     ,sort_logic = TRUE
     ,fn=yoytd_tbl
     ,lag_n = lag_n
-    ,new_date_column_name = NA_character_
+    ,new_date_column_name = "Year"
+    ,second_column_name_prefix = NA_character_
+    ,second_column_name=NA_character_
+    ,lag_n = NA_integer_
   )
 
   return(out)
@@ -702,7 +712,10 @@ qtd <- function(.data,date,value,calendar_type){
     ,new_column_name_prefix  = "qtd"
     ,sort_logic              = TRUE
     ,fn                      = qtd_tbl
-    ,new_date_column_name    = "Year"
+    ,new_date_column_name    = c("Year","Quarter")
+    ,second_column_name_prefix = NA_character_
+    ,second_column_name=NA_character_
+    ,lag_n = NA_integer_
   )
 
   return(out)
@@ -748,7 +761,10 @@ pqtd <- function(.data,date,value,calendar_type,lag_n){
     ,sort_logic = TRUE
     ,fn=qytd_tbl
     ,lag_n = lag_n
-    ,new_date_column_name = "Year"
+    ,new_date_column_name    = c("Year","Quarter")
+    ,second_column_name_prefix = NA_character_
+    ,second_column_name=NA_character_
+    ,lag_n = NA_integer_
   )
 
   return(out)
@@ -793,6 +809,9 @@ mtd <- function(.data,date,value,calendar_type){
       ,sort_logic = TRUE
       ,fn=mtd_tbl
       ,new_date_column_name = c("year","month")
+      ,second_column_name_prefix = NA_character_
+      ,second_column_name=NA_character_
+      ,lag_n = NA_integer_
     )
 
 
@@ -839,6 +858,9 @@ wtd <- function(.data,date,value,calendar_type){
     ,sort_logic = TRUE
     ,fn=wtd_tbl
     ,new_date_column_name = c("year","month","week")
+    ,second_column_name_prefix = NA_character_
+    ,second_column_name=NA_character_
+    ,lag_n = NA_integer_
   )
 
 
@@ -883,7 +905,10 @@ atd <- function(.data,date,value,calendar_type){
     ,new_column_name_prefix = "atd"
     ,sort_logic = TRUE
     ,fn=atd_tbl
-    ,new_date_column_name = NA_character_
+    ,new_date_column_name = c("date")
+    ,second_column_name_prefix = NA_character_
+    ,second_column_name=NA_character_
+    ,lag_n = NA_integer_
   )
 
   return(out)
@@ -922,7 +947,10 @@ dod <- function(.data,date,value,calendar_type,lag_n=1){
     ,sort_logic = TRUE
     ,fn=dod_tbl
     ,new_date_column_name = NA_character_
-    ,lag_n=lag_n
+    ,second_column_name_prefix = NA_character_
+    ,second_column_name=NA_character_
+    ,lag_n = NA_integer_
+
   )
 
   return(out)
@@ -997,6 +1025,8 @@ mom <- function(.data,date,value,calendar_type,lag_n=1){
     ,sort_logic = TRUE
     ,fn=mom_tbl
     ,new_date_column_name = NA_character_
+    ,second_column_name_prefix = NA_character_
+    ,second_column_name=NA_character_
     ,lag_n=lag_n
   )
   return(out)
@@ -1031,6 +1061,8 @@ yoy <- function(.data,date,value,calendar_type,lag_n=1){
     ,sort_logic = TRUE
     ,fn=yoy_tbl
     ,new_date_column_name = NA_character_
+    ,second_column_name_prefix = NA_character_
+    ,second_column_name=NA_character_
     ,lag_n=lag_n
   )
   return(out)
