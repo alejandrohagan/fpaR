@@ -235,8 +235,6 @@ s custom print function
 #| message: false
 #| error: false
 
-usethis::use_data_raw("functions")
-
 tibble::tribble(
    ~"short_name", ~"description", ~"shift", ~"aggregate", ~"compare",
    "YoY", "Full Year over Year", "", "", "X",

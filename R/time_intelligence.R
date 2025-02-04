@@ -1,4 +1,3 @@
-
 #' Aggregate and expand date table
 #'
 #' @param .data data either grouped or ungrouped
@@ -83,7 +82,9 @@ make_aggregation_tbl <- function(.data,date,value,time_unit) {
 
 }
 
+# Formulas to be put inside the ti_tbl class----------------------
 
+## year related functions
 
 #' Year-to-date for tibble objects
 #'
@@ -193,6 +194,7 @@ yoytd_tbl <- function(x){
 
 }
 
+## quarter related functions -----------------
 
 #' Quarter-to-date for tibble objects
 #'
@@ -301,6 +303,8 @@ qoqtd_tbl <- function(x){
 }
 
 
+## month related functions -------------------------
+
 #' Month-to-date for tibble objects
 #'
 #' @param x ti_tbl
@@ -335,7 +339,7 @@ mtd_tbl <- function(x){
 
 }
 
-
+## week related functions-----------------
 
 #' Week-to-date for tibble objects
 #'
@@ -366,6 +370,7 @@ wtd_tbl <- function(x){
   return(out_tbl)
 }
 
+## all to date related functions ----------------
 
 #' All-to-date for tibble objects
 #'
@@ -390,6 +395,9 @@ atd_tbl <- function(x){
 
 
 }
+
+
+## day related functions --------------------------
 
 #' Day-over-day for tibble objects
 #'
@@ -423,7 +431,7 @@ dod_tbl <- function(x){
   return(out_tbl)
 }
 
-
+## comparing related functions ------------------
 
 
 #' Week-over-week for tibble objects
@@ -522,10 +530,10 @@ yoy_tbl <- function(x){
 
 
 
-# functions that assign arguments to table --------------------
+# functions that assign arguments to the ti_tbl class --------------------
 
 
-## year related functions----------
+## year related ti_tbl----------
 
 #' Year-to-date
 #' @param .data either a tibble or  DBI object
@@ -746,6 +754,7 @@ pqtd <- function(.data,date,value,calendar_type,lag_n){
   return(out)
 }
 
+## month related ti_tbl-------------------
 
 #' Month-to-date
 #'
@@ -790,6 +799,9 @@ mtd <- function(.data,date,value,calendar_type){
   return(out)
 }
 
+## week related ti_tbl-------------
+
+
 #' Week-to-date
 #'
 #' @param .data either a tibble or  DBI object
@@ -833,6 +845,7 @@ wtd <- function(.data,date,value,calendar_type){
   return(out)
 }
 
+## all related ti_tbl-------------------------
 
 #' All-to-date
 #'
@@ -877,8 +890,10 @@ atd <- function(.data,date,value,calendar_type){
 
 }
 
+## comparison ti_tbl------------------
 
-#' Title
+
+#' day over day calculation
 #'
 #' @param .data tibble or DBI object
 #' @param date the date column to aggregate
@@ -1018,9 +1033,7 @@ yoy <- function(.data,date,value,calendar_type,lag_n=1){
     ,new_date_column_name = NA_character_
     ,lag_n=lag_n
   )
-
   return(out)
-
 }
 
 
