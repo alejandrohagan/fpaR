@@ -172,12 +172,12 @@ yoytd_tbl <- function(x){
 
   ytd_tbl <- ytd_tbl(x)
 
-  #pytd table
 
-  pytd_tbl <- pytd_tbl(x) |>
-    dplyr::rename(
-      !!x@value@new_column_name[[2]]:=!!x@value@new_column_name[[1]]
-    )
+
+  #pytd table
+  y <- x@value@new_column_name <- "pytd"
+
+  pytd_tbl <- pytd_tbl(y)
 
   # join tables together
 
@@ -207,7 +207,7 @@ yoy_tbl <- function(x){
     dplyr::arrange(date,.by_group = TRUE) |>
     dplyr::mutate(
       date_lag=dplyr::lead(date,n = x@fn@lag_n)
-      ,!!x@value@new_column_name:=!!x@value@value_quo
+      ,!!x@value@new_column_name[[1]]:=!!x@value@value_quo
     ) |>
     dplyr::select(-c(date,!!x@value@value_quo)) |>
     dplyr::ungroup()
@@ -234,21 +234,11 @@ ytdopy_tbl <- function(x){
   # year-to-date table
   ytd_tbl <-  ytd_tbl(x)
 
-
   #aggregate to prior year
-  py_tbl <-   ytd_tbl |>
-    dplyr::mutate(
-      year=lubridate::year(date)
-    ) |>
-    dplyr::group_by(year,!!!x@calendar@group_quo) |>
-    dplyr::summarise(
-      fy=base::sum(!!x@value@value_quo,na.rm=TRUE)
-      ,.groups="drop"
-    ) |>
-    dplyr::mutate(
-      !!x@value@second_column_name:=dplyr::lag(fy,x@fn@lag_n)
-    ) |>
-    dplyr::select(-c(fy))
+
+  y <- x@time_unit <- time_unit("year")
+
+  py_tbl <-   yoy_tbl(y)
 
   # join together
 
@@ -871,7 +861,7 @@ dod_tbl <- function(x){
 #' @export
 #'
 #' @examples
-#' ytd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
+#' ytd(fpaR::sales,date=date,.value=quantity,calendar_type="standard")
 ytd <- function(.data,.date,.value,calendar_type){
 
   # assigns inputs to ytd_tbl class
@@ -884,7 +874,7 @@ ytd <- function(.data,.date,.value,calendar_type){
     )
     ,time_unit             = time_unit("day")
     ,action                = action("aggregate")
-    ,value = value(
+    ,.value = value(
       value_vec            =  rlang::as_label(rlang::enquo(.value))
       ,new_column_name     = "ytd"
       )
@@ -914,8 +904,8 @@ ytd <- function(.data,.date,.value,calendar_type){
 #' @export
 #'
 #' @examples
-#' ytd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
-pytd <- function(.data,date,value,calendar_type,lag_n){
+#' ytd(fpaR::sales,date=date,.value=quantity,calendar_type="standard")
+pytd <- function(.data,..date,.value,calendar_type,lag_n){
 
 
   # assigns inputs to ytd_tbl class
@@ -923,26 +913,26 @@ pytd <- function(.data,date,value,calendar_type,lag_n){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(..date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
-      ,new_column_name_prefix = "pytd"
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
+      ,new_column_name = "pytd"
     )
     ,fn=fn(
       lag_n = lag_n
-      ,new_date_column_name = "year"
+      ,new_.date_column_name = "year"
     )
   )
 
   return(out)
 }
 
-#' Current year-to-date compared to previous year-to-date
+#' Current year-to-.date compared to previous year-to-.date
 #' @param .data either a tibble or  DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @description
@@ -955,11 +945,11 @@ pytd <- function(.data,date,value,calendar_type,lag_n){
 #' @export
 #'
 #' @examples
-#' ytd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
-yoytd <- function(.data,date,value,calendar_type,lag_n){
+#' ytd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+yoytd <- function(.data,.date,.value,calendar_type,lag_n){
 
 
-  # Validate inputs
+  # Vali.date inputs
 
   # assigns inputs to yoytd class
 
@@ -967,18 +957,17 @@ yoytd <- function(.data,date,value,calendar_type,lag_n){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value_tbl(
-      value_vec = rlang::as_label(rlang::enquo(value))
-      ,new_column_name_prefix = "ytd"
-      ,second_column_name_prefix = "pytd"
+    ,.value=value_tbl(
+      value_vec = rlang::as_label(rlang::enquo(.value))
+      ,new_column_name = c("ytd","pytd")
     )
     ,fn=fn(
       lag_n = lag_n
-      ,new_date_column_name = "year"
+      ,new_.date_column_name = "year"
     )
   )
 
@@ -989,7 +978,7 @@ yoytd <- function(.data,date,value,calendar_type,lag_n){
 #' Year-over-year
 #'
 #' @param .data tibble or DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @param lag_n the number of months to lag, default is 1
@@ -998,24 +987,24 @@ yoytd <- function(.data,date,value,calendar_type,lag_n){
 #' @export
 #'
 #' @examples
-#' yoy(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
-yoy <- function(.data,date,value,calendar_type,lag_n=1){
+#' yoy(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
+yoy <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("year")
     ,action=action(c("aggregate","shift","compare"))
 
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
-      ,new_column_name_prefix = "yoy"
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
+      ,new_column_name = "yoy"
     )
     ,fn=fn(
-      new_date_column_name = "date"
+      new_.date_column_name = ".date"
       ,lag_n=lag_n
     )
   )
@@ -1024,10 +1013,10 @@ yoy <- function(.data,date,value,calendar_type,lag_n=1){
 
 }
 
-#' Year-to-date over full previous year
+#' Year-to-.date over full previous year
 #'
 #' @param .data tibble or DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @param lag_n the number of years to lag, default is 1
@@ -1036,24 +1025,24 @@ yoy <- function(.data,date,value,calendar_type,lag_n=1){
 #' @export
 #'
 #' @examples
-#' ytdoy(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
-ytdopy <- function(.data,date,value,calendar_type,lag_n=1){
+#' ytdoy(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
+ytdopy <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action(c("aggregate","shift","compare"))
 
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
-      ,new_column_name_prefix = c("ytd","py")
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
+      ,new_column_name = c("ytd","py")
     )
     ,fn=fn(
-      new_date_column_name = c("date","year")
+      new_.date_column_name = c(".date","year")
       ,lag_n=lag_n
     )
   )
@@ -1067,10 +1056,10 @@ ytdopy <- function(.data,date,value,calendar_type,lag_n=1){
 
 ## quarter related ti_tbl-----------------------------
 
-#' quarter-to-date
+#' quarter-to-.date
 #'
 #' @param .data either a tibble or  dbi object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @description
@@ -1083,8 +1072,8 @@ ytdopy <- function(.data,date,value,calendar_type,lag_n=1){
 #' @export
 #'
 #' @examples
-#' qtd(fpar::sales,date=date,value=quantity,calendar_type="standard")
-qtd <- function(.data,date,value,calendar_type){
+#' qtd(fpar::sales,.date=.date,.value=quantity,calendar_type="standard")
+qtd <- function(.data,.date,.value,calendar_type){
 
 
   # Aggregate data based on provided time unit
@@ -1093,16 +1082,16 @@ qtd <- function(.data,date,value,calendar_type){
     calendar(
       data                       = .data
       ,calendar_type             = calendar_type
-      ,date_vec                  =  rlang::as_label(rlang::enquo(date))
+      ,.date_vec                  =  rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit                   = time_unit("day")
     ,action                      = action("aggregate")
-    ,value = value(
-      ,value_vec                 = rlang::as_label(rlang::enquo(value))
-      ,new_column_name_prefix    = "qtd"
+    ,.value = value(
+      ,.value_vec                 = rlang::as_label(rlang::enquo(.value))
+      ,new_column_name    = "qtd"
     )
     ,fn=fn(
-      new_date_column_name      = c("year","quarter")
+      new_.date_column_name      = c("year","quarter")
       ,lag_n                     = NA_integer_
     )
   )
@@ -1111,9 +1100,9 @@ qtd <- function(.data,date,value,calendar_type){
 
 
 
-#' Previous quarter quarter-to-date
+#' Previous quarter quarter-to-.date
 #' @param .data either a tibble or  DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @description
@@ -1126,10 +1115,10 @@ qtd <- function(.data,date,value,calendar_type){
 #' @export
 #'
 #' @examples
-#' ytd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
-pqtd <- function(.data,date,value,calendar_type,lag_n){
+#' ytd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+pqtd <- function(.data,.date,.value,calendar_type,lag_n){
 
-  # Validate inputs
+  # Vali.date inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
   # assigns inputs to pqtd_tbl class
@@ -1137,26 +1126,26 @@ pqtd <- function(.data,date,value,calendar_type,lag_n){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
-      ,new_column_name_prefix = "pqtd"
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
+      ,new_column_name = "pqtd"
     )
     ,fn=fn(
       lag_n = lag_n
-      ,new_date_column_name    = c("year","quarter")
+      ,new_.date_column_name    = c("year","quarter")
     )
   )
   return(out)
 }
 
 
-#' Current year-to-date compared to previous year-to-date
+#' Current year-to-.date compared to previous year-to-.date
 #' @param .data either a tibble or  DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @description
@@ -1169,11 +1158,11 @@ pqtd <- function(.data,date,value,calendar_type,lag_n){
 #' @export
 #'
 #' @examples
-#' ytd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
-qoqtd <- function(.data,date,value,calendar_type,lag_n){
+#' ytd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+qoqtd <- function(.data,.date,.value,calendar_type,lag_n){
 
 
-  # Validate inputs
+  # Vali.date inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
   # assigns inputs to yoytd class
@@ -1182,27 +1171,27 @@ qoqtd <- function(.data,date,value,calendar_type,lag_n){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value_tbl(
-      value_vec = rlang::as_label(rlang::enquo(value))
-      ,new_column_name_prefix = c("qtd","pqtd")
+    ,.value=value_tbl(
+      value_vec = rlang::as_label(rlang::enquo(.value))
+      ,new_column_name = c("qtd","pqtd")
     )
     ,fn=fn(
       lag_n = lag_n
-      ,new_date_column_name = c("year","quarter")
+      ,new_.date_column_name = c("year","quarter")
     )
   )
 
   return(out)
 }
 
-#' Year-to-date over full previous year
+#' Year-to-.date over full previous year
 #'
 #' @param .data tibble or DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @param lag_n the number of years to lag, default is 1
@@ -1211,24 +1200,24 @@ qoqtd <- function(.data,date,value,calendar_type,lag_n){
 #' @export
 #'
 #' @examples
-#' ytdoy(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
-qtdopq <- function(.data,date,value,calendar_type,lag_n=1){
+#' ytdoy(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
+qtdopq <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action(c("aggregate","shift","compare"))
 
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
-      ,new_column_name_prefix = c("qtd","pq")
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
+      ,new_column_name  = "qtd"
     )
     ,fn=fn(
-      new_date_column_name = c("date","year","quarter")
+      new_.date_column_name = c(".date","year","quarter")
       ,lag_n=lag_n
     )
   )
@@ -1242,7 +1231,7 @@ qtdopq <- function(.data,date,value,calendar_type,lag_n=1){
 #' Month-over-month
 #'
 #' @param .data tibble or DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @param lag_n the number of months to lag, default is 1
@@ -1251,24 +1240,24 @@ qtdopq <- function(.data,date,value,calendar_type,lag_n=1){
 #' @export
 #'
 #' @examples
-#' mom(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
-qoq <- function(.data,date,value,calendar_type,lag_n=1){
+#' mom(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
+qoq <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("quarter")
     ,action=action("aggregate")
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "qoq"
     )
     ,fn=fn(
       lag_n = lag_n
-      ,new_date_column_name = c("year","quarter")
+      ,new_.date_column_name = c("year","quarter")
     )
   )
   return(out)
@@ -1278,10 +1267,10 @@ qoq <- function(.data,date,value,calendar_type,lag_n=1){
 
 ## month related ti_tbl-------------------
 
-#' Month-to-date
+#' Month-to-.date
 #'
 #' @param .data either a tibble or  DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @description
@@ -1294,36 +1283,36 @@ qoq <- function(.data,date,value,calendar_type,lag_n=1){
 #' @export
 #'
 #' @examples
-#' mtd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
-mtd <- function(.data,date,value,calendar_type){
+#' mtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+mtd <- function(.data,.date,.value,calendar_type){
 
-    # Validate inputs
+    # Vali.date inputs
     assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
     out <- ti(
       calendar(
         data=.data
         ,calendar_type=calendar_type
-        ,date_vec = rlang::as_label(rlang::enquo(date))
+        ,.date_vec = rlang::as_label(rlang::enquo(.date))
       )
       ,time_unit = time_unit("day")
       ,action=action("aggregate")
-      ,value=value(
-        value_vec = rlang::as_label(rlang::enquo(value))
+      ,.value=value(
+        value_vec = rlang::as_label(rlang::enquo(.value))
         ,new_column_name_prefix = "mtd"
       )
       ,fn=fn_tbl(
-        new_date_column_name = c("year","month")
+        new_.date_column_name = c("year","month")
         ,lag_n = NA_integer_
       )
     )
   return(out)
 }
 
-#' Month-to-date
+#' Month-to-.date
 #'
 #' @param .data either a tibble or  DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @description
@@ -1336,36 +1325,36 @@ mtd <- function(.data,date,value,calendar_type){
 #' @export
 #'
 #' @examples
-#' mtd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
-pmtd <- function(.data,date,value,calendar_type,lag_n){
+#' mtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+pmtd <- function(.data,.date,.value,calendar_type,lag_n){
 
-  # Validate inputs
+  # Vali.date inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "pmtd"
     )
     ,fn=fn(
-      new_date_column_name = c("year","month")
+      new_.date_column_name = c("year","month")
       ,lag_n = lag_n
     )
   )
   return(out)
 }
 
-#' Month-to-date
+#' Month-to-.date
 #'
 #' @param .data either a tibble or  DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @description
@@ -1378,26 +1367,26 @@ pmtd <- function(.data,date,value,calendar_type,lag_n){
 #' @export
 #'
 #' @examples
-#' mtd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
-momtd <- function(.data,date,value,calendar_type,lag_n){
+#' mtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+momtd <- function(.data,.date,.value,calendar_type,lag_n){
 
-  # Validate inputs
+  # Vali.date inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "momtd"
     )
     ,fn=fn(
-      new_date_column_name = c("year","month")
+      new_.date_column_name = c("year","month")
       ,lag_n = lag_n
     )
   )
@@ -1406,10 +1395,10 @@ momtd <- function(.data,date,value,calendar_type,lag_n){
 
 
 
-#' Month-to-date
+#' Month-to-.date
 #'
 #' @param .data either a tibble or  DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @description
@@ -1422,26 +1411,26 @@ momtd <- function(.data,date,value,calendar_type,lag_n){
 #' @export
 #'
 #' @examples
-#' mtd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
-mtdopm <- function(.data,date,value,calendar_type,lag_n){
+#' mtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+mtdopm <- function(.data,.date,.value,calendar_type,lag_n){
 
-  # Validate inputs
+  # Vali.date inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "mtdopm"
     )
     ,fn=fn(
-      new_date_column_name = c("year","month")
+      new_.date_column_name = c("year","month")
       ,lag_n = lag_n
     )
   )
@@ -1451,7 +1440,7 @@ mtdopm <- function(.data,date,value,calendar_type,lag_n){
 #' Month-over-month
 #'
 #' @param .data tibble or DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @param lag_n the number of months to lag, default is 1
@@ -1460,23 +1449,23 @@ mtdopm <- function(.data,date,value,calendar_type,lag_n){
 #' @export
 #'
 #' @examples
-#' mom(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
-mom <- function(.data,date,value,calendar_type,lag_n=1){
+#' mom(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
+mom <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate","shift","compare")
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "mom"
     )
     ,fn=fn(
-      new_date_column_name = c("date","year","month")
+      new_.date_column_name = c("date","year","month")
       ,lag_n = NA_integer_
     )
   )
@@ -1489,10 +1478,10 @@ mom <- function(.data,date,value,calendar_type,lag_n=1){
 ## week related ti_tbl-------------
 
 
-#' Week-to-date
+#' Week-to-.date
 #'
 #' @param .data either a tibble or  DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @description
@@ -1505,35 +1494,35 @@ mom <- function(.data,date,value,calendar_type,lag_n=1){
 #' @export
 #'
 #' @examples
-#' wtd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
-wtd <- function(.data,date,value,calendar_type){
+#' wtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+wtd <- function(.data,.date,.value,calendar_type){
 
-  # Validate inputs
+  # Vali.date inputs
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "wtd"
     )
     ,fn=fn(
-      new_date_column_name = c("year","month","week")
+      new_.date_column_name = c("year","month","week")
       ,lag_n = NA_integer_
     )
   )
 
   return(out)
 }
-#' Week-to-date
+#' Week-to-.date
 #'
 #' @param .data either a tibble or  DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @description
@@ -1546,26 +1535,26 @@ wtd <- function(.data,date,value,calendar_type){
 #' @export
 #'
 #' @examples
-#' wtd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
-pwtd <- function(.data,date,value,calendar_type,lag_n){
+#' wtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+pwtd <- function(.data,.date,.value,calendar_type,lag_n){
 
-  # Validate inputs
+  # Vali.date inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value(
-      value = rlang::as_label(rlang::enquo(value))
+    ,.value=value(
+      value = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "pwtd"
     )
     ,fn=fn(
-      new_date_column_name = c("year","month","week")
+      new_.date_column_name = c("year","month","week")
       ,lag_n = lag_n
     )
   )
@@ -1573,10 +1562,10 @@ pwtd <- function(.data,date,value,calendar_type,lag_n){
   return(out)
 }
 
-#' Week-to-date
+#' Week-to-.date
 #'
 #' @param .data either a tibble or  DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @description
@@ -1589,26 +1578,26 @@ pwtd <- function(.data,date,value,calendar_type,lag_n){
 #' @export
 #'
 #' @examples
-#' wtd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
-wowtd <- function(.data,date,value,calendar_type,lag_n){
+#' wtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+wowtd <- function(.data,.date,.value,calendar_type,lag_n){
 
-  # Validate inputs
+  # Vali.date inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "wowtd"
     )
     ,fn=fn(
-      new_date_column_name = c("year","month","week")
+      new_.date_column_name = c("year","month","week")
       ,lag_n = lag_n
     )
   )
@@ -1617,10 +1606,10 @@ wowtd <- function(.data,date,value,calendar_type,lag_n){
 }
 
 
-#' Week-to-date
+#' Week-to-.date
 #'
 #' @param .data either a tibble or  DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @description
@@ -1633,26 +1622,26 @@ wowtd <- function(.data,date,value,calendar_type,lag_n){
 #' @export
 #'
 #' @examples
-#' wtd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
-wtwopw <- function(.data,date,value,calendar_type,lag_n){
+#' wtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+wtwopw <- function(.data,.date,.value,calendar_type,lag_n){
 
-  # Validate inputs
+  # Vali.date inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "wtwopw"
     )
     ,fn=fn(
-      new_date_column_name = c("year","month","week")
+      new_.date_column_name = c("year","month","week")
       ,lag_n = lag_n
     )
   )
@@ -1664,7 +1653,7 @@ wtwopw <- function(.data,date,value,calendar_type,lag_n){
 #' Week-over-Week
 #'
 #' @param .data tibble or DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @param lag_n the number of weeks to lag, default is 1
@@ -1673,24 +1662,24 @@ wtwopw <- function(.data,date,value,calendar_type,lag_n){
 #' @export
 #'
 #' @examples
-#' wow(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
-wow <- function(.data,date,value,calendar_type,lag_n=1){
+#' wow(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
+wow <- function(.data,.date,.value,calendar_type,lag_n=1){
 
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate","shift","compare")
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "wow"
     )
     ,fn=fn(
-      new_date_column_name = c("date")
+      new_.date_column_name = c("date")
       ,lag_n = lag_n
     )
   )
@@ -1701,10 +1690,10 @@ wow <- function(.data,date,value,calendar_type,lag_n=1){
 
 ## all related ti_tbl-------------------------
 
-#' All-to-date
+#' All-to-.date
 #'
 #' @param .data either a tibble or  DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @description
@@ -1717,26 +1706,26 @@ wow <- function(.data,date,value,calendar_type,lag_n=1){
 #' @export
 #'
 #' @examples
-#' atd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
-atd <- function(.data,date,value,calendar_type){
+#' atd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+atd <- function(.data,.date,.value,calendar_type){
 
-  # Validate inputs
+  # Vali.date inputs
 
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "atd"
     )
     ,fn=fn(
-      new_date_column_name = c("date")
+      new_.date_column_name = c("date")
       ,lag_n = NA_integer_
     )
   )
@@ -1751,7 +1740,7 @@ atd <- function(.data,date,value,calendar_type){
 #' day over day calculation
 #'
 #' @param .data tibble or DBI object
-#' @param date the date column to aggregate
+#' @param .date the .date column to aggregate
 #' @param value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @param lag_n the number of periods to lag, default is 1
@@ -1760,24 +1749,24 @@ atd <- function(.data,date,value,calendar_type){
 #' @export
 #'
 #' @examples
-#' dod(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
-dod <- function(.data,date,value,calendar_type,lag_n=1){
+#' dod(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
+dod <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+      ,.date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate","shift","compare")
-    ,value=value(
-      value_vec = rlang::as_label(rlang::enquo(value))
+    ,.value=value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "dod"
       ,second_column_name_prefix = NA_character_
     )
     ,fn=fn(
-      new_date_column_name = c("date")
+      new_.date_column_name = c("date")
       ,lag_n = NA_integer_
     )
   )
