@@ -2,7 +2,7 @@
 % Please edit documentation in R/time_intelligence.R
 \name{wow_tbl}
 \alias{wow_tbl}
-\title{Week-over-week for tibble objects}
+\title{Year-over-year}
 \usage{
 wow_tbl(x)
 }
@@ -13,5 +13,5 @@ wow_tbl(x)
 tibble
 }
 \description{
-Week-over-week for tibble objects
+Year-over-year
 }

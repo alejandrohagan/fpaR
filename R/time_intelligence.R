@@ -47,7 +47,7 @@ make_aggregation_tbl <- function(.data,date,value,time_unit) {
 
 
   # Create a calendar table with all the dates in the specified time frame
-  calendar_tbl <- tibble::tibble(
+  calendar <- tibble::tibble(
     date = base::seq.Date(from = base::min(summary_tbl$date,na.rm=TRUE), to = base::max(summary_tbl$date,na.rm = TRUE), by = time_unit)
   )
 
@@ -55,9 +55,9 @@ make_aggregation_tbl <- function(.data,date,value,time_unit) {
 
   if(!existing_groups|> is_empty()){
 
-    calendar_tbl <- dplyr::left_join(
+    calendar <- dplyr::left_join(
       summary_tbl |> dplyr::distinct(pick(existing_groups)) |> dplyr::mutate(id="id")
-      ,calendar_tbl |> dplyr::mutate(id="id")
+      ,calendar |> dplyr::mutate(id="id")
       ,by=dplyr::join_by(id)
       ,relationship = "many-to-many"
     ) |>
@@ -67,7 +67,7 @@ make_aggregation_tbl <- function(.data,date,value,time_unit) {
 
   # Perform a full join to ensure all time frames are represented
   full_tbl <- dplyr::full_join(
-    calendar_tbl
+    calendar
     ,summary_tbl
     ,by = dplyr::join_by(date,!!!existing_groups)
   ) |>
@@ -94,6 +94,7 @@ make_aggregation_tbl <- function(.data,date,value,time_unit) {
 #'
 ytd_tbl <- function(x){
 
+
   # create calendar table
 
   full_tbl <- create_calendar(x) |>
@@ -105,10 +106,10 @@ ytd_tbl <- function(x){
  # aggregate the data and create the cumulative sum
 
   out_tbl <- full_tbl |>
-    dplyr::group_by(year,!!!x@calendar_tbl@group_quo) |>
+    dplyr::group_by(year,!!!x@calendar@group_quo) |>
     dplyr::arrange(date,.by_group = TRUE) |>
     dplyr::mutate(
-      !!x@value@new_column_name:=base::cumsum(!!x@value@value_quo)
+      !!x@value@new_column_name[[1]]:=base::cumsum(!!x@value@value_quo)
     ) |>
     dplyr::ungroup()
 
@@ -136,11 +137,11 @@ pytd_tbl <- function(x){
 
   # create lag table
   lag_tbl <- full_tbl|>
-    dplyr::group_by(year,!!!x@calendar_tbl@group_quo) |>
+    dplyr::group_by(year,!!!x@calendar@group_quo) |>
     dplyr::arrange(date,.by_group = TRUE) |>
     dplyr::mutate(
       ,date_lag=date+lubridate::years(x@fn@lag_n)
-      ,!!x@value@new_column_name:=cumsum(!!x@value@value_quo)
+      ,!!x@value@new_column_name[[1]]:=cumsum(!!x@value@value_quo)
     ) |>
     dplyr::ungroup() |>
     dplyr::select(-c(date,year,!!x@value@value_quo))
@@ -150,7 +151,7 @@ pytd_tbl <- function(x){
   out_tbl <-   dplyr::left_join(
     full_tbl
     ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
   ) |>
     dplyr::select(-c(!!x@value@value_quo))
 
@@ -175,7 +176,7 @@ yoytd_tbl <- function(x){
 
   pytd_tbl <- pytd_tbl(x) |>
     dplyr::rename(
-      !!x@value@second_column_name:=!!x@value@new_column_name
+      !!x@value@new_column_name[[2]]:=!!x@value@new_column_name[[1]]
     )
 
   # join tables together
@@ -183,7 +184,7 @@ yoytd_tbl <- function(x){
   out_tbl <-   dplyr::left_join(
     ytd_tbl
     ,pytd_tbl
-    ,by=dplyr::join_by(date==date,year,!!!x@calendar_tbl@group_quo)
+    ,by=dplyr::join_by(date==date,year,!!!x@calendar@group_quo)
   )
 
   return(out_tbl)
@@ -215,7 +216,7 @@ yoy_tbl <- function(x){
   out_tbl <-   dplyr::left_join(
     full_tbl
     ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
   )
 
   return(out_tbl)
@@ -239,7 +240,7 @@ ytdopy_tbl <- function(x){
     dplyr::mutate(
       year=lubridate::year(date)
     ) |>
-    dplyr::group_by(year,!!!x@calendar_tbl@group_quo) |>
+    dplyr::group_by(year,!!!x@calendar@group_quo) |>
     dplyr::summarise(
       fy=base::sum(!!x@value@value_quo,na.rm=TRUE)
       ,.groups="drop"
@@ -254,7 +255,7 @@ ytdopy_tbl <- function(x){
  out_tbl <-  ytd_tbl |>
     dplyr::left_join(
       py_tbl
-      ,by=dplyr::join_by(year,!!!x@calendar_tbl@group_quo)
+      ,by=dplyr::join_by(year,!!!x@calendar@group_quo)
     )
 
   return(out_tbl)
@@ -280,7 +281,7 @@ qtd_tbl <- function(x){
     )
 
   out_tbl <- full_tbl |>
-    dplyr::group_by(year,quarter,!!!x@calendar_tbl@group_quo) |>
+    dplyr::group_by(year,quarter,!!!x@calendar@group_quo) |>
     dplyr::arrange(date,.by_group = TRUE) |>
     dplyr::mutate(
       !!x@new_column_name:=base::cumsum(!!x@value_quo)
@@ -308,7 +309,7 @@ pqtd_tbl <- function(x){
     )
 
   lag_tbl <- full_tbl|>
-    dplyr::group_by(year,quarter,!!!x@calendar_tbl@group_quo) |>
+    dplyr::group_by(year,quarter,!!!x@calendar@group_quo) |>
     dplyr::arrange(date,.by_group = TRUE) |>
     dplyr::mutate(
       ,date_lag=date +lubridate::quarters(x@fn@lag_n)
@@ -321,7 +322,7 @@ pqtd_tbl <- function(x){
   out_tbl <-   dplyr::left_join(
     full_tbl
     ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
   ) |>
     dplyr::select(-c(!!x@value_quo))
 
@@ -352,7 +353,7 @@ qoqtd_tbl <- function(x){
   out_tbl <-   dplyr::left_join(
     ytd_tbl
     ,pytd_tbl
-    ,by=dplyr::join_by(date==date,year,quarter,!!!x@calendar_tbl@group_quo)
+    ,by=dplyr::join_by(date==date,year,quarter,!!!x@calendar@group_quo)
   )
 
 #   full_tbl <-  create_calendar(x) |>
@@ -361,13 +362,13 @@ qoqtd_tbl <- function(x){
 #       ,quarter=lubridate::quarter(date)
 #       ,.before = 1
 #     ) |>
-#     group_by(year,quarter,!!!x@calendar_tbl@group_quo) |>
+#     group_by(year,quarter,!!!x@calendar@group_quo) |>
 #     mutate(
 #       !!paste0("qtd_",x@value_quo):=cumsum(!!x@value_quo)
 #     )
 #
 #   lag_tbl <- full_tbl|>
-#     dplyr::group_by(year,quarter,!!!x@calendar_tbl@group_quo) |>
+#     dplyr::group_by(year,quarter,!!!x@calendar@group_quo) |>
 #     dplyr::arrange(date,.by_group = TRUE) |>
 #     dplyr::mutate(
 #       ,date_lag=date +quarters(1)
@@ -379,7 +380,7 @@ qoqtd_tbl <- function(x){
 #   out_tbl <-   dplyr::left_join(
 #     full_tbl
 #     ,lag_tbl
-#     ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+#     ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
 #   ) |>
 #     dplyr::select(-c(!!x@value_quo))
 
@@ -405,7 +406,7 @@ ytdopy_tbl <- function(x){
       year=lubridate::year(date)
       ,quarter=lubridate::quarter(date)
     ) |>
-    dplyr::group_by(year,quarter,!!!x@calendar_tbl@group_quo) |>
+    dplyr::group_by(year,quarter,!!!x@calendar@group_quo) |>
     dplyr::summarise(
       fq=base::sum(!!x@value@value_quo,na.rm=TRUE)
       ,.groups="drop"
@@ -420,7 +421,7 @@ ytdopy_tbl <- function(x){
   out_tbl <-  qtd_tbl |>
     dplyr::left_join(
       pq_tbl
-      ,by=dplyr::join_by(year,quater,!!!x@calendar_tbl@group_quo)
+      ,by=dplyr::join_by(year,quater,!!!x@calendar@group_quo)
     )
 
   return(out_tbl)
@@ -447,7 +448,7 @@ mtd_tbl <- function(x){
 
 
   out_tbl <- full_tbl |>
-    dplyr::group_by(year,month,!!!x@calendar_tbl@group_quo) |>
+    dplyr::group_by(year,month,!!!x@calendar@group_quo) |>
     dplyr::arrange(date,.by_group = TRUE) |>
     dplyr::mutate(
       !!x@new_column_name:=base::cumsum(!!x@value_quo)
@@ -480,7 +481,7 @@ pmtd_tbl <- function(x){
 
   # create lag table
   lag_tbl <- full_tbl|>
-    dplyr::group_by(year,month,!!!x@calendar_tbl@group_quo) |>
+    dplyr::group_by(year,month,!!!x@calendar@group_quo) |>
     dplyr::arrange(date,.by_group = TRUE) |>
     dplyr::mutate(
       ,date_lag=date+lubridate::months(x@fn@lag_n)
@@ -494,7 +495,7 @@ pmtd_tbl <- function(x){
   out_tbl <-   dplyr::left_join(
     full_tbl
     ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
   ) |>
     dplyr::select(-c(!!x@value@value_quo))
 
@@ -527,7 +528,7 @@ momtd_tbl <- function(x){
   out_tbl <-   dplyr::left_join(
     ytd_tbl
     ,pytd_tbl
-    ,by=dplyr::join_by(date==date,year,month,!!!x@calendar_tbl@group_quo)
+    ,by=dplyr::join_by(date==date,year,month,!!!x@calendar@group_quo)
   )
 
   return(out_tbl)
@@ -559,7 +560,7 @@ mom_tbl <- function(x){
   out_tbl <-   dplyr::left_join(
     full_tbl
     ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
   )
 
   return(out_tbl)
@@ -584,7 +585,7 @@ mtdopm_tbl <- function(x){
       year=lubridate::year(date)
       ,month=lubridate::month(date)
     ) |>
-    dplyr::group_by(year,month,!!!x@calendar_tbl@group_quo) |>
+    dplyr::group_by(year,month,!!!x@calendar@group_quo) |>
     dplyr::summarise(
       fm=base::sum(!!x@value@value_quo,na.rm=TRUE)
       ,.groups="drop"
@@ -599,7 +600,7 @@ mtdopm_tbl <- function(x){
   out_tbl <-  ytd_tbl |>
     dplyr::left_join(
       pm_tbl
-      ,by=dplyr::join_by(year,month,!!!x@calendar_tbl@group_quo)
+      ,by=dplyr::join_by(year,month,!!!x@calendar@group_quo)
     )
 
   return(out_tbl)
@@ -629,7 +630,7 @@ wtd_tbl <- function(x){
 
 
   out_tbl <- full_tbl |>
-    dplyr::group_by(year,month,week,!!!x@calendar_tbl@group_quo) |>
+    dplyr::group_by(year,month,week,!!!x@calendar@group_quo) |>
     dplyr::arrange(date,.by_group = TRUE) |>
     dplyr::mutate(
       !!x@new_column_name:=base::cumsum(!!x@value_quo)
@@ -663,7 +664,7 @@ pwtd_tbl <- function(x){
 
   # create lag table
   lag_tbl <- full_tbl|>
-    dplyr::group_by(year,month,week,!!!x@calendar_tbl@group_quo) |>
+    dplyr::group_by(year,month,week,!!!x@calendar@group_quo) |>
     dplyr::arrange(date,.by_group = TRUE) |>
     dplyr::mutate(
       ,date_lag=date+lubridate::weeks(x@fn@lag_n)
@@ -677,7 +678,7 @@ pwtd_tbl <- function(x){
   out_tbl <-   dplyr::left_join(
     full_tbl
     ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
   ) |>
     dplyr::select(-c(!!x@value@value_quo))
 
@@ -710,7 +711,7 @@ wowtd_tbl <- function(x){
   out_tbl <-   dplyr::left_join(
     wtd_tbl
     ,pwtd_tbl
-    ,by=dplyr::join_by(date==date,year,month,week,!!!x@calendar_tbl@group_quo)
+    ,by=dplyr::join_by(date==date,year,month,week,!!!x@calendar@group_quo)
   )
 
   return(out_tbl)
@@ -742,7 +743,7 @@ wow_tbl <- function(x){
   out_tbl <-   dplyr::left_join(
     full_tbl
     ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
   )
 
   return(out_tbl)
@@ -768,7 +769,7 @@ wtdopw_tbl <- function(x){
       ,month=lubridate::month(date)
       ,week=lubridate::week(date)
     ) |>
-    dplyr::group_by(year,month,week,!!!x@calendar_tbl@group_quo) |>
+    dplyr::group_by(year,month,week,!!!x@calendar@group_quo) |>
     dplyr::summarise(
       fw=base::sum(!!x@value@value_quo,na.rm=TRUE)
       ,.groups="drop"
@@ -783,7 +784,7 @@ wtdopw_tbl <- function(x){
   out_tbl <-  wtd_tbl |>
     dplyr::left_join(
       pw_tbl
-      ,by=dplyr::join_by(year,month,week,!!!x@calendar_tbl@group_quo)
+      ,by=dplyr::join_by(year,month,week,!!!x@calendar@group_quo)
     )
 
   return(out_tbl)
@@ -802,7 +803,7 @@ atd_tbl <- function(x){
   full_tbl <-  create_calendar(x)
 
   out_tbl <- full_tbl |>
-    dplyr::group_by(!!!x@calendar_tbl@group_quo) |>
+    dplyr::group_by(!!!x@calendar@group_quo) |>
     dplyr::arrange(date,.by_group = TRUE) |>
     dplyr::mutate(
       !!x@new_column_name:=base::cumsum(!!x@value_quo)
@@ -840,7 +841,7 @@ dod_tbl <- function(x){
   out_tbl <-   dplyr::left_join(
     full_tbl
     ,lag_tbl
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
   )
   # mutate(
   # !!x@new_column_name:= dplyr::coalesce(.data[[rlang::englue(x@new_column_name)]],0)
@@ -871,35 +872,30 @@ dod_tbl <- function(x){
 #'
 #' @examples
 #' ytd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
-ytd <- function(.data,date,value,calendar_type){
-
-  # Validate inputs
-
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+ytd <- function(.data,.date,.value,calendar_type){
 
   # assigns inputs to ytd_tbl class
 
-  out <- ti_tbl(
-    calendar_tbl(
-      data=.data
-      ,calendar_type=calendar_type
-      ,date_vec = rlang::as_label(rlang::enquo(date))
+  x <- ti(
+    calendar(
+      data                 =.data
+      ,calendar_type       = calendar_type
+      ,date_vec            = rlang::as_label(rlang::enquo(.date))
     )
-    ,time_unit = time_unit("day")
-    ,action=action("aggregate")
-    ,value = value_tbl(
-      value_vec =rlang::as_label(rlang::enquo(value))
-      ,new_column_name_prefix = "ytd"
-      ,second_column_name_prefix = NA_character_
+    ,time_unit             = time_unit("day")
+    ,action                = action("aggregate")
+    ,value = value(
+      value_vec            =  rlang::as_label(rlang::enquo(.value))
+      ,new_column_name     = "ytd"
       )
-    ,fn=fn_tbl(
-      fn=ytd_tbl
-      ,new_date_column_name = "year"
+    ,fn=fn(
+      new_date_column_name = "year"
       ,lag_n = NA_integer_
-      ,sort_logic = TRUE
     )
   )
-  return(out)
+
+  return(x)
+
 }
 
 
@@ -921,27 +917,22 @@ ytd <- function(.data,date,value,calendar_type){
 #' ytd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
 pytd <- function(.data,date,value,calendar_type,lag_n){
 
-  # Validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
   # assigns inputs to ytd_tbl class
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "pytd"
-      ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=pytd_tbl
-      ,lag_n = lag_n
+    ,fn=fn(
+      lag_n = lag_n
       ,new_date_column_name = "year"
     )
   )
@@ -969,12 +960,11 @@ yoytd <- function(.data,date,value,calendar_type,lag_n){
 
 
   # Validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
   # assigns inputs to yoytd class
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
@@ -986,10 +976,8 @@ yoytd <- function(.data,date,value,calendar_type,lag_n){
       ,new_column_name_prefix = "ytd"
       ,second_column_name_prefix = "pytd"
     )
-    ,fn=fn_tbl(
-      fn=yoytd_tbl
-      ,sort_logic = TRUE
-      ,lag_n = lag_n
+    ,fn=fn(
+      lag_n = lag_n
       ,new_date_column_name = "year"
     )
   )
@@ -1013,8 +1001,8 @@ yoytd <- function(.data,date,value,calendar_type,lag_n){
 #' yoy(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
 yoy <- function(.data,date,value,calendar_type,lag_n=1){
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
@@ -1022,15 +1010,12 @@ yoy <- function(.data,date,value,calendar_type,lag_n=1){
     ,time_unit = time_unit("year")
     ,action=action(c("aggregate","shift","compare"))
 
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "yoy"
-      ,second_column_name_prefix = "yoy_delta"
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=yoy_tbl
-      ,new_date_column_name = "date"
+    ,fn=fn(
+      new_date_column_name = "date"
       ,lag_n=lag_n
     )
   )
@@ -1054,8 +1039,8 @@ yoy <- function(.data,date,value,calendar_type,lag_n=1){
 #' ytdoy(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
 ytdopy <- function(.data,date,value,calendar_type,lag_n=1){
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
@@ -1063,15 +1048,12 @@ ytdopy <- function(.data,date,value,calendar_type,lag_n=1){
     ,time_unit = time_unit("day")
     ,action=action(c("aggregate","shift","compare"))
 
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
-      ,new_column_name_prefix = "ytd"
-      ,second_column_name_prefix = "py"
+      ,new_column_name_prefix = c("ytd","py")
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=ytdopy_tbl
-      ,new_date_column_name = c("date","year")
+    ,fn=fn(
+      new_date_column_name = c("date","year")
       ,lag_n=lag_n
     )
   )
@@ -1104,28 +1086,23 @@ ytdopy <- function(.data,date,value,calendar_type,lag_n=1){
 #' qtd(fpar::sales,date=date,value=quantity,calendar_type="standard")
 qtd <- function(.data,date,value,calendar_type){
 
-  # validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
   # Aggregate data based on provided time unit
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data                       = .data
       ,calendar_type             = calendar_type
       ,date_vec                  =  rlang::as_label(rlang::enquo(date))
     )
     ,time_unit                   = time_unit("day")
     ,action                      = action("aggregate")
-    ,value = value_tbl(
+    ,value = value(
       ,value_vec                 = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix    = "qtd"
-      ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      ,sort_logic                = TRUE
-      ,fn                        = qtd_tbl
-      ,new_date_column_name      = c("year","quarter")
+    ,fn=fn(
+      new_date_column_name      = c("year","quarter")
       ,lag_n                     = NA_integer_
     )
   )
@@ -1156,23 +1133,20 @@ pqtd <- function(.data,date,value,calendar_type,lag_n){
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
   # assigns inputs to pqtd_tbl class
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "pqtd"
-      ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=qytd_tbl
-      ,lag_n = lag_n
+    ,fn=fn(
+      lag_n = lag_n
       ,new_date_column_name    = c("year","quarter")
     )
   )
@@ -1204,8 +1178,8 @@ qoqtd <- function(.data,date,value,calendar_type,lag_n){
 
   # assigns inputs to yoytd class
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
@@ -1214,13 +1188,10 @@ qoqtd <- function(.data,date,value,calendar_type,lag_n){
     ,action=action("aggregate")
     ,value=value_tbl(
       value_vec = rlang::as_label(rlang::enquo(value))
-      ,new_column_name_prefix = "qtd"
-      ,second_column_name_prefix = "qytd"
+      ,new_column_name_prefix = c("qtd","pqtd")
     )
-    ,fn=fn_tbl(
-      fn=yoytd_tbl
-      ,sort_logic = TRUE
-      ,lag_n = lag_n
+    ,fn=fn(
+      lag_n = lag_n
       ,new_date_column_name = c("year","quarter")
     )
   )
@@ -1243,8 +1214,8 @@ qoqtd <- function(.data,date,value,calendar_type,lag_n){
 #' ytdoy(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
 qtdopq <- function(.data,date,value,calendar_type,lag_n=1){
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
@@ -1252,15 +1223,12 @@ qtdopq <- function(.data,date,value,calendar_type,lag_n=1){
     ,time_unit = time_unit("day")
     ,action=action(c("aggregate","shift","compare"))
 
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
-      ,new_column_name_prefix = "qtd"
-      ,second_column_name_prefix = "pq"
+      ,new_column_name_prefix = c("qtd","pq")
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=ytdopy_tbl
-      ,new_date_column_name = c("date","year","quarter")
+    ,fn=fn(
+      new_date_column_name = c("date","year","quarter")
       ,lag_n=lag_n
     )
   )
@@ -1286,23 +1254,20 @@ qtdopq <- function(.data,date,value,calendar_type,lag_n=1){
 #' mom(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
 qoq <- function(.data,date,value,calendar_type,lag_n=1){
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("quarter")
     ,action=action("aggregate")
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "qoq"
-      ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      fn=yoytd_tbl
-      ,sort_logic = TRUE
-      ,lag_n = lag_n
+    ,fn=fn(
+      lag_n = lag_n
       ,new_date_column_name = c("year","quarter")
     )
   )
@@ -1335,23 +1300,20 @@ mtd <- function(.data,date,value,calendar_type){
     # Validate inputs
     assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
-    out <- ti_tbl(
-      calendar_tbl(
+    out <- ti(
+      calendar(
         data=.data
         ,calendar_type=calendar_type
         ,date_vec = rlang::as_label(rlang::enquo(date))
       )
       ,time_unit = time_unit("day")
       ,action=action("aggregate")
-      ,value=value_tbl(
+      ,value=value(
         value_vec = rlang::as_label(rlang::enquo(value))
         ,new_column_name_prefix = "mtd"
-        ,second_column_name_prefix = NA_character_
       )
       ,fn=fn_tbl(
-        sort_logic = TRUE
-        ,fn=mtd_tbl
-        ,new_date_column_name = c("year","month")
+        new_date_column_name = c("year","month")
         ,lag_n = NA_integer_
       )
     )
@@ -1380,23 +1342,20 @@ pmtd <- function(.data,date,value,calendar_type,lag_n){
   # Validate inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "pmtd"
-      ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=mtd_tbl
-      ,new_date_column_name = c("year","month")
+    ,fn=fn(
+      new_date_column_name = c("year","month")
       ,lag_n = lag_n
     )
   )
@@ -1425,23 +1384,20 @@ momtd <- function(.data,date,value,calendar_type,lag_n){
   # Validate inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "momtd"
-      ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=mtd_tbl
-      ,new_date_column_name = c("year","month")
+    ,fn=fn(
+      new_date_column_name = c("year","month")
       ,lag_n = lag_n
     )
   )
@@ -1472,23 +1428,20 @@ mtdopm <- function(.data,date,value,calendar_type,lag_n){
   # Validate inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "mtdopm"
-      ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=mtd_tbl
-      ,new_date_column_name = c("year","month")
+    ,fn=fn(
+      new_date_column_name = c("year","month")
       ,lag_n = lag_n
     )
   )
@@ -1510,23 +1463,20 @@ mtdopm <- function(.data,date,value,calendar_type,lag_n){
 #' mom(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
 mom <- function(.data,date,value,calendar_type,lag_n=1){
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate","shift","compare")
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "mom"
-      ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=mtd_tbl
-      ,new_date_column_name = c("date","year","month")
+    ,fn=fn(
+      new_date_column_name = c("date","year","month")
       ,lag_n = NA_integer_
     )
   )
@@ -1559,25 +1509,21 @@ mom <- function(.data,date,value,calendar_type,lag_n=1){
 wtd <- function(.data,date,value,calendar_type){
 
   # Validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "wtd"
-      ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=mtd_tbl
-      ,new_date_column_name = c("year","month","week")
+    ,fn=fn(
+      new_date_column_name = c("year","month","week")
       ,lag_n = NA_integer_
     )
   )
@@ -1606,23 +1552,20 @@ pwtd <- function(.data,date,value,calendar_type,lag_n){
   # Validate inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value_tbl(
-      value_vec = rlang::as_label(rlang::enquo(value))
+    ,value=value(
+      value = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "pwtd"
-      ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=mtd_tbl
-      ,new_date_column_name = c("year","month","week")
+    ,fn=fn(
+      new_date_column_name = c("year","month","week")
       ,lag_n = lag_n
     )
   )
@@ -1652,23 +1595,20 @@ wowtd <- function(.data,date,value,calendar_type,lag_n){
   # Validate inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "wowtd"
-      ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=mtd_tbl
-      ,new_date_column_name = c("year","month","week")
+    ,fn=fn(
+      new_date_column_name = c("year","month","week")
       ,lag_n = lag_n
     )
   )
@@ -1699,23 +1639,20 @@ wtwopw <- function(.data,date,value,calendar_type,lag_n){
   # Validate inputs
   assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "wtwopw"
-      ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=mtd_tbl
-      ,new_date_column_name = c("year","month","week")
+    ,fn=fn(
+      new_date_column_name = c("year","month","week")
       ,lag_n = lag_n
     )
   )
@@ -1740,24 +1677,21 @@ wtwopw <- function(.data,date,value,calendar_type,lag_n){
 wow <- function(.data,date,value,calendar_type,lag_n=1){
 
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate","shift","compare")
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "wow"
-      ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=mtd_tbl
-      ,new_date_column_name = c("date")
-      ,lag_n = NA_integer_
+    ,fn=fn(
+      new_date_column_name = c("date")
+      ,lag_n = lag_n
     )
   )
 
@@ -1787,30 +1721,25 @@ wow <- function(.data,date,value,calendar_type,lag_n=1){
 atd <- function(.data,date,value,calendar_type){
 
   # Validate inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "atd"
-      ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=mtd_tbl
-      ,new_date_column_name = c("date")
+    ,fn=fn(
+      new_date_column_name = c("date")
       ,lag_n = NA_integer_
     )
   )
-
 
   return(out)
 
@@ -1834,23 +1763,21 @@ atd <- function(.data,date,value,calendar_type){
 #' dod(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
 dod <- function(.data,date,value,calendar_type,lag_n=1){
 
-  out <- ti_tbl(
-    calendar_tbl(
+  out <- ti(
+    calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate","shift","compare")
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(value))
       ,new_column_name_prefix = "dod"
       ,second_column_name_prefix = NA_character_
     )
-    ,fn=fn_tbl(
-      sort_logic = TRUE
-      ,fn=mtd_tbl
-      ,new_date_column_name = c("date")
+    ,fn=fn(
+      new_date_column_name = c("date")
       ,lag_n = NA_integer_
     )
   )

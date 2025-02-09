@@ -228,8 +228,15 @@ s custom print function
 - create new tests (1 hour)
 
 2024-02-08
+- made ti_tbl flexible to dbi and tbl functions
+- trying to figure out how to have lower maintenance
+  - single ti object
+  - single function > make_ti_object
+  - single head function >ytd>make_ti_object>then dbi or tbl based workflow based on type
+  - do i have sepetart ytd_tbl / ytd_dbi or do do it in same body?
 - then need to create tests
 - then need to fine tune print methods
+
 
 # list of all functions
 

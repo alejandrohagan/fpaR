@@ -5,13 +5,19 @@
 \title{Year-over-year}
 \usage{
 ytdopy_tbl(x)
+
+ytdopy_tbl(x)
 }
 \arguments{
 \item{x}{ti_tbl}
 }
 \value{
 tibble
+
+tibble
 }
 \description{
 Year-over-year
+
+quarter-to-date over previous quarter
 }

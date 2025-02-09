@@ -6,12 +6,50 @@ library(dbplyr)
 devtools::document()
 devtools::load_all()
 
-x <- fpaR::ytd(fpaR::sales,date = order_date,value = margin,calendar_type = "standard")
+x <- fpaR::ytd(.data = fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard")
 y <- fpaR::pytd(fpaR::sales,date = order_date,value = margin,calendar_type = "standard",lag_n = 1)
 z <- fpaR::yoytd(fpaR::sales,date = order_date,value = margin,calendar_type = "standard",lag_n = 1)
 a <- fpaR::yoy(fpaR::sales,date = order_date,value = margin,calendar_type = "standard",lag_n = 1)
 
 x <- fpaR::ytdopy(fpaR::sales,date = order_date,value = margin,calendar_type = "standard",lag_n = 1)
+
+x@time_unit <- time_unit("year")
+
+
+sales_db |>
+  dplyr::pull(dplyr::any_of(date_vec)) |>
+  max(na.rm=TRUE)
+
+db$sales |>
+dplyr::pull(dplyr::any_of(date_vec)) |>
+  unique() |>
+  length()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

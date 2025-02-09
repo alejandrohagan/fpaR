@@ -1,5 +1,4 @@
 
-
 # to register methods upon packag loading--------------
 .onLoad <- function(...) {
   S7::methods_register()
@@ -49,15 +48,27 @@ action <- S7::new_class(
   )
 )
 
+
 # calendar class to create a calendar compliant table---------------
 
-calendar_tbl <- S7::new_class(
-  name="calendar_tbl"
+calendar <- S7::new_class(
+  name="calendar"
   ,package = "fpaR"
   ,properties =
     list(
       data=S7::new_property(
-        class=S7::class_data.frame
+        class=S7::class_any
+      )
+      ,class_name=S7::new_property(
+        class=S7::class_any
+        ,getter = \(self){
+          class <- class(self@data)
+          x <- if_else(str_detect(class,"tbl_dbi"),"dbi","tbl")
+          x
+        }
+        ,validator = \(value){
+          if(!any(class(value) %in% c("tbl_dbi","data.frame"))) return(cli::format_error("Please pass a 'dbi' or 'data.frame' object"))
+        }
       )
       ,calendar_type=S7::new_property(
         class=S7::class_character
@@ -71,7 +82,7 @@ calendar_tbl <- S7::new_class(
         }
       )
       ,date_vec=S7::new_property(
-        class=class_any
+        class=S7::class_any
       )
       ,date_quo=S7::new_property(
         class=S7::class_any
@@ -83,9 +94,11 @@ calendar_tbl <- S7::new_class(
       ,min_date=S7::new_property(
         class=S7::class_numeric
         ,getter=\(self){
+
           x <-  self@data |>
             dplyr::pull(dplyr::any_of(self@date_vec)) |>
             min(na.rm=TRUE)
+
           x
         }
       )
@@ -162,56 +175,46 @@ calendar_tbl <- S7::new_class(
 
 # value tbl class
 
-value_tbl <- S7::new_class(
+value <- S7::new_class(
   "value"
   ,properties = list(
+
     value_vec=S7::new_property(
-      class=class_character
+      class=S7::class_character
       ,default = NA_character_
     )
+
     ,value_quo=S7::new_property(
       class=S7::class_any
       ,getter=\(self){
+
         x <- rlang::parse_expr(self@value_vec)
+
         x
+
       }
     )
-    ,new_column_name_prefix=S7::new_property(
-      class=S7::class_character
-      ,default = NA_character_
-    )
+
     ,new_column_name=S7::new_property(
-      class=class_character
-      ,getter = \(self){
-        x <- paste0(self@new_column_name_prefix,"_",self@value_vec)
-        x
-      }
-    )
-    ,second_column_name_prefix=S7::new_property(
       class=S7::class_character
-      ,default=NA_character_
-    )
-    ,second_column_name=S7::new_property(
-      class=class_character
-      ,getter = \(self){
-        x <- paste0(self@second_column_name_prefix,"_",self@value_vec)
-        x
+      ,setter = \(self,value){
+
+        self@new_column_name <- base::paste0(value,"_",self@value_vec)
+
+        self
       }
     )
   )
 )
 
 
-# funtion tbl class
+# function tbl class
 
 
-fn_tbl <- S7::new_class(
+fn <- S7::new_class(
   "fn"
   ,properties = list(
-
-    fn=S7::new_property(
-      class=class_function
-    )
+    fn_exec=class_any
     ,new_date_column_name=S7::new_property(
       class=S7::class_character
       ,default = NA_character_
@@ -221,21 +224,13 @@ fn_tbl <- S7::new_class(
       ,default = 0
     )
     # sort logic for cumulative sums
-    ,sort_logic=S7::new_property(
-      class=S7::class_logical
-      ,default = TRUE
-    )
   )
 )
 
-
-
-
-
 # ti class to bring everything together ----------------
 
-ti_tbl <- S7::new_class(
-  name="ti_tbl"
+ti <- S7::new_class(
+  name="ti"
 
   ,package = "fpaR"
 
@@ -243,23 +238,23 @@ ti_tbl <- S7::new_class(
   ,properties = list(
 
   #see calendar class
-    calendar_tbl=calendar_tbl
+    calendar=calendar
   # see time unit class
     ,time_unit=time_unit
 
   # properties on the target variable
-  ,value=value_tbl
+    ,value=value
 
   # properties of function
-  ,fn=fn_tbl
+    ,fn=fn
   # properties to help with printing method
-    ,action=S7::new_property(class=action)
+    ,action=action
 
   )
   # validator to check if date column is in date format
-  ,validator = \(self){
+    ,validator = \(self){
 
-    if(!any(self@calendar_tbl@data |>  dplyr::pull(self@calendar_tbl@date_vec) |> class() %in% c("Date"))){
+    if(!any(self@calendar@data |>  dplyr::pull(self@calendar@date_vec) |> class() %in% c("Date"))){
 
       return(cli::format_error("'{self@date_vec}' is not in Date format"))
     }

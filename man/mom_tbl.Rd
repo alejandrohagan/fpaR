@@ -2,7 +2,7 @@
 % Please edit documentation in R/time_intelligence.R
 \name{mom_tbl}
 \alias{mom_tbl}
-\title{Month-over-month for tibble objectsj}
+\title{Year-over-year}
 \usage{
 mom_tbl(x)
 }
@@ -13,5 +13,5 @@ mom_tbl(x)
 tibble
 }
 \description{
-Month-over-month for tibble objectsj
+Year-over-year
 }

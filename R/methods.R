@@ -15,11 +15,11 @@ calculate <- S7::new_generic("calculate","x")
 #' @export
 #'
 #'
-method(create_calendar,ti_tbl) <- function(x){
+method(create_calendar,ti) <- function(x){
 
-  summary_tbl <- x@calendar_tbl@data |>
+  summary_tbl <- x@calendar@data |>
     dplyr::mutate(
-      date = lubridate::floor_date(!!x@calendar_tbl@date_quo,unit = x@time_unit@value)
+      date = lubridate::floor_date(!!x@calendar@date_quo,unit = x@time_unit@value)
       ,time_unit=x@time_unit@value
     ) |>
     dplyr::group_by(date,.add=TRUE) |>
@@ -28,18 +28,18 @@ method(create_calendar,ti_tbl) <- function(x){
       ,.groups = "drop"
     )
 
-  calendar_tbl <- tibble::tibble(
+  calendar <- tibble::tibble(
     date = base::seq.Date(from = min(summary_tbl$date), to = max(summary_tbl$date), by = x@time_unit@value)
   )
 
   # Create a calendar table with all the dates in the specified time frame
-  if(x@calendar_tbl@group_indicator){
+  if(x@calendar@group_indicator){
 
-    calendar_tbl <- dplyr::left_join(
+    calendar <- dplyr::left_join(
 
-      summary_tbl |> dplyr::distinct(!!!x@calendar_tbl@group_quo) |> dplyr::mutate(id="id")
+      summary_tbl |> dplyr::distinct(!!!x@calendar@group_quo) |> dplyr::mutate(id="id")
 
-      ,calendar_tbl |> dplyr::mutate(id="id")
+      ,calendar |> dplyr::mutate(id="id")
       ,by=dplyr::join_by(id)
       ,relationship = "many-to-many"
     ) |>
@@ -49,15 +49,15 @@ method(create_calendar,ti_tbl) <- function(x){
 
   # Perform a full join to ensure all time frames are represented
   full_tbl <- dplyr::full_join(
-    calendar_tbl
+    calendar
     ,summary_tbl
-    ,by = dplyr::join_by(date,!!!x@calendar_tbl@group_quo)
+    ,by = dplyr::join_by(date,!!!x@calendar@group_quo)
   ) |>
     dplyr::mutate(
       # dplyr::across(dplyr::where(\(x) base::is.numeric(x)),\(x) tidyr::replace_na(x,0))
       !!x@value@value_vec:= dplyr::coalesce(!!x@value@value_quo, 0)
     ) |>
-    dplyr::arrange(!!!x@calendar_tbl@group_quo,date)
+    dplyr::arrange(!!!x@calendar@group_quo,date)
 
   return(full_tbl)
 }
@@ -84,7 +84,7 @@ method(create_calendar,ti_tbl) <- function(x){
 #'
 #'
 #'   out_tbl <- full_tbl |>
-#'     dplyr::group_by(year,!!!x@calendar_tbl@group_quo) |>
+#'     dplyr::group_by(year,!!!x@calendar@group_quo) |>
 #'     dplyr::arrange(date,.by_group = TRUE) |>
 #'     dplyr::mutate(
 #'       !!x@new_column_name:=base::cumsum(!!x@value_quo)
@@ -100,7 +100,7 @@ method(create_calendar,ti_tbl) <- function(x){
 #'
 #'   x@fn
 #'
-#'   group_count <- x@calendar_tbl@group_count
+#'   group_count <- x@calendar@group_count
 #'   value_chr <- x@value_vec
 #'   show <- cli::cli_div(theme = cli::simple_theme())
 #'
@@ -117,10 +117,10 @@ method(create_calendar,ti_tbl) <- function(x){
 #'   cli::cli_h2("Calendar:")
 #'   cli::cat_bullet(paste("The calendar was aggregated to the",cli::col_yellow(x@time_unit@value),"time unit"))
 #'
-#'   cli::cli_text("A ",cli::col_br_red(x@calendar_tbl@calendar_type)," calendar is created with ",cli::col_green("{group_count} group{?s}"))
+#'   cli::cli_text("A ",cli::col_br_red(x@calendar@calendar_type)," calendar is created with ",cli::col_green("{group_count} group{?s}"))
 #'
-#'   cli::cat_bullet(paste("Calendar ranges from",cli::col_br_green(x@calendar_tbl@min_date),"to",cli::col_br_green(x@calendar_tbl@max_date)))
-#'   cli::cat_bullet(paste(cli::col_blue(x@calendar_tbl@date_missing),"days were missing and replaced with 0"))
+#'   cli::cat_bullet(paste("Calendar ranges from",cli::col_br_green(x@calendar@min_date),"to",cli::col_br_green(x@calendar@max_date)))
+#'   cli::cat_bullet(paste(cli::col_blue(x@calendar@date_missing),"days were missing and replaced with 0"))
 #'   cli::cli_text("New date column ",cli::col_br_red(x@new_date_column_name)," was created")
 #'   cli::cli_h2("Actions:")
 #'
@@ -128,9 +128,9 @@ method(create_calendar,ti_tbl) <- function(x){
 #'   cli::cli_text(x@action@value[2])
 #'   cli::cli_text(x@action@value[3])
 #'
-#'   if(x@calendar_tbl@group_indicator){
+#'   if(x@calendar@group_indicator){
 #'
-#'   cli::cli_text("{stringr::str_flatten_comma(x@calendar_tbl@group_vec,last = ' and ')} groups are in the table")
+#'   cli::cli_text("{stringr::str_flatten_comma(x@calendar@group_vec,last = ' and ')} groups are in the table")
 #'
 #'   }
 #'
@@ -178,7 +178,7 @@ method(create_calendar,ti_tbl) <- function(x){
 #'
 #'
 #' out_tbl <- full_tbl |>
-#'   dplyr::group_by(year,quarter,!!!x@calendar_tbl@group_quo) |>
+#'   dplyr::group_by(year,quarter,!!!x@calendar@group_quo) |>
 #'   dplyr::arrange(date,.by_group = TRUE) |>
 #'   dplyr::mutate(
 #'     !!x@new_column_name:=base::cumsum(!!x@value_quo)
@@ -212,7 +212,7 @@ method(create_calendar,ti_tbl) <- function(x){
 #'
 #'
 #'   out_tbl <- full_tbl |>
-#'     dplyr::group_by(year,month,!!!x@calendar_tbl@group_quo) |>
+#'     dplyr::group_by(year,month,!!!x@calendar@group_quo) |>
 #'     dplyr::arrange(date,.by_group = TRUE) |>
 #'     dplyr::mutate(
 #'       !!x@new_column_name:=base::cumsum(!!x@value_quo)
@@ -246,7 +246,7 @@ method(create_calendar,ti_tbl) <- function(x){
 #'
 #'
 #'   out_tbl <- full_tbl |>
-#'     dplyr::group_by(year,month,week,!!!x@calendar_tbl@group_quo) |>
+#'     dplyr::group_by(year,month,week,!!!x@calendar@group_quo) |>
 #'     dplyr::arrange(date,.by_group = TRUE) |>
 #'     dplyr::mutate(
 #'       !!x@new_column_name:=base::cumsum(!!x@value_quo)
@@ -273,7 +273,7 @@ method(create_calendar,ti_tbl) <- function(x){
 #'   full_tbl <-  create_calendar(x)
 #'
 #'   out_tbl <- full_tbl |>
-#'     dplyr::group_by(!!!x@calendar_tbl@group_quo) |>
+#'     dplyr::group_by(!!!x@calendar@group_quo) |>
 #'     dplyr::arrange(date,.by_group = TRUE) |>
 #'     dplyr::mutate(
 #'       !!x@new_column_name:=base::cumsum(!!x@value_quo)
@@ -303,7 +303,7 @@ method(create_calendar,ti_tbl) <- function(x){
 #'   out_tbl <-   dplyr::left_join(
 #'     full_tbl
 #'     ,lag_tbl
-#'     ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+#'     ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
 #'   )
 #'   # mutate(
 #'   # !!x@new_column_name:= dplyr::coalesce(.data[[rlang::englue(x@new_column_name)]],0)
@@ -333,7 +333,7 @@ method(create_calendar,ti_tbl) <- function(x){
 #'   out_tbl <-   dplyr::left_join(
 #'     full_tbl
 #'     ,lag_tbl
-#'     ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+#'     ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
 #'   )
 #'
 #'
@@ -360,7 +360,7 @@ method(create_calendar,ti_tbl) <- function(x){
 #'   out_tbl <-   dplyr::left_join(
 #'     full_tbl
 #'     ,lag_tbl
-#'     ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+#'     ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
 #'   )
 #'
 #'
@@ -387,7 +387,7 @@ method(create_calendar,ti_tbl) <- function(x){
 #' #   out_tbl <-   dplyr::left_join(
 #' #     full_tbl
 #' #     ,lag_tbl
-#' #     ,by=dplyr::join_by(date==date_lag,!!!x@calendar_tbl@group_quo)
+#' #     ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
 #' #   )
 #' #
 #' #   return(out_tbl)
