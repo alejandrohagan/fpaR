@@ -160,6 +160,78 @@ calendar_tbl <- S7::new_class(
     )
 )
 
+# value tbl class
+
+value_tbl <- S7::new_class(
+  "value"
+  ,properties = list(
+    value_vec=S7::new_property(
+      class=class_character
+      ,default = NA_character_
+    )
+    ,value_quo=S7::new_property(
+      class=S7::class_any
+      ,getter=\(self){
+        x <- rlang::parse_expr(self@value_vec)
+        x
+      }
+    )
+    ,new_column_name_prefix=S7::new_property(
+      class=S7::class_character
+      ,default = NA_character_
+    )
+    ,new_column_name=S7::new_property(
+      class=class_character
+      ,getter = \(self){
+        x <- paste0(self@new_column_name_prefix,"_",self@value_vec)
+        x
+      }
+    )
+    ,second_column_name_prefix=S7::new_property(
+      class=S7::class_character
+      ,default=NA_character_
+    )
+    ,second_column_name=S7::new_property(
+      class=class_character
+      ,getter = \(self){
+        x <- paste0(self@second_column_name_prefix,"_",self@value_vec)
+        x
+      }
+    )
+  )
+)
+
+
+# funtion tbl class
+
+
+fn_tbl <- S7::new_class(
+  "fn"
+  ,properties = list(
+
+    fn=S7::new_property(
+      class=class_function
+    )
+    ,new_date_column_name=S7::new_property(
+      class=S7::class_character
+      ,default = NA_character_
+    )
+    ,lag_n=new_property(
+      class=class_numeric
+      ,default = 0
+    )
+    # sort logic for cumulative sums
+    ,sort_logic=S7::new_property(
+      class=S7::class_logical
+      ,default = TRUE
+    )
+  )
+)
+
+
+
+
+
 # ti class to bring everything together ----------------
 
 ti_tbl <- S7::new_class(
@@ -170,67 +242,19 @@ ti_tbl <- S7::new_class(
   #properties
   ,properties = list(
 
-
   #see calendar class
     calendar_tbl=calendar_tbl
   # see time unit class
     ,time_unit=time_unit
 
   # properties on the target variable
-    ,value_vec=S7::new_property(
-      class=class_character
-      ,default = NA_character_
-      )
+  ,value=value_tbl
 
-    ,value_quo=S7::new_property(
-      class=S7::class_any
-      ,getter=\(self){
-        x <- rlang::parse_expr(self@value_vec)
-        x
-      }
-    )
-
-  # properties on new columns created
-    ,new_column_name_prefix=S7::new_property(
-      class=S7::class_character
-      ,default = NA_character_
-      )
-    ,new_column_name=S7::new_property(
-      class=class_character
-      ,getter = \(self){
-        x <- paste0(self@new_column_name_prefix,"_",self@value_vec)
-        x
-      }
-    )
-    ,new_date_column_name=S7::new_property(
-      class=S7::class_character
-      ,default = NA_character_
-      )
-    ,second_column_name_prefix=S7::new_property(
-      class=S7::class_character
-      ,default=NA_character_
-      )
-    ,second_column_name=S7::new_property(
-      class=class_character
-      ,getter = \(self){
-        x <- paste0(self@second_column_name_prefix,"_",self@value_vec)
-        x
-      }
-    )
-  # time unit lag
-    ,lag_n=new_property(
-      class=class_numeric
-      ,default = 0
-    )
-  # sort logic for cumulative sums
-    ,sort_logic=S7::new_property(
-      class=S7::class_logical
-      ,default = TRUE
-      )
-
+  # properties of function
+  ,fn=fn_tbl
   # properties to help with printing method
     ,action=S7::new_property(class=action)
-    ,fn=class_function
+
   )
   # validator to check if date column is in date format
   ,validator = \(self){

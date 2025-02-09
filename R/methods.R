@@ -7,15 +7,14 @@ create_calendar <- S7::new_generic("create_calendar","x")
 calculate <- S7::new_generic("calculate","x")
 
 
-# create methods
-#' Title
+#' Create Calendar Table
 #'
-#' @param x
+#' @param x ti_tbl object
 #'
-#' @returns
+#' @returns tibble
 #' @export
 #'
-#' @examples
+#'
 method(create_calendar,ti_tbl) <- function(x){
 
   summary_tbl <- x@calendar_tbl@data |>
@@ -25,7 +24,7 @@ method(create_calendar,ti_tbl) <- function(x){
     ) |>
     dplyr::group_by(date,.add=TRUE) |>
     dplyr::summarise(
-      !!x@value_vec:= sum(!!x@value_quo,na.rm=TRUE)
+      !!x@value@value_vec:= sum(!!x@value@value_quo,na.rm=TRUE)
       ,.groups = "drop"
     )
 
@@ -56,7 +55,7 @@ method(create_calendar,ti_tbl) <- function(x){
   ) |>
     dplyr::mutate(
       # dplyr::across(dplyr::where(\(x) base::is.numeric(x)),\(x) tidyr::replace_na(x,0))
-      !!x@value_vec:= dplyr::coalesce(!!x@value_quo, 0)
+      !!x@value@value_vec:= dplyr::coalesce(!!x@value@value_quo, 0)
     ) |>
     dplyr::arrange(!!!x@calendar_tbl@group_quo,date)
 

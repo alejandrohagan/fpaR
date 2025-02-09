@@ -2,7 +2,7 @@
 % Please edit documentation in R/time_intelligence.R
 \name{yoytd}
 \alias{yoytd}
-\title{Prevoius year-to-date}
+\title{Current year-to-date compared to previous year-to-date}
 \usage{
 yoytd(.data, date, value, calendar_type, lag_n)
 }

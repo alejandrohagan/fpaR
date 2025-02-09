@@ -4,53 +4,19 @@ library(S7)
 library(rlang)
 library(dbplyr)
 devtools::document()
+devtools::load_all()
+
+x <- fpaR::ytd(fpaR::sales,date = order_date,value = margin,calendar_type = "standard")
+y <- fpaR::pytd(fpaR::sales,date = order_date,value = margin,calendar_type = "standard",lag_n = 1)
+z <- fpaR::yoytd(fpaR::sales,date = order_date,value = margin,calendar_type = "standard",lag_n = 1)
+a <- fpaR::yoy(fpaR::sales,date = order_date,value = margin,calendar_type = "standard",lag_n = 1)
+
+x <- fpaR::ytdopy(fpaR::sales,date = order_date,value = margin,calendar_type = "standard",lag_n = 1)
 
 
 
-test_date = function(x, unit = "seconds") {
-    unit <- arg_match(
-      unit,
-      c(
-        "second", "minute", "hour", "day", "week", "month", "quarter", "year",
-        "seconds", "minutes", "hours", "days", "weeks", "months", "quarters", "years"
-      )
-    )
-    sql_expr(DATE_TRUNC(!!unit, !!x))
-}
 
-
-ceiling_month=function(x) {
-
-  sql_expr(LAST_DAY(!!x))
-}
-
-
-test_week <- function(x){
-
-  sql_expr(LAST_DAY(!!x))
-
-}
-
-
-
-# unit <- "month"
-# x <- "date"
-# con <- DBI::dbConnect(duckdb::duckdb())
-
-sql_expr(con = con,DATE_TRUNC(!!unit, !!x))
-
-
-db_list <- fpaR::create_contonso_duckdb()
-
-db_list$date |>
-  mutate(
-    test=test_date(date,unit="month")
-    # ,test2=ceiling_month(date)
-    # ,test3=test_week(date)
-    ) |>
-  relocate(contains("test"))
-
--------------- #factor
+#factor----------------------
 factor_tbl <- new_class(
   "factor_tbl"
   ,properties = list(

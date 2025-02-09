@@ -2,7 +2,7 @@
 % Please edit documentation in R/time_intelligence.R
 \name{yoytd_tbl}
 \alias{yoytd_tbl}
-\title{Previous year-to-date for tibble objects}
+\title{Current year to date over previous year-to-date for tibble objects}
 \usage{
 yoytd_tbl(x)
 }
@@ -13,5 +13,5 @@ yoytd_tbl(x)
 tibble
 }
 \description{
-Previous year-to-date for tibble objects
+Current year to date over previous year-to-date for tibble objects
 }
