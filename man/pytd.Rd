@@ -4,16 +4,16 @@
 \alias{pytd}
 \title{Prevoius year-to-date}
 \usage{
-pytd(.data, date, value, calendar_type, lag_n)
+pytd(.data, .date, .value, calendar_type, lag_n)
 }
 \arguments{
 \item{.data}{either a tibble or  DBI object}
 
+\item{calendar_type}{either 'standard' or '5-5-4' calendar}
+
 \item{date}{the date column to aggregate}
 
 \item{value}{the value column to summarize}
-
-\item{calendar_type}{either 'standard' or '5-5-4' calendar}
 }
 \value{
 ytd_tbl or ytd_dbi
@@ -25,5 +25,5 @@ any groups that are passed through with \code{dplyr::group_by()}.
 Use \code{calculate()} to return the results
 }
 \examples{
-ytd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
+pytd(fpaR::sales,date=date,.value=quantity,calendar_type="standard")
 }

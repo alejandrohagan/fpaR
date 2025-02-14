@@ -2,18 +2,18 @@
 % Please edit documentation in R/time_intelligence.R
 \name{atd}
 \alias{atd}
-\title{All-to-date}
+\title{All-to-.date}
 \usage{
-atd(.data, date, value, calendar_type)
+atd(.data, .date, .value, calendar_type)
 }
 \arguments{
 \item{.data}{either a tibble or  DBI object}
 
-\item{date}{the date column to aggregate}
-
-\item{value}{the value column to summarize}
+\item{.date}{the .date column to aggregate}
 
 \item{calendar_type}{either 'standard' or '5-5-4' calendar}
+
+\item{value}{the value column to summarize}
 }
 \value{
 atd_tbl or atd_dbi object depending on what is passed through
@@ -25,5 +25,5 @@ any groups that are passed through with \code{dplyr::group_by()}.
 Use \code{calculate()} to return the results
 }
 \examples{
-atd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
+atd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
 }

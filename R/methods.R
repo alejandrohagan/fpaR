@@ -62,40 +62,24 @@ method(create_calendar,ti) <- function(x){
   return(full_tbl)
 }
 
+#' Title
 #'
+#' @param x ytd_tbl object
 #'
-#' #' Title
-#' #'
-#' #' @param x ytd_tbl object
-#' #'
-#' #' @returns
-#' #' @export
-#' #' @examples
-#' method(calculate,ytd_tbl) <- function(x){
-#'
-#'   # Aggregate data based on provided time unit
-#'
-#'   full_tbl <- create_calendar(x) |>
-#'     dplyr::mutate(
-#'       year=lubridate::year(date)
-#'       ,.before = 1
-#'     )
-#'
-#'
-#'
-#'   out_tbl <- full_tbl |>
-#'     dplyr::group_by(year,!!!x@calendar@group_quo) |>
-#'     dplyr::arrange(date,.by_group = TRUE) |>
-#'     dplyr::mutate(
-#'       !!x@new_column_name:=base::cumsum(!!x@value_quo)
-#'     ) |>
-#'     dplyr::ungroup()
-#'
-#'   return(out_tbl)
-#'
-#' }
-#'
-#'
+#' @returns
+#' @export
+#' @examples
+method(calculate,ti) <- function(x){
+
+
+
+    out <- x@fn@fn_exec(x)
+
+  return(out)
+
+}
+
+
 #' method(print,ytd_tbl) <- function(x){
 #'
 #'   x@fn

@@ -94,7 +94,6 @@ make_aggregation_tbl <- function(.data,date,value,time_unit) {
 #'
 ytd_tbl <- function(x){
 
-
   # create calendar table
 
   full_tbl <- create_calendar(x) |>
@@ -111,7 +110,10 @@ ytd_tbl <- function(x){
     dplyr::mutate(
       !!x@value@new_column_name[[1]]:=base::cumsum(!!x@value@value_quo)
     ) |>
-    dplyr::ungroup()
+    dplyr::ungroup() |>
+    dplyr::relocate(
+      date,year
+    )
 
   return(out_tbl)
 
@@ -874,7 +876,7 @@ ytd <- function(.data,.date,.value,calendar_type){
     )
     ,time_unit             = time_unit("day")
     ,action                = action("aggregate")
-    ,.value = value(
+    ,value = value(
       value_vec            =  rlang::as_label(rlang::enquo(.value))
       ,new_column_name     = "ytd"
       )
@@ -883,6 +885,17 @@ ytd <- function(.data,.date,.value,calendar_type){
       ,lag_n = NA_integer_
     )
   )
+  # assign right execution function
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- ytd_tbl
+
+  }else{
+
+    x@fn@fn_exec <- ytd_tbl
+  }
+
 
   return(x)
 
@@ -904,8 +917,8 @@ ytd <- function(.data,.date,.value,calendar_type){
 #' @export
 #'
 #' @examples
-#' ytd(fpaR::sales,date=date,.value=quantity,calendar_type="standard")
-pytd <- function(.data,..date,.value,calendar_type,lag_n){
+#' pytd(fpaR::sales,date=date,.value=quantity,calendar_type="standard")
+pytd <- function(.data,.date,.value,calendar_type,lag_n){
 
 
   # assigns inputs to ytd_tbl class
@@ -913,19 +926,29 @@ pytd <- function(.data,..date,.value,calendar_type,lag_n){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(..date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name = "pytd"
     )
     ,fn=fn(
       lag_n = lag_n
-      ,new_.date_column_name = "year"
+      ,new_date_column_name = "year"
     )
   )
+
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- pytd_tbl
+
+  }else{
+
+    x@fn@fn_exec <- pytd_tbl
+  }
 
   return(out)
 }
@@ -957,19 +980,28 @@ yoytd <- function(.data,.date,.value,calendar_type,lag_n){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,.value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name = c("ytd","pytd")
     )
     ,fn=fn(
       lag_n = lag_n
-      ,new_.date_column_name = "year"
+      ,new_date_column_name = "year"
     )
   )
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- yoytd_tbl
+
+  }else{
+
+    x@fn@fn_exec <- yoytd_tbl
+  }
 
   return(out)
 }
@@ -994,20 +1026,32 @@ yoy <- function(.data,.date,.value,calendar_type,lag_n=1){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("year")
     ,action=action(c("aggregate","shift","compare"))
 
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name = "yoy"
     )
     ,fn=fn(
-      new_.date_column_name = ".date"
+      new_date_column_name = "date"
       ,lag_n=lag_n
     )
   )
+
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- yoy_tbl
+
+  }else{
+
+    x@fn@fn_exec <- yoy_tbl
+  }
+
+
 
   return(out)
 
@@ -1032,20 +1076,33 @@ ytdopy <- function(.data,.date,.value,calendar_type,lag_n=1){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
+
     ,action=action(c("aggregate","shift","compare"))
 
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name = c("ytd","py")
     )
+
     ,fn=fn(
-      new_.date_column_name = c(".date","year")
+      new_date_column_name = c("date","year")
       ,lag_n=lag_n
     )
   )
+
+
+
+  if(out@calendar@class_name=="tbl"){
+
+    out@fn@fn_exec <- ytdopy_tbl
+
+  }else{
+
+    out@fn@fn_exec <- ytdopy_tbl
+  }
 
   return(out)
 
@@ -1082,19 +1139,31 @@ qtd <- function(.data,.date,.value,calendar_type){
     calendar(
       data                       = .data
       ,calendar_type             = calendar_type
-      ,.date_vec                  =  rlang::as_label(rlang::enquo(.date))
+      ,date_vec                  =  rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit                   = time_unit("day")
     ,action                      = action("aggregate")
-    ,.value = value(
-      ,.value_vec                 = rlang::as_label(rlang::enquo(.value))
+    ,value = value(
+      ,value_vec                 = rlang::as_label(rlang::enquo(.value))
       ,new_column_name    = "qtd"
     )
     ,fn=fn(
-      new_.date_column_name      = c("year","quarter")
+      new_date_column_name      = c("year","quarter")
       ,lag_n                     = NA_integer_
     )
   )
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- qtd_tbl
+
+  }else{
+
+    x@fn@fn_exec <- qtd_tbl
+  }
+
+
+
   return(out)
 }
 
@@ -1126,19 +1195,30 @@ pqtd <- function(.data,.date,.value,calendar_type,lag_n){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name = "pqtd"
     )
     ,fn=fn(
       lag_n = lag_n
-      ,new_.date_column_name    = c("year","quarter")
+      ,new_date_column_name    = c("year","quarter")
     )
   )
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- pqtd_tbl
+
+  }else{
+
+    x@fn@fn_exec <- pqtd_tbl
+  }
+
+
   return(out)
 }
 
@@ -1171,19 +1251,30 @@ qoqtd <- function(.data,.date,.value,calendar_type,lag_n){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,.value=value_tbl(
+    ,value=value_tbl(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name = c("qtd","pqtd")
     )
     ,fn=fn(
       lag_n = lag_n
-      ,new_.date_column_name = c("year","quarter")
+      ,new_date_column_name = c("year","quarter")
     )
   )
+
+
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- qoqtd_tbl
+
+  }else{
+
+    x@fn@fn_exec <- qoqtd_tbl
+  }
 
   return(out)
 }
@@ -1207,20 +1298,29 @@ qtdopq <- function(.data,.date,.value,calendar_type,lag_n=1){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action(c("aggregate","shift","compare"))
 
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name  = "qtd"
     )
     ,fn=fn(
-      new_.date_column_name = c(".date","year","quarter")
+      new_date_column_name = c(".date","year","quarter")
       ,lag_n=lag_n
     )
   )
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- qtdopq_tbl
+
+  }else{
+
+    x@fn@fn_exec <- qtdopq_tbl
+  }
 
   return(out)
 
@@ -1247,19 +1347,31 @@ qoq <- function(.data,.date,.value,calendar_type,lag_n=1){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("quarter")
     ,action=action("aggregate")
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "qoq"
     )
     ,fn=fn(
       lag_n = lag_n
-      ,new_.date_column_name = c("year","quarter")
+      ,new_date_column_name = c("year","quarter")
     )
   )
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- qoq_tbl
+
+  }else{
+
+    x@fn@fn_exec <- qoq_tbl
+  }
+
+
+
   return(out)
 }
 
@@ -1293,23 +1405,35 @@ mtd <- function(.data,.date,.value,calendar_type){
       calendar(
         data=.data
         ,calendar_type=calendar_type
-        ,.date_vec = rlang::as_label(rlang::enquo(.date))
+        ,date_vec = rlang::as_label(rlang::enquo(.date))
       )
       ,time_unit = time_unit("day")
       ,action=action("aggregate")
-      ,.value=value(
+      ,value=value(
         value_vec = rlang::as_label(rlang::enquo(.value))
         ,new_column_name_prefix = "mtd"
       )
       ,fn=fn_tbl(
-        new_.date_column_name = c("year","month")
+        new_date_column_name = c("year","month")
         ,lag_n = NA_integer_
       )
     )
+
+    if(x@calendar@class_name=="tbl"){
+
+      x@fn@fn_exec <- mtd_tbl
+
+    }else{
+
+      x@fn@fn_exec <- mtd_tbl
+    }
+
+
+
   return(out)
 }
 
-#' Month-to-.date
+#' Prior month-to-date
 #'
 #' @param .data either a tibble or  DBI object
 #' @param .date the .date column to aggregate
@@ -1335,19 +1459,30 @@ pmtd <- function(.data,.date,.value,calendar_type,lag_n){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "pmtd"
     )
     ,fn=fn(
-      new_.date_column_name = c("year","month")
+      new_date_column_name = c("year","month")
       ,lag_n = lag_n
     )
   )
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- pmtd_tbl
+
+  }else{
+
+    x@fn@fn_exec <- pmtd_tbl
+  }
+
+
   return(out)
 }
 
@@ -1377,19 +1512,31 @@ momtd <- function(.data,.date,.value,calendar_type,lag_n){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "momtd"
     )
     ,fn=fn(
-      new_.date_column_name = c("year","month")
+      new_date_column_name = c("year","month")
       ,lag_n = lag_n
     )
   )
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- momtd_tbl
+
+  }else{
+
+    x@fn@fn_exec <- momtd_tbl
+  }
+
+
+
   return(out)
 }
 
@@ -1421,19 +1568,30 @@ mtdopm <- function(.data,.date,.value,calendar_type,lag_n){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "mtdopm"
     )
     ,fn=fn(
-      new_.date_column_name = c("year","month")
+      new_date_column_name = c("year","month")
       ,lag_n = lag_n
     )
   )
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- mtdopm_tbl
+
+  }else{
+
+    x@fn@fn_exec <- mtdopm_tbl
+  }
+
+
   return(out)
 }
 
@@ -1456,19 +1614,27 @@ mom <- function(.data,.date,.value,calendar_type,lag_n=1){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate","shift","compare")
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "mom"
     )
     ,fn=fn(
-      new_.date_column_name = c("date","year","month")
+      new_date_column_name = c("date","year","month")
       ,lag_n = NA_integer_
     )
   )
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- mom_tbl
+
+  }else{
+
+    x@fn@fn_exec <- mom_tbl
+  }
 
     return(out)
 
@@ -1503,19 +1669,29 @@ wtd <- function(.data,.date,.value,calendar_type){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "wtd"
     )
     ,fn=fn(
-      new_.date_column_name = c("year","month","week")
+      new_date_column_name = c("year","month","week")
       ,lag_n = NA_integer_
     )
   )
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- wtd_tbl
+
+  }else{
+
+    x@fn@fn_exec <- wtd_tbl
+  }
+
 
   return(out)
 }
@@ -1545,19 +1721,27 @@ pwtd <- function(.data,.date,.value,calendar_type,lag_n){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,.value=value(
+    ,value=value(
       value = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "pwtd"
     )
     ,fn=fn(
-      new_.date_column_name = c("year","month","week")
+      new_date_column_name = c("year","month","week")
       ,lag_n = lag_n
     )
   )
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- pwtd_tbl
+
+  }else{
+
+    x@fn@fn_exec <- pwtd_tbl
+  }
 
   return(out)
 }
@@ -1588,19 +1772,28 @@ wowtd <- function(.data,.date,.value,calendar_type,lag_n){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "wowtd"
     )
     ,fn=fn(
-      new_.date_column_name = c("year","month","week")
+      new_date_column_name = c("year","month","week")
       ,lag_n = lag_n
     )
   )
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- wowtd_tbl
+
+  }else{
+
+    x@fn@fn_exec <- wowtd_tbl
+  }
 
   return(out)
 }
@@ -1632,19 +1825,29 @@ wtwopw <- function(.data,.date,.value,calendar_type,lag_n){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "wtwopw"
     )
     ,fn=fn(
-      new_.date_column_name = c("year","month","week")
+      new_date_column_name = c("year","month","week")
       ,lag_n = lag_n
     )
   )
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- wtwopw_tbl
+
+  }else{
+
+    x@fn@fn_exec <- wtwopw_tbl
+  }
+
 
   return(out)
 }
@@ -1670,19 +1873,28 @@ wow <- function(.data,.date,.value,calendar_type,lag_n=1){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate","shift","compare")
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "wow"
     )
     ,fn=fn(
-      new_.date_column_name = c("date")
+      new_date_column_name = c("date")
       ,lag_n = lag_n
     )
   )
+
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- wow_tbl
+
+  }else{
+
+    x@fn@fn_exec <- wow_tbl
+  }
 
     return(out)
 }
@@ -1716,23 +1928,32 @@ atd <- function(.data,.date,.value,calendar_type){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "atd"
     )
     ,fn=fn(
-      new_.date_column_name = c("date")
+      new_date_column_name = c("date")
       ,lag_n = NA_integer_
     )
   )
 
-  return(out)
+  if(x@calendar@class_name=="tbl"){
 
+    x@fn@fn_exec <- atd_tbl
+
+  }else{
+
+    x@fn@fn_exec <- atd_tbl
+  }
+
+  return(out)
 }
+
 
 ## comparison ti_tbl------------------
 
@@ -1756,20 +1977,29 @@ dod <- function(.data,.date,.value,calendar_type,lag_n=1){
     calendar(
       data=.data
       ,calendar_type=calendar_type
-      ,.date_vec = rlang::as_label(rlang::enquo(.date))
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate","shift","compare")
-    ,.value=value(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name_prefix = "dod"
       ,second_column_name_prefix = NA_character_
     )
     ,fn=fn(
-      new_.date_column_name = c("date")
+      new_date_column_name = c("date")
       ,lag_n = NA_integer_
     )
   )
+  if(x@calendar@class_name=="tbl"){
+
+    x@fn@fn_exec <- dod_tbl
+
+  }else{
+
+    x@fn@fn_exec <- dod_tbl
+  }
+
   return(out)
 }
 

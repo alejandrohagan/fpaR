@@ -4,18 +4,18 @@
 \alias{wow}
 \title{Week-over-Week}
 \usage{
-wow(.data, date, value, calendar_type, lag_n = 1)
+wow(.data, .date, .value, calendar_type, lag_n = 1)
 }
 \arguments{
 \item{.data}{tibble or DBI object}
 
-\item{date}{the date column to aggregate}
-
-\item{value}{the value column to summarize}
+\item{.date}{the .date column to aggregate}
 
 \item{calendar_type}{either 'standard' or '5-5-4' calendar}
 
 \item{lag_n}{the number of weeks to lag, default is 1}
+
+\item{value}{the value column to summarize}
 }
 \value{
 wow_tbl or wow_dbi
@@ -24,5 +24,5 @@ wow_tbl or wow_dbi
 Week-over-Week
 }
 \examples{
-wow(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
+wow(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
 }

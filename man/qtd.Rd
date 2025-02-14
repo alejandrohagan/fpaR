@@ -2,18 +2,18 @@
 % Please edit documentation in R/time_intelligence.R
 \name{qtd}
 \alias{qtd}
-\title{quarter-to-date}
+\title{quarter-to-.date}
 \usage{
-qtd(.data, date, value, calendar_type)
+qtd(.data, .date, .value, calendar_type)
 }
 \arguments{
 \item{.data}{either a tibble or  dbi object}
 
-\item{date}{the date column to aggregate}
-
-\item{value}{the value column to summarize}
+\item{.date}{the .date column to aggregate}
 
 \item{calendar_type}{either 'standard' or '5-5-4' calendar}
+
+\item{value}{the value column to summarize}
 }
 \value{
 qtd_tbl or qtd_dbi object depending on what is passed through
@@ -25,5 +25,5 @@ any groups that are passed through with \code{dplyr::group_by()}.
 use \code{calculate()} to return the results
 }
 \examples{
-qtd(fpar::sales,date=date,value=quantity,calendar_type="standard")
+qtd(fpar::sales,.date=.date,.value=quantity,calendar_type="standard")
 }

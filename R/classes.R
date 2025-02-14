@@ -63,7 +63,7 @@ calendar <- S7::new_class(
         class=S7::class_any
         ,getter = \(self){
           class <- class(self@data)
-          x <- if_else(str_detect(class,"tbl_dbi"),"dbi","tbl")
+          x <- dplyr::first(if_else(str_detect(class,"tbl_dbi"),"dbi","tbl"))
           x
         }
         ,validator = \(value){
@@ -187,20 +187,15 @@ value <- S7::new_class(
     ,value_quo=S7::new_property(
       class=S7::class_any
       ,getter=\(self){
-
         x <- rlang::parse_expr(self@value_vec)
-
         x
-
       }
     )
 
     ,new_column_name=S7::new_property(
       class=S7::class_character
       ,setter = \(self,value){
-
         self@new_column_name <- base::paste0(value,"_",self@value_vec)
-
         self
       }
     )
@@ -208,13 +203,14 @@ value <- S7::new_class(
 )
 
 
-# function tbl class
+# function tbl class-----------------------
 
 
 fn <- S7::new_class(
   "fn"
   ,properties = list(
-    fn_exec=class_any
+    fn_exec=S7::class_any
+    ,fn_name=class_character
     ,new_date_column_name=S7::new_property(
       class=S7::class_character
       ,default = NA_character_

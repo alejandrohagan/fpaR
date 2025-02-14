@@ -4,16 +4,18 @@ library(S7)
 library(rlang)
 library(dbplyr)
 devtools::document()
-devtools::load_all()
 
 x <- fpaR::ytd(.data = fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard")
-y <- fpaR::pytd(fpaR::sales,date = order_date,value = margin,calendar_type = "standard",lag_n = 1)
-z <- fpaR::yoytd(fpaR::sales,date = order_date,value = margin,calendar_type = "standard",lag_n = 1)
-a <- fpaR::yoy(fpaR::sales,date = order_date,value = margin,calendar_type = "standard",lag_n = 1)
+y <- fpaR::pytd(.data = fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+z <- fpaR::yoytd(fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+a <- fpaR::yoy(fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
 
-x <- fpaR::ytdopy(fpaR::sales,date = order_date,value = margin,calendar_type = "standard",lag_n = 1)
+b <- fpaR::ytdopy(fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
 
-x@time_unit <- time_unit("year")
+x@fn@fn_exec
+
+x |> calculate()
+
 
 
 sales_db |>

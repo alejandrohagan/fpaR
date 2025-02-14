@@ -2,18 +2,18 @@
 % Please edit documentation in R/time_intelligence.R
 \name{yoytd}
 \alias{yoytd}
-\title{Current year-to-date compared to previous year-to-date}
+\title{Current year-to-.date compared to previous year-to-.date}
 \usage{
-yoytd(.data, date, value, calendar_type, lag_n)
+yoytd(.data, .date, .value, calendar_type, lag_n)
 }
 \arguments{
 \item{.data}{either a tibble or  DBI object}
 
-\item{date}{the date column to aggregate}
-
-\item{value}{the value column to summarize}
+\item{.date}{the .date column to aggregate}
 
 \item{calendar_type}{either 'standard' or '5-5-4' calendar}
+
+\item{value}{the value column to summarize}
 }
 \value{
 ytd_tbl or ytd_dbi
@@ -25,5 +25,5 @@ any groups that are passed through with \code{dplyr::group_by()}.
 Use \code{calculate()} to return the results
 }
 \examples{
-ytd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
+ytd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
 }

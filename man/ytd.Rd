@@ -25,5 +25,5 @@ any groups that are passed through with \code{dplyr::group_by()}.
 Use \code{calculate()} to return the results
 }
 \examples{
-ytd(fpaR::sales,date=date,value=quantity,calendar_type="standard")
+ytd(fpaR::sales,date=date,.value=quantity,calendar_type="standard")
 }

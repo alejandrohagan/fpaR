@@ -3,6 +3,7 @@
 export("%>%")
 export(abc)
 export(abc_graph)
+export(assign_fn_exec)
 export(atd)
 export(capture_original_query)
 export(clean_file_names)

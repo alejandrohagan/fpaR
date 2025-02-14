@@ -1,27 +1,86 @@
 
 
+
+test_that(
+  "ytd - sum validation",{
+    testthat::expect_true(
+      all(
+        sales |>
+          ytd(order_date,quantity,"standard") |>
+          calculate() |>
+          dplyr::group_by(
+            year
+          ) |>
+          dplyr::summarise(
+            sum_value=sum(quantity,na.rm=TRUE)
+            ,max_ytd=last(ytd_quantity),
+            ,.groups="drop"
+          ) |>
+          dplyr::mutate(
+            delta=sum_value-max_ytd
+          ) |>
+          dplyr::pull(delta)==0
+      )
+    )
+  }
+)
+
+
+test_that(
+  "mtd - sum validation",{
+    testthat::expect_true(
+      all(
+        sales |>
+          mtd(order_date,quantity,"standard") |>
+          calculate() |>
+          dplyr::group_by(
+            year,month
+          ) |>
+          dplyr::summarise(
+            sum_value=sum(quantity,na.rm=TRUE)
+            ,max_mtd=last(mtd_quantity),
+            ,.groups="drop"
+          ) |>
+          dplyr::mutate(
+            delta=sum_value-max_mtd
+          ) |>
+          dplyr::pull(delta)==0
+      )
+    )
+  }
+)
+
+
+
 test_that(
   "yoy - sum validation",{
     testthat::expect_true(
       all(
         sales |> ytd(order_date,quantity,"standard") |>
-        calculate() |>
-        dplyr::group_by(
-          year
-        ) |>
-        dplyr::summarise(
-          sum_value=sum(quantity,na.rm=TRUE)
-          ,max_ytd=max(ytd_quantity),
-          ,.groups="drop"
-        ) |>
-        dplyr::mutate(
-          delta=sum_value-max_ytd
-        ) |>
-        dplyr::pull(delta)==0
+          calculate() |>
+          dplyr::group_by(
+            year
+          ) |>
+          dplyr::summarise(
+            sum_value=sum(quantity,na.rm=TRUE)
+            ,max_ytd=max(ytd_quantity),
+            ,.groups="drop"
+          ) |>
+          dplyr::mutate(
+            delta=sum_value-max_ytd
+          ) |>
+          dplyr::pull(delta)==0
       )
-)
+    )
   }
 )
+
+
+
+## validated tests are above
+
+
+
 
 test_that(
   "mtd - sum validation",{

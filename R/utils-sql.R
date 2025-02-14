@@ -385,4 +385,49 @@ create_contonso_duckdb <- function(){
   return(out)
 }
 
+#' Title
+#'
+#' @param x tibble or dbi object
+#'
+#' @returns
+#'
+#' @examples
+make_db_tbl <- function(x){
 
+
+  assertthat::assert_that(
+    any(class(x) %in% c("tbl_dbi","data.frame"))
+    ,msg = "Please use class dbi or tibble"
+  )
+
+
+
+  if(any(class(x) %in% c("tbl_dbi"))){
+
+    return(x)
+
+  }
+
+  if(is.data.frame(x)){
+
+    print("step 1")
+  groups_lst <- dplyr::groups(x)
+
+    print("step 2")
+  con <- DBI::dbConnect(duckdb::duckdb(tempfile()))
+
+    print("step 3")
+  duckdb::duckdb_register(con,name = "x",df = x,overwrite = TRUE)
+
+    print("step 4")
+
+  out <- dplyr::tbl(con,"x") |>
+    dplyr::group_by(groups_lst)
+
+    print("step 5")
+  return(out)
+
+  }
+
+
+}

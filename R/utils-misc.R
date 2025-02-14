@@ -16,6 +16,30 @@ return(out)
 }
 
 
+#' Assigns fn to ti class
+#'
+#' @param x
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+assign_fn_exec <- function(x){
+
+  class_name <- class(x)[1]
+
+  assertthat::assert_that(
+    any(class(x) %in% c("fpaR::ti"))
+      ,msg = glue::glue("requires x to be class 'fpaR::ti' not {class_name}")
+  )
+
+
+  fn_exec_vec <- paste0(x@fn@fn_name,"_",x@calendar@class_name)
+  return(fn_exec_vec)
+
+}
+
+
 
 #' Convert quoted or unquoted input to string
 #'
@@ -223,5 +247,8 @@ make_print_message <- function(x){
   cli::cli_end()
 
 }
+
+
+
 
 

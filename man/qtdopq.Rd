@@ -2,27 +2,27 @@
 % Please edit documentation in R/time_intelligence.R
 \name{qtdopq}
 \alias{qtdopq}
-\title{Year-to-date over full previous year}
+\title{Year-to-.date over full previous year}
 \usage{
-qtdopq(.data, date, value, calendar_type, lag_n = 1)
+qtdopq(.data, .date, .value, calendar_type, lag_n = 1)
 }
 \arguments{
 \item{.data}{tibble or DBI object}
 
-\item{date}{the date column to aggregate}
-
-\item{value}{the value column to summarize}
+\item{.date}{the .date column to aggregate}
 
 \item{calendar_type}{either 'standard' or '5-5-4' calendar}
 
 \item{lag_n}{the number of years to lag, default is 1}
+
+\item{value}{the value column to summarize}
 }
 \value{
 mom_tbl or mom_dbi
 }
 \description{
-Year-to-date over full previous year
+Year-to-.date over full previous year
 }
 \examples{
-ytdoy(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
+ytdoy(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
 }

@@ -4,18 +4,18 @@
 \alias{dod}
 \title{day over day calculation}
 \usage{
-dod(.data, date, value, calendar_type, lag_n = 1)
+dod(.data, .date, .value, calendar_type, lag_n = 1)
 }
 \arguments{
 \item{.data}{tibble or DBI object}
 
-\item{date}{the date column to aggregate}
-
-\item{value}{the value column to summarize}
+\item{.date}{the .date column to aggregate}
 
 \item{calendar_type}{either 'standard' or '5-5-4' calendar}
 
 \item{lag_n}{the number of periods to lag, default is 1}
+
+\item{value}{the value column to summarize}
 }
 \value{
 dod_tbl or dbi_tbl
@@ -24,5 +24,5 @@ dod_tbl or dbi_tbl
 day over day calculation
 }
 \examples{
-dod(fpaR::sales,date=order_date,value=quantity,calendar_type='standard',lag_n=1)
+dod(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
 }

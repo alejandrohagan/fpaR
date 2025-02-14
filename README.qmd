@@ -238,6 +238,13 @@ s custom print function
 - then need to fine tune print methods
 
 
+2024-02-14
+- okay -- will simplify the tech overhead and just do everyhting sql
+- convert dataframe objects to duckdb
+- single set of fucnctin to create and maintain
+- more simple api -- not dependent on the class
+
+
 # list of all functions
 
 ```{r}
