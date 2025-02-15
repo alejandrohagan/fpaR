@@ -5,28 +5,258 @@ library(rlang)
 library(dbplyr)
 devtools::document()
 
-x <- fpaR::ytd(.data = fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard")
+
+.data <- fpaR:::make_db_tbl(sales) |> group_by(customer_key,store_key)
+
+x <- fpaR::ytd(.data = .data,.date = order_date,.value = margin,calendar_type = "standard")
 y <- fpaR::pytd(.data = fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
 z <- fpaR::yoytd(fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
 a <- fpaR::yoy(fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
 
 b <- fpaR::ytdopy(fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
 
-x@fn@fn_exec
+## calendar table--------
 
-x |> calculate()
+group_cte$dbi |>
+  filter(
+    customer_key==1855811
+  )
+  count(date) |>
+  arrange(date)
+  filter()
+# delcare variables
+
+sales |>
+  filter(
+    is.na(customer_key)
+  )
+
+
+create_no_group_calendar <- function(x){
+### original table
+original_query <- fpaR::capture_original_query(x@calendar@data)
+
+interval_key <- base::paste("1", x@time_unit@value)
+
+con <- dbplyr::remote_con(x@calendar@data)
+time_unit <- x@time_unit@value
+date_var <- x@calendar@date_vec
+value_var <- x@value@value_vec
+group_var <- x@calendar@group_vec
 
 
 
-sales_db |>
-  dplyr::pull(dplyr::any_of(date_vec)) |>
-  max(na.rm=TRUE)
+## create calendar
+calendar_sql <- fpaR::seq_date_sql(start_date = x@calendar@min_date,end_date =x@calendar@max_date,time_unit = "day",con = con,cte=TRUE)$sql
 
-db$sales |>
-dplyr::pull(dplyr::any_of(date_vec)) |>
-  unique() |>
-  length()
 
+
+
+
+
+
+#no group sql --------------
+
+no_group_summary_sql <-
+  fpaR::with(
+    query=fpaR::sql_query_select(
+      select = glue::glue_sql("
+                       DATE_TRUNC({time_unit}, {`date_var`})::DATE AS date
+                       ,SUM({`value_var`}) AS {`value_var`}
+                       ",.con=con)
+      ,group_by=dplyr::sql("ALL")
+      ,previous_query = TRUE
+      ,.data = x@calendar@data
+    )$sql
+    ,query_name=summary_tbl
+    ,order="last"
+
+  )
+
+no_group_collect_sql <-
+  glue::glue_sql("
+  SELECT
+
+CALENDAR_TBL.date
+,COALESCE(SUMMARY_TBL.{`value_var`}, 0) AS {`value_var`}
+
+FROM
+
+CALENDAR_TBL
+
+LEFT JOIN
+
+SUMMARY_TBL ON
+
+CALENDAR_TBL.date = SUMMARY_TBL.date
+
+ORDER BY
+
+SUMMARY_TBL.date
+",.con = con)
+
+
+no_group_cte <- fpaR::cte(
+  con = con
+  ,calendar_sql
+  ,no_group_summary_sql
+  ,no_group_collect_sql
+)
+}
+
+
+create_group_calendar <- function(x){
+
+  original_query <- fpaR::capture_original_query(x@calendar@data)
+
+  interval_key <- base::paste("1", x@time_unit@value)
+
+  con <- dbplyr::remote_con(x@calendar@data)
+  time_unit <- x@time_unit@value
+  date_var <- x@calendar@date_vec
+  value_var <- x@value@value_vec
+  group_var <- x@calendar@group_vec
+
+
+
+  ## create calendar
+  calendar_sql <- fpaR::seq_date_sql(start_date = x@calendar@min_date,end_date =x@calendar@max_date,time_unit = "day",con = con,cte=TRUE)$sql
+
+
+
+## Group SQL-------------------
+
+group_summary_sql <- fpaR::with(
+  query=fpaR::sql_query_select(
+    select = glue::glue_sql("
+                       DATE_TRUNC({time_unit}, {`date_var`})::DATE AS date
+                       ,SUM({`value_var`}) AS {`value_var`}
+                      ,{`group_var`*}
+
+                       ",.con=con)
+    ,group_by=dplyr::sql("ALL")
+    ,previous_query = TRUE
+    ,.data = sales_db
+  )$sql
+  ,query_name=summary_tbl
+  ,order="middle"
+
+)
+
+  group_cte <- fpaR::with(
+    query =
+      glue::glue_sql("
+                       SELECT DISTINCT {`group_var`*}
+                       FROM SUMMARY_TBL
+                       ",.con=con)
+    ,query_name=group_cte
+    ,order="middle"
+  )
+
+
+
+
+  cross_join_sql <- fpaR::with(
+    query=fpaR::sql_query_select(
+      select = glue::glue_sql("
+                       CALENDAR_TBL.date
+                       ,SUMMARY_TBL.{`group_var`*}
+                       FROM CALENDAR_TBL
+                       CROSS JOIN summary_tbl
+
+                       ",.con=con)
+      ,previous_query = TRUE
+      ,.data = sales_db
+    )$sql
+    ,query_name=cross_join
+    ,order="last"
+
+  )
+
+group_collect_sql <- glue::glue_sql("
+  SELECT
+
+  CALENDAR_TBL.date
+  ,SUMMARY_TBL.{`group_var`*}
+  ,COALESCE(SUMMARY_TBL.{`value_var`}, 0) AS {`value_var`}
+
+  FROM
+  CALENDAR_TBL
+  FULL JOIN
+  SUMMARY_TBL
+  ON
+  CALENDAR_TBL.date = SUMMARY_TBL.date
+  ORDER BY
+  CALENDAR_TBL.date", .con = con)
+
+
+## return logic---------------
+
+  group_cte <- fpaR::cte(
+    con=con
+    ,calendar_sql
+    ,group_summary_sql
+    ,cross_join_sql
+    ,group_collect_sql
+  )
+
+  return(group_cte$dbi)
+
+}
+
+.data <- fpaR:::make_db_tbl(sales) |> group_by(customer_key,store_key)
+
+x <- fpaR::ytd(.data = .data,.date = order_date,.value = margin,calendar_type = "standard")
+
+create_group_calendar(x)
+
+
+tidyr::expand()
+
+### table equivlaent---------------------------
+
+
+summary_tbl <- x@calendar@data |>
+  dplyr::mutate(
+    date = lubridate::floor_date(!!x@calendar@date_quo,unit = x@time_unit@value)
+    ,time_unit=x@time_unit@value
+  ) |>
+  dplyr::group_by(date,.add=TRUE) |>
+  dplyr::summarise(
+    !!x@value@value_vec:= sum(!!x@value@value_quo,na.rm=TRUE)
+    ,.groups = "drop"
+  )
+
+calendar <- tibble::tibble(
+  date = base::seq.Date(from = min(summary_tbl$date), to = max(summary_tbl$date), by = x@time_unit@value)
+)
+
+# Create a calendar table with all the dates in the specified time frame
+if(x@calendar@group_indicator){
+
+  calendar <- dplyr::left_join(
+
+    summary_tbl |> dplyr::distinct(!!!x@calendar@group_quo) |> dplyr::mutate(id="id")
+
+    ,calendar |> dplyr::mutate(id="id")
+    ,by=dplyr::join_by(id)
+    ,relationship = "many-to-many"
+  ) |>
+    dplyr::select(-id)
+}
+
+
+# Perform a full join to ensure all time frames are represented
+full_tbl <- dplyr::full_join(
+  calendar
+  ,summary_tbl
+  ,by = dplyr::join_by(date,!!!x@calendar@group_quo)
+) |>
+  dplyr::mutate(
+    # dplyr::across(dplyr::where(\(x) base::is.numeric(x)),\(x) tidyr::replace_na(x,0))
+    !!x@value@value_vec:= dplyr::coalesce(!!x@value@value_quo, 0)
+  ) |>
+  dplyr::arrange(!!!x@calendar@group_quo,date)
 
 
 

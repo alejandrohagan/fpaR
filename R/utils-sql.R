@@ -105,9 +105,9 @@ seq_date_sql <- function(start_date, end_date, time_unit, cte = TRUE, con) {
 
 
 
-  start_date_vec <- convert_input_to_string({{ start_date }})
-  end_date_vec <- convert_input_to_string({{ end_date }})
-  time_unit_vec <- convert_input_to_string({{ time_unit }})
+  start_date_vec <- start_date
+  end_date_vec <- end_date
+  time_unit_vec <- time_unit
   interval_key <- paste("1", time_unit_vec)
 
 
