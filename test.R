@@ -16,18 +16,51 @@ b <- fpaR::ytdopy(fpaR::sales,.date = order_date,.value = margin,calendar_type =
 
 ## calendar table--------
 
-group_cte$dbi |>
-  filter(
-    customer_key==1855811
-  )
-  count(date) |>
-  arrange(date)
-  filter()
-# delcare variables
+test_sql <- sql("
+WITH DATE_SERIES AS (
+SELECT
 
-sales |>
-  filter(
-    is.na(customer_key)
+GENERATE_SERIES(
+   MIN(DATE_TRUNC('day', DATE '2021-05-18'::date))::DATE
+  ,MAX(DATE_TRUNC('day', DATE '2024-04-20'::date))::DATE
+  ,INTERVAL '1 day'
+) AS DATE_LIST),
+
+CALENDAR_TBL AS (
+      SELECT
+
+      UNNEST(DATE_LIST)::DATE AS date
+
+      FROM DATE_SERIES
+
+      )
+
+select *
+from calendar_tbl
+
+")
+
+
+tbl(con,"x") |>
+  distinct(order_date,customer_key) |>
+  cross_join(
+    tbl(con,sql(test_sql))
+  ) |>
+  left_join(
+    tbl(con,"x") |> group_by(customer_key,order_date) |> summarise(margin=sum(margin))
+    ,by=join_by(date==order_date,customer_key)
+  ) |>
+  mutate(
+    margin=coalesce(margin,0)
+  )
+
+
+
+
+tbl(con,sql(test_sql)) |>
+  left_join(
+    tbl(con,"x")
+    ,by=join_by(date==order_date)
   )
 
 
@@ -35,23 +68,19 @@ create_no_group_calendar <- function(x){
 ### original table
 original_query <- fpaR::capture_original_query(x@calendar@data)
 
+# create variables
+
 interval_key <- base::paste("1", x@time_unit@value)
 
 con <- dbplyr::remote_con(x@calendar@data)
 time_unit <- x@time_unit@value
 date_var <- x@calendar@date_vec
 value_var <- x@value@value_vec
-group_var <- x@calendar@group_vec
 
 
 
 ## create calendar
 calendar_sql <- fpaR::seq_date_sql(start_date = x@calendar@min_date,end_date =x@calendar@max_date,time_unit = "day",con = con,cte=TRUE)$sql
-
-
-
-
-
 
 
 #no group sql --------------
@@ -101,7 +130,6 @@ no_group_cte <- fpaR::cte(
   ,no_group_summary_sql
   ,no_group_collect_sql
 )
-}
 
 
 create_group_calendar <- function(x){
@@ -141,7 +169,7 @@ create_group_calendar <- function(x){
                          ",.con=con)
       ,group_by=dplyr::sql("ALL")
       ,previous_query = TRUE
-      ,.data = sales_db
+      ,.data = x@calendar@data
     )$sql
     ,query_name=summary_tbl
     ,order="middle"
@@ -169,7 +197,6 @@ create_group_calendar <- function(x){
     ,query_name=cross_join_cte
     ,order="last"
   )
-
 
 group_collect_sql <- glue::glue_sql("
   SELECT
@@ -202,6 +229,7 @@ group_collect_sql <- glue::glue_sql("
 
   return(group_cte$dbi)
 }
+
 
 
 ### table equivlaent---------------------------
