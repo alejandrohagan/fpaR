@@ -5,7 +5,6 @@ library(rlang)
 library(dbplyr)
 devtools::document()
 
-
 .data <- fpaR:::make_db_tbl(sales) |> group_by(customer_key,store_key)
 
 x <- fpaR::ytd(.data = .data,.date = order_date,.value = margin,calendar_type = "standard")
@@ -116,6 +115,13 @@ create_group_calendar <- function(x){
   date_var <- x@calendar@date_vec
   value_var <- x@value@value_vec
   group_var <- x@calendar@group_vec
+  group1 <- paste0("cross_join_cte.",group_var)
+  group1_collapse <- glue::glue_sql_collapse(group1,sep = ",")
+  group2 <- paste0("summary_tbl.",group_var)
+
+  join_group <- paste("AND",group1,"=",group2)
+
+  group <- glue::glue_sql_collapse(join_group,sep = " ")
 
 
 
@@ -123,25 +129,23 @@ create_group_calendar <- function(x){
   calendar_sql <- fpaR::seq_date_sql(start_date = x@calendar@min_date,end_date =x@calendar@max_date,time_unit = "day",con = con,cte=TRUE)$sql
 
 
+  ## Group SQL-------------------
 
-## Group SQL-------------------
+  group_summary_sql <- fpaR::with(
+    query=fpaR::sql_query_select(
+      select = glue::glue_sql("
+                         DATE_TRUNC({time_unit}, {`date_var`})::DATE AS date
+                         ,SUM({`value_var`}) AS {`value_var`}
+                        ,{`group_var`*}
 
-group_summary_sql <- fpaR::with(
-  query=fpaR::sql_query_select(
-    select = glue::glue_sql("
-                       DATE_TRUNC({time_unit}, {`date_var`})::DATE AS date
-                       ,SUM({`value_var`}) AS {`value_var`}
-                      ,{`group_var`*}
-
-                       ",.con=con)
-    ,group_by=dplyr::sql("ALL")
-    ,previous_query = TRUE
-    ,.data = sales_db
-  )$sql
-  ,query_name=summary_tbl
-  ,order="middle"
-
-)
+                         ",.con=con)
+      ,group_by=dplyr::sql("ALL")
+      ,previous_query = TRUE
+      ,.data = sales_db
+    )$sql
+    ,query_name=summary_tbl
+    ,order="middle"
+    )
 
   group_cte <- fpaR::with(
     query =
@@ -153,41 +157,36 @@ group_summary_sql <- fpaR::with(
     ,order="middle"
   )
 
-
-
-
   cross_join_sql <- fpaR::with(
-    query=fpaR::sql_query_select(
-      select = glue::glue_sql("
-                       CALENDAR_TBL.date
-                       ,SUMMARY_TBL.{`group_var`*}
-                       FROM CALENDAR_TBL
-                       CROSS JOIN summary_tbl
+      query = glue::glue_sql("
+      SELECT
+      CALENDAR_TBL.date
+      ,{`group_var`*}
+      FROM CALENDAR_TBL
+      CROSS JOIN group_cte
 
                        ",.con=con)
-      ,previous_query = TRUE
-      ,.data = sales_db
-    )$sql
-    ,query_name=cross_join
+    ,query_name=cross_join_cte
     ,order="last"
-
   )
+
 
 group_collect_sql <- glue::glue_sql("
   SELECT
 
-  CALENDAR_TBL.date
-  ,SUMMARY_TBL.{`group_var`*}
+  cross_join_cte.date
+  ,{`group1_collapse`*}
   ,COALESCE(SUMMARY_TBL.{`value_var`}, 0) AS {`value_var`}
 
   FROM
-  CALENDAR_TBL
-  FULL JOIN
+  cross_join_cte
+  LEFT JOIN
   SUMMARY_TBL
   ON
-  CALENDAR_TBL.date = SUMMARY_TBL.date
+  cross_join_cte.date = SUMMARY_TBL.date
+ {`group`*}
   ORDER BY
-  CALENDAR_TBL.date", .con = con)
+  cross_join_cte.date", .con = con)
 
 
 ## return logic---------------
@@ -196,22 +195,14 @@ group_collect_sql <- glue::glue_sql("
     con=con
     ,calendar_sql
     ,group_summary_sql
+    ,group_cte
     ,cross_join_sql
     ,group_collect_sql
   )
 
   return(group_cte$dbi)
-
 }
 
-.data <- fpaR:::make_db_tbl(sales) |> group_by(customer_key,store_key)
-
-x <- fpaR::ytd(.data = .data,.date = order_date,.value = margin,calendar_type = "standard")
-
-create_group_calendar(x)
-
-
-tidyr::expand()
 
 ### table equivlaent---------------------------
 
