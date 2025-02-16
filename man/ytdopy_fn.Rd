@@ -5,19 +5,13 @@
 \title{Year-to-date vs. full prior year}
 \usage{
 ytdopy_fn(x)
-
-ytdopy_fn(x)
 }
 \arguments{
 \item{x}{ti_tbl}
 }
 \value{
 tibble
-
-tibble
 }
 \description{
 Year-to-date vs. full prior year
-
-quarter-to-date over previous quarter
 }

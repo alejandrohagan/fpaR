@@ -239,10 +239,18 @@ s custom print function
 
 
 2024-02-14
-- okay -- will simplify the tech overhead and just do everyhting sql
+- okay -- will simplify the tech overhead and just do everything sql
 - convert dataframe objects to duckdb
-- single set of fucnctin to create and maintain
+- single set of function to create and maintain
 - more simple api -- not dependent on the class
+
+2024-02-15
+- almost done with finalize ti functions -- at long last 
+- much simplier api to maintain
+- ok -- then focus on the factor functions
+- then lastly can focus on the sql lm 
+
+
 
 
 # list of all functions

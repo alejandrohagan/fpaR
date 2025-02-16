@@ -60,7 +60,7 @@ calendar <- S7::new_class(
         class=S7::class_any
         ,setter = \(self,value){
 
-          self@data <- make_db_tbl(value |> dplyr::ungroup())
+          self@data <- make_db_tbl(value)
           self
         }
       )

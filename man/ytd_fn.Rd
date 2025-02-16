@@ -24,5 +24,5 @@ If you want to summarize to a particular group, simply pass the tibble through t
 prior to function and the function will make summarize and make a complete calendar for each group item.
 }
 \seealso{
-\code{\link[fpaR::pytd() fpaR::yoy() fpaR:yoytd]{fpaR::pytd() fpaR::yoy() fpaR::yoytd()}} are the year based ti functions
+\code{\link[fpaR::pytd()fpaR::yoy()fpaR:yoytd]{fpaR::pytd()fpaR::yoy()fpaR::yoytd()}} are the year based ti functions
 }

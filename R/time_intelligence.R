@@ -4,7 +4,7 @@
 #' Year-to-date for tibble objects
 #'
 #' @param x ti_tbl
-#' @seealso [fpaR::pytd() fpaR::yoy() fpaR::yoytd()] are the year based ti functions
+#' @seealso [fpaR::pytd()fpaR::yoy()fpaR::yoytd()] are the year based ti functions
 #' @description
 #' `ytd_fn()` summarizes a tibble to target time unit and completes the calendar to ensure
 #' no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
@@ -149,7 +149,10 @@ yoy_fn <- function(x){
     full_dbi
     ,lag_dbi
     ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
-  )
+  ) |>
+    mutate(
+      year=lubridate::year(date)
+    )
 
   return(out_dbi)
 
@@ -164,20 +167,27 @@ yoy_fn <- function(x){
 ytdopy_fn <- function(x){
 
   # year-to-date table
-  ytd_tbl <-  ytd_tbl(x)
+   x@value@new_column_name <- "ytd"
+  ytd_dbi <-  ytd_fn(x)
 
   #aggregate to prior year
 
+  x@value@new_column_name <- "py"
   x@time_unit <- time_unit("year")
 
-  py_tbl <-   yoy_tbl(x)
+  py_dbi <-   yoy_fn(x)
 
   # join together
 
- out_tbl <-  ytd_tbl |>
+ out_dbi <-  ytd_dbi |>
+   select(
+     -c(!!x@value@value_quo)
+   ) |>
     dplyr::left_join(
-      py_tbl
-      ,by=dplyr::join_by(year,!!!x@calendar@group_quo)
+      py_dbi |> select(
+        -c(!!x@value@value_quo)
+      )
+      ,by=dplyr::join_by(year,date,!!!x@calendar@group_quo)
     )
 
   return(out_tbl)
@@ -195,22 +205,22 @@ ytdopy_fn <- function(x){
 qtd_fn <- function(x){
 
 
-  full_tbl <-  create_calendar(x) |>
+  full_dbi <-  create_calendar(x) |>
     dplyr::mutate(
       year=lubridate::year(date)
       ,quarter=lubridate::quarter(date)
       ,.before = 1
     )
 
-  out_tbl <- full_tbl |>
-    dplyr::group_by(year,quarter,!!!x@calendar@group_quo) |>
-    dplyr::arrange(date,.by_group = TRUE) |>
+  out_dbi <- full_dbi |>
+    dbplyr::window_order(date,!!!x@calendar@group_quo) |>
     dplyr::mutate(
-      !!x@new_column_name:=base::cumsum(!!x@value_quo)
+      !!x@value@new_column_name:=base::cumsum(!!x@value@value_quo)
+      ,.by=c(year,quarter,!!!x@calendar@group_quo)
     ) |>
     dplyr::ungroup()
 
-  return(out_tbl)
+  return(out_dbi)
 
 }
 
@@ -231,14 +241,14 @@ pqtd_fn <- function(x){
     )
 
   lag_tbl <- full_tbl|>
-    dplyr::group_by(year,quarter,!!!x@calendar@group_quo) |>
-    dplyr::arrange(date,.by_group = TRUE) |>
+    dbplyr::window_order(date) |>
     dplyr::mutate(
       ,date_lag=date +lubridate::quarters(x@fn@lag_n)
-      ,!!x@new_column_name:=cumsum(!!x@value_quo)
+      ,!!x@nvalue@ew_column_name:=cumsum(!!x@value@value_quo)
+      ,.by=c(year,quarter,!!!x@calendar@group_quo)
     ) |>
-    ungroup() |>
-    dplyr::select(-c(date,quarter,year,!!x@value_quo))
+    dplyr::ungroup() |>
+    dplyr::select(-c(date,quarter,year,!!x@value@value_quo))
 
 
   out_tbl <-   dplyr::left_join(
@@ -250,6 +260,46 @@ pqtd_fn <- function(x){
 
   return(out_tbl)
 }
+
+
+#' Title
+#'
+#' @param x
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+qoq_fn <- function(x){
+
+  # create calendar
+  full_dbi <-  create_calendar(x)
+
+  # create lag
+  lag_dbi <- full_dbi |>
+    dbplyr::window_order(date,!!!x@calendar@group_quo) |>
+    dplyr::mutate(
+      date_lag=dplyr::lead(date,n = !!x@fn@lag_n)
+      ,!!x@value@new_column_name[[1]]:=!!x@value@value_quo
+      ,.by=c(!!!x@calendar@group_quo)
+    ) |>
+    dplyr::select(-c(date,!!x@value@value_quo))
+
+  # bring tables together
+  out_dbi <-   dplyr::left_join(
+    full_dbi
+    ,lag_dbi
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
+  ) |>
+    mutate(
+      year=lubridate::year(date)
+      ,quarter=lubridate::quarter(date)
+    ) |>
+    dplyr::relocate(date,year,quarter)
+
+  return(out_dbi)
+}
+
 
 #' Previous quarter-to-date for tibble objects
 #'
@@ -278,33 +328,6 @@ qoqtd_fn <- function(x){
     ,by=dplyr::join_by(date==date,year,quarter,!!!x@calendar@group_quo)
   )
 
-#   full_tbl <-  create_calendar(x) |>
-#     mutate(
-#       year=lubridate::year(date)
-#       ,quarter=lubridate::quarter(date)
-#       ,.before = 1
-#     ) |>
-#     group_by(year,quarter,!!!x@calendar@group_quo) |>
-#     mutate(
-#       !!paste0("qtd_",x@value_quo):=cumsum(!!x@value_quo)
-#     )
-#
-#   lag_tbl <- full_tbl|>
-#     dplyr::group_by(year,quarter,!!!x@calendar@group_quo) |>
-#     dplyr::arrange(date,.by_group = TRUE) |>
-#     dplyr::mutate(
-#       ,date_lag=date +quarters(1)
-#       ,!!x@new_column_name:=cumsum(!!x@value_quo)
-#     ) |>
-#     dplyr::ungroup() |>
-#     dplyr::select(-c(date,quarter,year,!!x@value_quo,!!paste0("qtd_",x@value_quo)))
-#
-#   out_tbl <-   dplyr::left_join(
-#     full_tbl
-#     ,lag_tbl
-#     ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
-#   ) |>
-#     dplyr::select(-c(!!x@value_quo))
 
   return(out_tbl)
 
@@ -316,11 +339,16 @@ qoqtd_fn <- function(x){
 #'
 #' @returns tibble
 #'
-ytdopy_fn <- function(x){
+qtdopq_fn <- function(x){
 
   # year-to-date table
-  qtd_tbl <-  qtd_tbl(x)
+  x@value@new_column_name <- "qtd"
+  qtd_dbi <-  qtd_fn(x)
 
+  x@time_unit@value <- "quarter"
+  x@value@new_column_name <- "pq"
+
+  pq_dbi <-  qoq(x)
 
   #aggregate to prior year
   pq_tbl <-   qtd_tbl |>
@@ -330,13 +358,13 @@ ytdopy_fn <- function(x){
     ) |>
     dplyr::group_by(year,quarter,!!!x@calendar@group_quo) |>
     dplyr::summarise(
-      fq=base::sum(!!x@value@value_quo,na.rm=TRUE)
+      pq=base::sum(!!x@value@value_quo,na.rm=TRUE)
       ,.groups="drop"
     ) |>
     dplyr::mutate(
-      !!x@value@second_column_name:=dplyr::lag(fq,x@fn@lag_n)
+      !!x@value@second_column_name:=dplyr::lag(pq,x@fn@lag_n)
     ) |>
-    dplyr::select(-c(fq))
+    dplyr::select(-c(pq))
 
   # join together
 
@@ -1026,13 +1054,13 @@ qtd <- function(.data,.date,.value,calendar_type){
     ,time_unit                   = time_unit("day")
     ,action                      = action("aggregate")
     ,value = value(
-      ,value_vec                 = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name    = "qtd"
+      value_vec                 = rlang::as_label(rlang::enquo(.value))
+      ,new_column_name           = "qtd"
     )
     ,fn=fn(
-      new_date_column_name      = c("year","quarter")
+      new_date_column_name       = c("year","quarter")
       ,lag_n                     = NA_integer_
-      ,fn_exec = qtd_fn
+      ,fn_exec                   = qtd_fn
     )
   )
 
@@ -1119,7 +1147,7 @@ qoqtd <- function(.data,.date,.value,calendar_type,lag_n){
     )
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
-    ,value=value_tbl(
+    ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
       ,new_column_name = c("qtd","pqtd")
     )
@@ -1200,7 +1228,7 @@ qoq <- function(.data,.date,.value,calendar_type,lag_n=1){
     ,action=action("aggregate")
     ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name_prefix = "qoq"
+      ,new_column_name  = "qoq"
     )
     ,fn=fn(
       lag_n = lag_n
@@ -1743,4 +1771,3 @@ dod <- function(.data,.date,.value,calendar_type,lag_n=1){
   )
   return(out)
 }
-
