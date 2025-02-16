@@ -58,6 +58,11 @@ calendar <- S7::new_class(
     list(
       data=S7::new_property(
         class=S7::class_any
+        ,setter = \(self,value){
+
+          self@data <- make_db_tbl(value |> dplyr::ungroup())
+          self
+        }
       )
       ,class_name=S7::new_property(
         class=S7::class_any
@@ -209,8 +214,7 @@ value <- S7::new_class(
 fn <- S7::new_class(
   "fn"
   ,properties = list(
-    fn_exec=S7::class_any
-    ,fn_name=class_character
+    fn_exec=S7::class_function
     ,new_date_column_name=S7::new_property(
       class=S7::class_character
       ,default = NA_character_

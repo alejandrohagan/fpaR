@@ -5,230 +5,27 @@ library(rlang)
 library(dbplyr)
 devtools::document()
 
-.data <- fpaR:::make_db_tbl(sales) |> group_by(customer_key,store_key)
+.data <- sales |> group_by(customer_key)
 
 x <- fpaR::ytd(.data = .data,.date = order_date,.value = margin,calendar_type = "standard")
-y <- fpaR::pytd(.data = fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
-z <- fpaR::yoytd(fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
-a <- fpaR::yoy(fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::pytd(.data =.data ,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::yoytd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::yoy(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::ytdopy(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
 
-b <- fpaR::ytdopy(fpaR::sales,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+fpaR::seq_date_sql("2022-01-01","2022-10-01",time_unit = "day",con=con)
 
-## calendar table--------
+## calendar sql
 
-test_sql <- sql("
-WITH DATE_SERIES AS (
-SELECT
-
-GENERATE_SERIES(
-   MIN(DATE_TRUNC('day', DATE '2021-05-18'::date))::DATE
-  ,MAX(DATE_TRUNC('day', DATE '2024-04-20'::date))::DATE
-  ,INTERVAL '1 day'
-) AS DATE_LIST),
-
-CALENDAR_TBL AS (
-      SELECT
-
-      UNNEST(DATE_LIST)::DATE AS date
-
-      FROM DATE_SERIES
-
-      )
-
-select *
-from calendar_tbl
-
-")
-
-
-tbl(con,"x") |>
-  distinct(order_date,customer_key) |>
-  cross_join(
-    tbl(con,sql(test_sql))
-  ) |>
-  left_join(
-    tbl(con,"x") |> group_by(customer_key,order_date) |> summarise(margin=sum(margin))
-    ,by=join_by(date==order_date,customer_key)
-  ) |>
-  mutate(
-    margin=coalesce(margin,0)
-  )
+x |>
+  create_calendar()
+## end calendaer sql --------------
 
 
 
 
-tbl(con,sql(test_sql)) |>
-  left_join(
-    tbl(con,"x")
-    ,by=join_by(date==order_date)
-  )
 
 
-create_no_group_calendar <- function(x){
-### original table
-original_query <- fpaR::capture_original_query(x@calendar@data)
-
-# create variables
-
-interval_key <- base::paste("1", x@time_unit@value)
-
-con <- dbplyr::remote_con(x@calendar@data)
-time_unit <- x@time_unit@value
-date_var <- x@calendar@date_vec
-value_var <- x@value@value_vec
-
-
-
-## create calendar
-calendar_sql <- fpaR::seq_date_sql(start_date = x@calendar@min_date,end_date =x@calendar@max_date,time_unit = "day",con = con,cte=TRUE)$sql
-
-
-#no group sql --------------
-
-no_group_summary_sql <-
-  fpaR::with(
-    query=fpaR::sql_query_select(
-      select = glue::glue_sql("
-                       DATE_TRUNC({time_unit}, {`date_var`})::DATE AS date
-                       ,SUM({`value_var`}) AS {`value_var`}
-                       ",.con=con)
-      ,group_by=dplyr::sql("ALL")
-      ,previous_query = TRUE
-      ,.data = x@calendar@data
-    )$sql
-    ,query_name=summary_tbl
-    ,order="last"
-
-  )
-
-no_group_collect_sql <-
-  glue::glue_sql("
-  SELECT
-
-CALENDAR_TBL.date
-,COALESCE(SUMMARY_TBL.{`value_var`}, 0) AS {`value_var`}
-
-FROM
-
-CALENDAR_TBL
-
-LEFT JOIN
-
-SUMMARY_TBL ON
-
-CALENDAR_TBL.date = SUMMARY_TBL.date
-
-ORDER BY
-
-SUMMARY_TBL.date
-",.con = con)
-
-
-no_group_cte <- fpaR::cte(
-  con = con
-  ,calendar_sql
-  ,no_group_summary_sql
-  ,no_group_collect_sql
-)
-
-
-create_group_calendar <- function(x){
-
-  original_query <- fpaR::capture_original_query(x@calendar@data)
-
-  interval_key <- base::paste("1", x@time_unit@value)
-
-  con <- dbplyr::remote_con(x@calendar@data)
-  time_unit <- x@time_unit@value
-  date_var <- x@calendar@date_vec
-  value_var <- x@value@value_vec
-  group_var <- x@calendar@group_vec
-  group1 <- paste0("cross_join_cte.",group_var)
-  group1_collapse <- glue::glue_sql_collapse(group1,sep = ",")
-  group2 <- paste0("summary_tbl.",group_var)
-
-  join_group <- paste("AND",group1,"=",group2)
-
-  group <- glue::glue_sql_collapse(join_group,sep = " ")
-
-
-
-  ## create calendar
-  calendar_sql <- fpaR::seq_date_sql(start_date = x@calendar@min_date,end_date =x@calendar@max_date,time_unit = "day",con = con,cte=TRUE)$sql
-
-
-  ## Group SQL-------------------
-
-  group_summary_sql <- fpaR::with(
-    query=fpaR::sql_query_select(
-      select = glue::glue_sql("
-                         DATE_TRUNC({time_unit}, {`date_var`})::DATE AS date
-                         ,SUM({`value_var`}) AS {`value_var`}
-                        ,{`group_var`*}
-
-                         ",.con=con)
-      ,group_by=dplyr::sql("ALL")
-      ,previous_query = TRUE
-      ,.data = x@calendar@data
-    )$sql
-    ,query_name=summary_tbl
-    ,order="middle"
-    )
-
-  group_cte <- fpaR::with(
-    query =
-      glue::glue_sql("
-                       SELECT DISTINCT {`group_var`*}
-                       FROM SUMMARY_TBL
-                       ",.con=con)
-    ,query_name=group_cte
-    ,order="middle"
-  )
-
-  cross_join_sql <- fpaR::with(
-      query = glue::glue_sql("
-      SELECT
-      CALENDAR_TBL.date
-      ,{`group_var`*}
-      FROM CALENDAR_TBL
-      CROSS JOIN group_cte
-
-                       ",.con=con)
-    ,query_name=cross_join_cte
-    ,order="last"
-  )
-
-group_collect_sql <- glue::glue_sql("
-  SELECT
-
-  cross_join_cte.date
-  ,{`group1_collapse`*}
-  ,COALESCE(SUMMARY_TBL.{`value_var`}, 0) AS {`value_var`}
-
-  FROM
-  cross_join_cte
-  LEFT JOIN
-  SUMMARY_TBL
-  ON
-  cross_join_cte.date = SUMMARY_TBL.date
- {`group`*}
-  ORDER BY
-  cross_join_cte.date", .con = con)
-
-
-## return logic---------------
-
-  group_cte <- fpaR::cte(
-    con=con
-    ,calendar_sql
-    ,group_summary_sql
-    ,group_cte
-    ,cross_join_sql
-    ,group_collect_sql
-  )
-
-  return(group_cte$dbi)
-}
 
 
 

@@ -1183,3 +1183,145 @@
 #'   return(out_tbl)
 #' }
 #'
+#'
+#'
+#'
+#'
+#'
+#' #' Create a calendar table in sql (standalone or part of CTE)
+#' #'
+#' #' @param start_date calendar start date in YYYY-MM-DD format
+#' #' @param end_date calendar end date in YYYY-MM-DD format
+#' #' @param time_unit calendar table unit in day, week, month, quarter or year
+#' #' @param cte logical indicator generate sql query to be used as part of a CTE
+#' #' @param con database connection
+#' #'
+#' #' @return DBI object
+#' #' @export
+#' #'
+#' #' @examples
+#' #' con <- DBI::dbConnect(drv = duckdb::duckdb())
+#' #' seq_date_sql(start_date = "2015-01-01", end_date = "2024-04-20", time_unit = "day", cte = FALSE, con = con)
+#' seq_date_sql <- function(start_date, end_date, time_unit, cte = TRUE, con) {
+#'   ## prepare and validate inputs----------
+#'
+#'
+#'
+#'   start_date_vec <- start_date
+#'   end_date_vec <- end_date
+#'   time_unit_vec <- time_unit
+#'   interval_key <- paste("1", time_unit_vec)
+#'
+#'
+#'
+#'   assertthat::assert_that(
+#'     time_unit_vec %in% c("day", "week", "month", "quarter", "year"),
+#'     msg = "Please have time unit match 'day', 'week','month','quarter' or 'year'"
+#'   )
+#'
+#'   assertthat::assert_that(
+#'     base::is.logical(cte),
+#'     msg = "Please select TRUE or FALSE if the return query should be a CTE or standalone query"
+#'   )
+#'
+#'
+#'   assertthat::assert_that(
+#'     is_yyyy_mm_dd(start_date_vec) & is_yyyy_mm_dd(end_date_vec),
+#'     msg = "Please ensure dates are in YYYY-MM-DD format"
+#'   )
+#'
+#'   assertthat::assert_that(
+#'     lubridate::ymd(start_date_vec) < lubridate::ymd(end_date_vec),
+#'     msg = "Please ensure end date is greater than start date"
+#'   )
+#'
+#'   con_info <- paste0("connection: ", DBI::dbGetInfo(con)$dbname)
+#'
+#'   assertthat::assert_that(
+#'     DBI::dbIsValid(con),
+#'     msg = paste("Please check if your connection is valid", con_info)
+#'   )
+#'
+#'   ## calendar CTE query----------
+#'
+#'
+#'   ### generate series of dates
+#'
+#'   date_series_sql <- fpaR::with(
+#'     query = glue::glue_sql("
+#'
+#'     SELECT
+#'
+#'     GENERATE_SERIES(
+#'        MIN(DATE_TRUNC({time_unit_vec}, DATE {start_date_vec}))::DATE
+#'       ,MAX(DATE_TRUNC({time_unit_vec}, DATE {end_date_vec}))::DATE
+#'       ,INTERVAL {interval_key}
+#'     ) AS DATE_LIST"
+#'                            ,.con = con
+#'     )
+#'     ,query_name = DATE_SERIES
+#'     ,order = "first"
+#'   )
+#'
+#'   ## Expand series as last query
+#'   calendar_tbl_last_sql <- fpaR::with(
+#'     query=dplyr::sql(
+#'       "
+#'       SELECT
+#'
+#'       UNNEST(DATE_LIST)::DATE AS date
+#'
+#'       FROM DATE_SERIES
+#'
+#'       "
+#'     )
+#'     ,query_name = CALENDAR_TBL
+#'     ,order = "last"
+#'   )
+#'
+#'
+#'   ## Expand series as middle query
+#'
+#'
+#'   calendar_tbl_middle_sql <- fpaR::with(
+#'     query=dplyr::sql(
+#'       "
+#'       SELECT
+#'
+#'       UNNEST(DATE_LIST)::DATE AS date
+#'
+#'       FROM DATE_SERIES
+#'
+#'       "
+#'     )
+#'     ,query_name = CALENDAR_TBL
+#'     ,order = "middle"
+#'   )
+#'
+#'   ## no CTE returns dbi
+#'
+#'   no_cte_sql <- cte(
+#'     con = con
+#'     ,dplyr::sql(date_series_sql)
+#'     ,sql(calendar_tbl_last_sql)
+#'     ,dplyr::sql("select * from CALENDAR_TBL")
+#'   )
+#'
+#'   ## does not return dbi
+#'
+#'   cte_sql <- cte(
+#'     con = con
+#'     ,dplyr::sql(date_series_sql)
+#'     ,sql(calendar_tbl_middle_sql)
+#'   )
+#'
+#'   ## print alerts and return objects-------
+#'
+#'   cli::cli_alert_info("{con_info} database")
+#'
+#'   if (cte) {
+#'     return(cte_sql)
+#'   } else {
+#'     return(no_cte_sql)
+#'   }
+#' }

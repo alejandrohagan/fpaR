@@ -11,55 +11,60 @@ calculate <- S7::new_generic("calculate","x")
 #'
 #' @param x ti_tbl object
 #'
-#' @returns tibble
+#' @returns dbi object
 #' @export
-#'
+#' @seealso [fpaR::make_aggregation_dbi()] which is the DBI equivalent of this function
+#' @description
+#' `create_calendar()` summarizes a tibble to target time unit and completes the calendar to ensure
+#' no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
+#' for each combination of the group
+#' @details
+#' This is in internal function to make it easier to ensure data has no missing dates to
+#'  simplify the use of time intelligence functions downstream of the application.
+#' If you want to summarize to a particular group, simply pass the tibble through to the `group_by()` argument
+#' prior to function and the function will make summarize and make a complete calendar for each group item.
 #'
 method(create_calendar,ti) <- function(x){
 
-  summary_tbl <- x@calendar@data |>
+  ## summarize data table
+  summary_dbi <- x@calendar@data |>
+    dplyr::ungroup() |>
+    make_db_tbl() |>
     dplyr::mutate(
-      date = lubridate::floor_date(!!x@calendar@date_quo,unit = x@time_unit@value)
-      ,time_unit=x@time_unit@value
+      date = lubridate::floor_date(!!x@calendar@date_quo,unit = !!x@time_unit@value)
+      ,time_unit=!!x@time_unit@value
     ) |>
-    dplyr::group_by(date,.add=TRUE) |>
     dplyr::summarise(
       !!x@value@value_vec:= sum(!!x@value@value_quo,na.rm=TRUE)
-      ,.groups = "drop"
+      ,.by=c(date,!!!x@calendar@group_quo)
     )
 
-  calendar <- tibble::tibble(
-    date = base::seq.Date(from = min(summary_tbl$date), to = max(summary_tbl$date), by = x@time_unit@value)
-  )
+  #create calendar table
 
-  # Create a calendar table with all the dates in the specified time frame
+  calendar_dbi <- fpaR::seq_date_sql(start_date = x@calendar@min_date,end_date = x@calendar@max_date,time_unit = x@time_unit@value,con=dbplyr::remote_con(x@calendar@data))
+
+
+  # Expand calendar table with cross join of groups
   if(x@calendar@group_indicator){
 
-    calendar <- dplyr::left_join(
-
-      summary_tbl |> dplyr::distinct(!!!x@calendar@group_quo) |> dplyr::mutate(id="id")
-
-      ,calendar |> dplyr::mutate(id="id")
-      ,by=dplyr::join_by(id)
-      ,relationship = "many-to-many"
-    ) |>
-      dplyr::select(-id)
+    calendar_dbi <- calendar_dbi |>
+      dplyr::cross_join(
+        summary_dbi |>
+          dplyr::distinct(!!!x@calendar@group_quo)
+      )
   }
 
-
   # Perform a full join to ensure all time frames are represented
-  full_tbl <- dplyr::full_join(
-    calendar
-    ,summary_tbl
+  full_dbi <- dplyr::full_join(
+    calendar_dbi
+    ,summary_dbi
     ,by = dplyr::join_by(date,!!!x@calendar@group_quo)
   ) |>
     dplyr::mutate(
-      # dplyr::across(dplyr::where(\(x) base::is.numeric(x)),\(x) tidyr::replace_na(x,0))
       !!x@value@value_vec:= dplyr::coalesce(!!x@value@value_quo, 0)
-    ) |>
-    dplyr::arrange(!!!x@calendar@group_quo,date)
+    )
 
-  return(full_tbl)
+  return(full_dbi)
 }
 
 #' Title

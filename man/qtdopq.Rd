@@ -2,7 +2,7 @@
 % Please edit documentation in R/time_intelligence.R
 \name{qtdopq}
 \alias{qtdopq}
-\title{Year-to-.date over full previous year}
+\title{Quarter-to-date over full previous quarter}
 \usage{
 qtdopq(.data, .date, .value, calendar_type, lag_n = 1)
 }
@@ -21,7 +21,7 @@ qtdopq(.data, .date, .value, calendar_type, lag_n = 1)
 mom_tbl or mom_dbi
 }
 \description{
-Year-to-.date over full previous year
+Quarter-to-date over full previous quarter
 }
 \examples{
 ytdoy(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)

@@ -2,18 +2,16 @@
 % Please edit documentation in R/utils-sql.R
 \name{seq_date_sql}
 \alias{seq_date_sql}
-\title{Create a calendar table in sql (standalone or part of CTE)}
+\title{Create a calendar table in sql}
 \usage{
-seq_date_sql(start_date, end_date, time_unit, cte = TRUE, con)
+seq_date_sql(start_date, end_date, time_unit, con)
 }
 \arguments{
 \item{start_date}{calendar start date in YYYY-MM-DD format}
 
 \item{end_date}{calendar end date in YYYY-MM-DD format}
 
-\item{time_unit}{calendar table unit in day, week, month, quarter or year}
-
-\item{cte}{logical indicator generate sql query to be used as part of a CTE}
+\item{time_unit}{calendar table unit in 'day', 'week', 'month', 'quarter' or 'year'}
 
 \item{con}{database connection}
 }
@@ -21,9 +19,9 @@ seq_date_sql(start_date, end_date, time_unit, cte = TRUE, con)
 DBI object
 }
 \description{
-Create a calendar table in sql (standalone or part of CTE)
+Create a calendar table in sql
 }
 \examples{
 con <- DBI::dbConnect(drv = duckdb::duckdb())
-seq_date_sql(start_date = "2015-01-01", end_date = "2024-04-20", time_unit = "day", cte = FALSE, con = con)
+seq_date_sql(start_date = "2015-01-01", end_date = "2024-04-20", time_unit = "day", con = con)
 }
