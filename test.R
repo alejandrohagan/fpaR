@@ -1,9 +1,10 @@
-library(tidyverse)
+  library(tidyverse)
 library(assertthat)
 library(S7)
 library(rlang)
 library(dbplyr)
 devtools::document()
+
 
 .data <- sales |> group_by(customer_key)
 
@@ -14,6 +15,8 @@ x <- fpaR::yoy(.data,.date = order_date,.value = margin,calendar_type = "standar
 x <- fpaR::ytdopy(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
 x <- fpaR::qoq(.data,.date = order_date,.value = margin,calendar_type = "standard")
 x <- fpaR::qoqtd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::mtd(.data,.date = order_date,.value = margin,calendar_type = "standard")
+x <- fpaR::pmtd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
 
 pytd(x@calendar@data,.value= x@value@value_quo,.date = !!x@calendar@date_quo,calendar_type = x@calendar@calendar_type,lag_n = 1)
 

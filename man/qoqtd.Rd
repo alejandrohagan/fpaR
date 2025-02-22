@@ -2,7 +2,7 @@
 % Please edit documentation in R/time_intelligence.R
 \name{qoqtd}
 \alias{qoqtd}
-\title{Current year-to-.date compared to previous year-to-.date}
+\title{Previous quarter-to-date}
 \usage{
 qoqtd(.data, .date, .value, calendar_type, lag_n)
 }

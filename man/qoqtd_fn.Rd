@@ -2,7 +2,7 @@
 % Please edit documentation in R/time_intelligence.R
 \name{qoqtd_fn}
 \alias{qoqtd_fn}
-\title{Previous quarter-to-date for tibble objects}
+\title{Current quarter to date over previous quarter-to-date for tibble objects}
 \usage{
 qoqtd_fn(x)
 }
@@ -13,5 +13,5 @@ qoqtd_fn(x)
 tibble
 }
 \description{
-Previous quarter-to-date for tibble objects
+Current quarter to date over previous quarter-to-date for tibble objects
 }
