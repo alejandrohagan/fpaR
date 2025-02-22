@@ -12,10 +12,10 @@ x <- fpaR::pytd(.data =.data ,.date = order_date,.value = margin,calendar_type =
 x <- fpaR::yoytd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
 x <- fpaR::yoy(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
 x <- fpaR::ytdopy(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
-x <- fpaR::qtd(.data,.date = order_date,.value = margin,calendar_type = "standard")
-x <- fpaR::qtdopq(.data,.date = order_date,.value = margin,calendar_type = "standard")
 x <- fpaR::qoq(.data,.date = order_date,.value = margin,calendar_type = "standard")
 x <- fpaR::qoqtd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+
+pytd(x@calendar@data,.value= x@value@value_quo,.date = !!x@calendar@date_quo,calendar_type = x@calendar@calendar_type,lag_n = 1)
 
 fpaR::seq_date_sql("2022-01-01","2022-10-01",time_unit = "day",con=con)
 
