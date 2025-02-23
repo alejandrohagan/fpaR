@@ -50,8 +50,12 @@ abc <- function(.data,...,dim,a=.7,b=.26,c=.04,func=c("sum")){
 
     assertthat::assert_that(
 
-      column_type_vec <- .data |> dplyr::select({{dim}}) |>  utils::head(1) |> dplyr::collect() |> dplyr::pull({{dim}}) |> base::is.numeric()
-
+      column_type_vec <- .data |>
+        dplyr::select({{dim}}) |>
+        utils::head(1) |>
+        dplyr::collect() |>
+        dplyr::pull({{dim}}) |>
+        base::is.numeric()
       ,msg = "dim must be a numeric column"
       )
 

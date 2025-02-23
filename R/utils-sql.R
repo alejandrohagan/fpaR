@@ -58,8 +58,6 @@ with <- function(query,query_name,order=c("middle")){
   }
 }
 
-
-
 #' Capture previous query steps
 #'
 #' @param .data dbi object
@@ -167,86 +165,6 @@ seq_date_sql <- function(start_date,end_date,time_unit,con){
 }
 
 
-#' sql_query_select
-#'
-#' @param .data DBI object
-#' @param previous_query Logical indicator if the from value should reference the previous .data steps
-#' @param select the select values
-#' @param from the from caluse
-#' @param where the where clause
-#' @param group_by the group by clause
-#' @param having the having clause
-#' @param window the window operation
-#' @param order_by the order by caluse
-#' @param limit the limit
-#' @param distinct the distinct values
-#'
-#' @return sql and con object
-#' @export
-#'
-#' @examples
-#' sql_query_select(db_sales,previous_query=TRUE,select=sql(select *))
-sql_query_select <- function(
-    .data,
-    previous_query,
-    select,
-    from,
-    where = NULL,
-    group_by = NULL,
-    having = NULL,
-    window = NULL,
-    order_by = NULL,
-    limit = NULL,
-    distinct = FALSE){
-
-  con <- dbplyr::remote_con(.data)
-  previous_query_sql=dbplyr::remote_query(.data)
-
-
-  if(previous_query){
-
-    sql <-  dbplyr::sql_query_select(
-      con=con
-      ,from=dplyr::sql(paste0("(",previous_query_sql,")"))
-      ,where=where
-      ,group_by=group_by
-      ,select = select
-      ,having = having
-      ,window = window
-      ,order_by = order_by
-      ,limit = limit
-      ,distinct = distinct
-    )
-out <- list(con=con,sql=sql)
-
-    return(out)
-
-  }else{
-
-    sql <- dbplyr::sql_query_select(
-      con=con
-      ,from=from
-      ,where=where
-      ,group_by=group_by
-      ,select = select
-      ,having = having
-      ,window = window
-      ,order_by = order_by
-      ,limit = limit
-      ,distinct = distinct
-    )
-    out <- list(
-      con=con
-      ,sql=sql
-      )
-
-    return(out)
-
-  }
-}
-
-
-
 #' CTE
 #'
 #' @param con the DBI connection
@@ -276,7 +194,6 @@ cte <- function(con,...){
     dbi=dbi
     ,sql=dplyr::sql(combined_query)
   )
-
   return(out)
 }
 

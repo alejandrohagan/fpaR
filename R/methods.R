@@ -25,7 +25,7 @@ calculate <- S7::new_generic("calculate","x")
 #' If you want to summarize to a particular group, simply pass the tibble through to the `group_by()` argument
 #' prior to function and the function will make summarize and make a complete calendar for each group item.
 #'
-method(create_calendar,ti) <- function(x){
+S7::method(create_calendar,ti) <- function(x){
 
   ## summarize data table
   summary_dbi <- x@calendar@data |>
@@ -77,7 +77,7 @@ method(create_calendar,ti) <- function(x){
 #' @examples
 #' ytd(fpaR::sales,.date=date,.value=quantity,calendar_type="standard") |>
 #' calculate()
-method(calculate,ti) <- function(x){
+S7::method(calculate,ti) <- function(x){
 
 
     out <- x@fn@fn_exec(x)

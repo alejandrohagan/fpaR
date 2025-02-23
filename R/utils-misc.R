@@ -303,3 +303,15 @@ divide <- function(.data,new_col_name,numerator_col,denominator_col,alternative_
 
 
 
+utils::globalVariables(
+  c(
+  "pick", "desc", "var", "cum_sum", "prop_total", "row_id", "max_row_id",
+  "dim_category", "cum_prop_total", "cum_unit_prop", "dim_threshold",
+  ":=", "out_tbl", "dir_path", "files", "str_extract", "if_else", "str_remove",
+  "map_chr", "as_label", "n", "prop_n", "lead", "pull", "relocate", "select",
+  "order_date", "quantity", "fn_name_lower", "test", ".cluster", "centers_input",
+  "kmeans_models", "kmeans_results", "tot.withinss", "sql", "quarter", "quater",
+  "date_lag", "month", "week", "year")
+  )
+
+

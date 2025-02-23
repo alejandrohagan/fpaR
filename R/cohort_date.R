@@ -76,7 +76,6 @@ if(db_flag){
   summary_tbl <- .data |>
 
     dplyr::group_by({{id_var}}) |>
-
     dplyr::mutate(
        date   = lubridate::floor_date({{date_var}},unit=time_unit)
       ,cohort = base::min(date,na.rm=TRUE)
@@ -114,7 +113,7 @@ if(db_flag){
       dplyr::ungroup() |>
       dplyr::arrange(cohort) |>
       dplyr::mutate(cohort_id = dplyr::row_number()) |>
-      relocate(cohort_id)
+      dplyr::relocate(cohort_id)
 
 
   }

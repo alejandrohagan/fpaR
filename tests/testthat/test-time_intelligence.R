@@ -214,8 +214,6 @@ test_that("yoy -- expand missing dates",{
   }
 )
 
-
-
 test_that("yoy - calender_type fail ", {
 
   testthat::expect_error(

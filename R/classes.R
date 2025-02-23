@@ -219,8 +219,8 @@ fn <- S7::new_class(
       class=S7::class_character
       ,default = NA_character_
     )
-    ,lag_n=new_property(
-      class=class_numeric
+    ,lag_n=S7::new_property(
+      class=S7::class_numeric
       ,default = 0
     )
     # sort logic for cumulative sums
