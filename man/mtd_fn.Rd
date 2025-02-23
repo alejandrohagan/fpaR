@@ -2,16 +2,24 @@
 % Please edit documentation in R/time_intelligence.R
 \name{mtd_fn}
 \alias{mtd_fn}
-\title{Month-to-date for tibble objects}
+\title{Month-to-date execution function}
 \usage{
 mtd_fn(x)
 }
 \arguments{
-\item{x}{ti_tbl}
+\item{x}{ti object}
 }
 \value{
-tibble
+dbi object
 }
 \description{
-Month-to-date for tibble objects
+\code{mtd_fn()} is the function that is called by \code{mtd()} when passed through to \code{calculate()}
+}
+\details{
+This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+by \code{calculated()}
+This will return a dbi object that can converted to a tibble object with \code{dplyr::collect()}
+}
+\seealso{
+\code{\link[=mtd]{mtd()}} for the function's intent
 }

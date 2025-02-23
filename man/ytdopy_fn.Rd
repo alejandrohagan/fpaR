@@ -2,16 +2,24 @@
 % Please edit documentation in R/time_intelligence.R
 \name{ytdopy_fn}
 \alias{ytdopy_fn}
-\title{Year-to-date vs. full prior year}
+\title{Year-to-date over full prior year}
 \usage{
 ytdopy_fn(x)
 }
 \arguments{
-\item{x}{ti_tbl}
+\item{x}{ti object}
 }
 \value{
-tibble
+dbi object
 }
 \description{
-Year-to-date vs. full prior year
+\code{ytdopy_fn()} is the function that is called by \code{ytdopy()} when passed through to \code{calculate()}
+}
+\details{
+This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+by \code{calculated()}
+This will return a dbi object that can converted to a tibble object with\code{dplyr::collect()}
+}
+\seealso{
+\code{\link[=ytdopy]{ytdopy()}} for the function's intent
 }

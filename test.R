@@ -1,11 +1,13 @@
-  library(tidyverse)
+library(tidyverse)
 library(assertthat)
 library(S7)
 library(rlang)
 library(dbplyr)
+library(testthat)
+usethis::use_package("S7")
 devtools::document()
-x <- ytd(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
-make_action_cli(x@action@value)
+devtools::check()
+?ytd()
 ?ytd()
 .data <- sales |> group_by(customer_key)
 
@@ -29,6 +31,8 @@ x@fn@lag_n
 fpaR::seq_date_sql("2022-01-01","2022-10-01",time_unit = "day",con=con)
 
 ## calendar sql
+
+?pytd()
 
 x |>
   create_calendar()

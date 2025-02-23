@@ -7,11 +7,19 @@
 qoqtd_fn(x)
 }
 \arguments{
-\item{x}{ti_tbl}
+\item{x}{ti object}
 }
 \value{
-tibble
+dbi object
 }
 \description{
-Current quarter to date over previous quarter-to-date for tibble objects
+\code{qoqtd_fn()} is the function that is called by \code{qoqtd()} when passed through to \code{calculate()}
+}
+\details{
+This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+by \code{calculated()}
+This will return a dbi object that can converted to a tibble object with \code{dplyr::collect()}
+}
+\seealso{
+\code{\link[=qoqtd]{qoqtd()}} for the function's intent
 }

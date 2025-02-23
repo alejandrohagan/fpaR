@@ -7,11 +7,19 @@
 yoy_fn(x)
 }
 \arguments{
-\item{x}{ti_tbl}
+\item{x}{ti object}
 }
 \value{
-tibble
+dbi object
 }
 \description{
-Year-over-year
+\code{yoy_fn()} is the function that is called by \code{yoy()} when passed through to \code{calculate()}
+}
+\details{
+This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+by \code{calculated()}
+This will return a dbi object that can converted to a tibble object with\code{dplyr::collect()}
+}
+\seealso{
+\code{\link[=yoy]{yoy()}} for the function's intent
 }

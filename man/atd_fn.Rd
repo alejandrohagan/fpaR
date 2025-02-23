@@ -2,16 +2,24 @@
 % Please edit documentation in R/time_intelligence.R
 \name{atd_fn}
 \alias{atd_fn}
-\title{All-to-date for tibble objects}
+\title{All-to-date execution function}
 \usage{
 atd_fn(x)
 }
 \arguments{
-\item{x}{ti_tbl}
+\item{x}{ti object}
 }
 \value{
-tibble
+dbi object
 }
 \description{
-All-to-date for tibble objects
+\code{atd_fn()} is the function that is called by \code{atd()} when passed through to \code{calculate()}
+}
+\details{
+This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+by \code{calculated()}
+This will return a dbi object that can converted to a tibble object with \code{dplyr::collect()}
+}
+\seealso{
+\code{\link[=atd]{atd()}} for the function's intent
 }

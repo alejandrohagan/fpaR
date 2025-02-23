@@ -2,16 +2,24 @@
 % Please edit documentation in R/time_intelligence.R
 \name{mtdopm_fn}
 \alias{mtdopm_fn}
-\title{Year-over-year}
+\title{Month-over-month vs. prior full momth execution function}
 \usage{
 mtdopm_fn(x)
 }
 \arguments{
-\item{x}{ti_tbl}
+\item{x}{ti object}
 }
 \value{
-tibble
+dbi object
 }
 \description{
-Year-over-year
+\code{mtdopm_fn()} is the function that is called by \code{mtdopm()} when passed through to \code{calculate()}
+}
+\details{
+This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+by \code{calculated()}
+This will return a dbi object that can converted to a tibble object with \code{dplyr::collect()}
+}
+\seealso{
+\code{\link[=mtdopm]{mtdopm()}} for the function's intent
 }

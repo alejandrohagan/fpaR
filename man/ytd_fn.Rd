@@ -7,19 +7,19 @@
 ytd_fn(x)
 }
 \arguments{
-\item{x}{ti_tbl}
+\item{x}{ti object}
 }
 \value{
-dbi
+dbi object
 }
 \description{
-\code{ytd_fn()} summarizes a tibble to target time unit and completes the calendar to ensure
-no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
-for each combination of the group
+\code{ytd_fn()} is the function that is called by \code{ytd()} when passed through to \code{calculate()}
 }
 \details{
-This is in internal function to make it easier to ensure data has no missing dates to
-simplify the use of time intelligence functions downstream of the application.
-If you want to summarize to a particular group, simply pass the tibble through to the \code{group_by()} argument
-prior to function and the function will make summarize and make a complete calendar for each group item.
+This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+by \code{calculated()}.
+This will return a dbi object that can converted to a tibble object with\code{dplyr::collect()}
+}
+\seealso{
+\code{\link[=ytd]{ytd()}} for the function's class
 }

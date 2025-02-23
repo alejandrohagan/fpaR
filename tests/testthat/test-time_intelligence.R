@@ -1,5 +1,27 @@
 
 
+# load arguments / data
+
+.data <- sales |> group_by(customer_key)
+
+
+x <- fpaR::ytd(.data = .data,.date = order_date,.value = margin,calendar_type = "standard")
+x <- fpaR::pytd(.data =.data ,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::yoytd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::yoy(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::ytdopy(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::qoq(.data,.date = order_date,.value = margin,calendar_type = "standard")
+x <- fpaR::qoqtd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::mtd(.data,.date = order_date,.value = margin,calendar_type = "standard")
+x <- fpaR::pmtd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::mom(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::wtd(.data,.date = order_date,.value = margin,calendar_type = "standard")
+x <- fpaR::pwtd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::wow(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::atd(.data,.date = order_date,.value = margin,calendar_type = "standard")
+x <- fpaR::dod(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+
+
 
 test_that(
   "ytd - sum validation",{
@@ -56,24 +78,26 @@ test_that(
   "yoy - sum validation",{
     testthat::expect_true(
       all(
-        sales |> ytd(order_date,quantity,"standard") |>
+        sales |>
+          yoy(order_date,quantity,"standard") |>
           calculate() |>
-          dplyr::group_by(
-            year
+          collect() |>
+          arrange(year) |>
+          mutate(
+            lag_value=lead(yoy_quantity,1)
+            ,delta=quantity-lag_value
           ) |>
-          dplyr::summarise(
-            sum_value=sum(quantity,na.rm=TRUE)
-            ,max_ytd=max(ytd_quantity),
-            ,.groups="drop"
-          ) |>
-          dplyr::mutate(
-            delta=sum_value-max_ytd
+          filter(
+            !is.na(delta)
           ) |>
           dplyr::pull(delta)==0
       )
     )
   }
 )
+
+
+
 
 
 

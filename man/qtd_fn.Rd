@@ -2,16 +2,24 @@
 % Please edit documentation in R/time_intelligence.R
 \name{qtd_fn}
 \alias{qtd_fn}
-\title{Quarter-to-date for tibble objects}
+\title{Quarter-to-date execution function}
 \usage{
 qtd_fn(x)
 }
 \arguments{
-\item{x}{ti_tbl}
+\item{x}{ti object}
 }
 \value{
-tibble
+dbi object
 }
 \description{
-Quarter-to-date for tibble objects
+\code{qtd_fn()} is the function that is called by \code{qtd()} when passed through to \code{calculate()}
+}
+\details{
+This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+by \code{calculated()}
+This will return a dbi object that can converted to a tibble object with\code{dplyr::collect()}
+}
+\seealso{
+\code{\link[=qtd]{qtd()}} for the function's intent
 }

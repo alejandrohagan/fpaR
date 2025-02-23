@@ -2,18 +2,16 @@
 ## year related functions
 
 #' Year-to-date execution function
-#'
-#' @param x ti_tbl
+#' @name ytd_fn
+#' @param x ti object
 #' @description
-#' `ytd_fn()` summarizes a tibble to target time unit and completes the calendar to ensure
-#' no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
-#' for each combination of the group
+#' `ytd_fn()` is the function that is called by `ytd()` when passed through to `calculate()`
+#' @seealso [ytd()] for the function's class
 #' @details
-#' This is in internal function to make it easier to ensure data has no missing dates to
-#'  simplify the use of time intelligence functions downstream of the application.
-#' If you want to summarize to a particular group, simply pass the tibble through to the `group_by()` argument
-#' prior to function and the function will make summarize and make a complete calendar for each group item.
-#' @returns dbi
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`.
+#' This will return a dbi object that can converted to a tibble object with`dplyr::collect()`
+#' @returns dbi object
 #'
 ytd_fn <- function(x){
 
@@ -41,21 +39,17 @@ ytd_fn <- function(x){
 }
 
 
-#' Previous year-to-date for tibble objects
-#'
+#' Previous year-to-date
+#' @name pytd_fn
 #' @param x ti object
 #' @description
-#' `pytd_fn()` summarizes a tibble to target time unit and completes the calendar to ensure
-#' no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
-#' for each combination of the group
+#' `pytd_fn()` is the function that is called by `pytd()` when passed through to `calculate()`
+#' @seealso [pytd()] for the function's intent
 #' @details
-#' This is in internal function to make it easier to ensure data has no missing dates to
-#'  simplify the use of time intelligence functions downstream of the application.
-#' If you want to summarize to a particular group, simply pass the tibble through to the `group_by()` argument
-#' prior to function and the function will make summarize and make a complete calendar for each group item.
-#' @returns dbi
-#'
-#' @returns tibble
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`.
+#' This will return a dbi object that can converted to a tibble object with`dplyr::collect()`
+#' @returns dbi object
 #'
 pytd_fn <- function(x){
 
@@ -103,10 +97,16 @@ pytd_fn <- function(x){
 
 
 #' Current year to date over previous year-to-date for tibble objects
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' @name yoytd_fn
+#' @param x ti object
+#' @description
+#' `yoytd_fn()` is the function that is called by `yoytd()` when passed through to `calculate()`
+#' @seealso [yoytd()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with`dplyr::collect()`
+#' @returns dbi object
 #'
 yoytd_fn <- function(x){
 
@@ -141,10 +141,16 @@ yoytd_fn <- function(x){
 
 
 #' Year-over-year
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' @name yoy_fn
+#' @param x ti object
+#' @description
+#' `yoy_fn()` is the function that is called by `yoy()` when passed through to `calculate()`
+#' @seealso [yoy()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with`dplyr::collect()`
+#' @returns dbi object
 #'
 yoy_fn <- function(x){
 
@@ -176,11 +182,17 @@ yoy_fn <- function(x){
 
 }
 
-#' Year-to-date vs. full prior year
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' Year-to-date over full prior year
+#' @name ytdopy_fn
+#' @param x ti object
+#' @description
+#' `ytdopy_fn()` is the function that is called by `ytdopy()` when passed through to `calculate()`
+#' @seealso [ytdopy()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with`dplyr::collect()`
+#' @returns dbi object
 #'
 ytdopy_fn <- function(x){
 
@@ -212,11 +224,17 @@ ytdopy_fn <- function(x){
 
 ## quarter related functions -----------------
 
-#' Quarter-to-date for tibble objects
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' Quarter-to-date execution function
+#' @name qtd_fn
+#' @param x ti object
+#' @description
+#' `qtd_fn()` is the function that is called by `qtd()` when passed through to `calculate()`
+#' @seealso [qtd()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with`dplyr::collect()`
+#' @returns dbi object
 #'
 qtd_fn <- function(x){
 
@@ -241,21 +259,17 @@ qtd_fn <- function(x){
 
 }
 
-
 #' Previous quarter-to-date for tibble objects
+#' @name pqtd_fn
 #' @param x ti object
 #' @description
-#' `pqtd_fn()` summarizes a tibble to target time unit and completes the calendar to ensure
-#' no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
-#' for each combination of the group
+#' `pqtd_fn()` is the function that is called by `pqtd()` when passed through to `calculate()`
+#' @seealso [pqtd()] for the function's intent
 #' @details
-#' This is in internal function to make it easier to ensure data has no missing dates to
-#'  simplify the use of time intelligence functions downstream of the application.
-#' If you want to summarize to a particular group, simply pass the tibble through to the `group_by()` argument
-#' prior to function and the function will make summarize and make a complete calendar for each group item.
-#' @returns dbi
-#'
-#' @returns tibble
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
 pqtd_fn <- function(x){
 
@@ -304,10 +318,16 @@ pqtd_fn <- function(x){
 
 
 #' Current quarter to date over previous quarter-to-date for tibble objects
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' @name qoqtd_fn
+#' @param x ti object
+#' @description
+#' `qoqtd_fn()` is the function that is called by `qoqtd()` when passed through to `calculate()`
+#' @seealso [qoqtd()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
 qoqtd_fn <- function(x){
 
@@ -345,9 +365,15 @@ qtd_dbi <- qtd(.data=x@calendar@data,.date=!!x@calendar@date_quo,.value = !!x@va
 
 
 #' Quarter-over-quarter execution function
-#'
+#' @name qoq_fn
 #' @param x ti object
-#'
+#' @description
+#' `qoq_fn()` is the function that is called by `qoq()` when passed through to `calculate()`
+#' @seealso [qoq()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
 #' @returns dbi object
 #'
 qoq_fn <- function(x){
@@ -381,12 +407,18 @@ qoq_fn <- function(x){
 }
 
 
-#
+
 #' quarter-to-date over previous quarter
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' @name qtdopq_fn
+#' @param x ti object
+#' @description
+#' `qtdopq_fn()` is the function that is called by `qtdopq()` when passed through to `calculate()`
+#' @seealso [qtdopq()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
 qtdopq_fn <- function(x){
 
@@ -411,11 +443,17 @@ qtdopq_fn <- function(x){
 
 ## month related functions -------------------------
 
-#' Month-to-date for tibble objects
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' Month-to-date execution function
+#' @name mtd_fn
+#' @param x ti object
+#' @description
+#' `mtd_fn()` is the function that is called by `mtd()` when passed through to `calculate()`
+#' @seealso [mtd()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
 mtd_fn <- function(x){
 
@@ -442,10 +480,16 @@ mtd_fn <- function(x){
 
 
 #' Previous month-to-date for tibble objects
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' @name pmtd_fn
+#' @param x ti object
+#' @description
+#' `pmtd_fn()` is the function that is called by `pmtd()` when passed through to `calculate()`
+#' @seealso [pmtd()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
 pmtd_fn <- function(x){
 
@@ -496,10 +540,16 @@ pmtd_fn <- function(x){
 
 
 #' Current year to date over previous year-to-date for tibble objects
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' @name momtd_fn
+#' @param x ti object
+#' @description
+#' `momtd_fn()` is the function that is called by `momtd()` when passed through to `calculate()`
+#' @seealso [momtd()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
 momtd_fn <- function(x){
 
@@ -537,10 +587,16 @@ momtd_fn <- function(x){
 
 
 #' month-over-month
-#'
+#' @name mom_fn
 #' @param x ti object
-#'
-#' @returns dbi
+#' @description
+#' `mom_fn()` is the function that is called by `mom()` when passed through to `calculate()`
+#' @seealso [mom()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
 mom_fn <- function(x){
 
@@ -575,11 +631,17 @@ mom_fn <- function(x){
 
 }
 
-#' Year-over-year
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' Month-over-month vs. prior full momth execution function
+#' @name mtdopm_fn
+#' @param x ti object
+#' @description
+#' `mtdopm_fn()` is the function that is called by `mtdopm()` when passed through to `calculate()`
+#' @seealso [mtdopm()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
 mtdopm_fn <- function(x){
 
@@ -616,11 +678,17 @@ mtdopm_fn <- function(x){
 
 ## week related functions-----------------
 
-#' Week-to-date for tibble objects
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' Week-to-date execution fucntion
+#' @name wtd_fn
+#' @param x ti object
+#' @description
+#' `wtd_fn()` is the function that is called by `wtd()` when passed through to `calculate()`
+#' @seealso [wtd()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
 wtd_fn <- function(x){
 
@@ -649,10 +717,16 @@ wtd_fn <- function(x){
 
 
 #' Previous month-to-date for tibble objects
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' @name pwtd_fn
+#' @param x ti object
+#' @description
+#' `pwtd_fn()` is the function that is called by `pwtd()` when passed through to `calculate()`
+#' @seealso [pwtd()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
 pwtd_fn <- function(x){
 
@@ -704,10 +778,16 @@ pwtd_fn <- function(x){
 
 
 #' Current year to date over previous year-to-date for tibble objects
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' @name wowtd_fn
+#' @param x ti object
+#' @description
+#' `wowtd_fn()` is the function that is called by `wowtd()` when passed through to `calculate()`
+#' @seealso [wowtd()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
 wowtd_fn <- function(x){
 
@@ -736,10 +816,16 @@ wowtd_fn <- function(x){
 
 
 #' Week-over-week
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' @name wow_fn
+#' @param x ti object
+#' @description
+#' `wow_fn()` is the function that is called by `wow()` when passed through to `calculate()`
+#' @seealso [wow()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
 wow_fn <- function(x){
 
@@ -768,10 +854,16 @@ wow_fn <- function(x){
 }
 
 #' Year-over-year
-#'
-#' @param x ti_tbl
-#'
-#' @returns tibble
+#' @name wtdopw_fn
+#' @param x ti object
+#' @description
+#' `wtdopw_fn()` is the function that is called by `wtdopw()` when passed through to `calculate()`
+#' @seealso [wtdopw()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
 wtdopw_fn <- function(x){
 
@@ -804,11 +896,18 @@ wtdopw_fn <- function(x){
 
 ## all to date related functions ----------------
 
-#' All-to-date for tibble objects
+#' All-to-date execution function
+#' @name atd_fn
+#' @param x ti object
+#' @description
+#' `atd_fn()` is the function that is called by `atd()` when passed through to `calculate()`
+#' @seealso [atd()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
-#' @param x ti_tbl
-#'
-#' @returns tibble
 atd_fn <- function(x){
 
   full_dbi <-  create_calendar(x)
@@ -819,19 +918,23 @@ atd_fn <- function(x){
       !!x@value@new_column_name:=base::cumsum(!!x@value@value_quo)
       ,.by=c(!!!x@calendar@group_quo)
     )
-
   return(out_tbl)
-
 }
 
 
 ## day related functions --------------------------
 
 #' Day-over-day
-#'
-#' @param x ti
-#'
-#' @returns dbi
+#' @name dod_fn
+#' @param x ti object
+#' @description
+#' `dod_fn()` is the function that is called by `dod()` when passed through to `calculate()`
+#' @seealso [dod()] for the function's intent
+#' @details
+#' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+#' by `calculated()`
+#' This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+#' @returns dbi object
 #'
 dod_fn <- function(x){
 
@@ -863,25 +966,30 @@ dod_fn <- function(x){
 
 ## year related ti_tbl----------
 
-
-
-#' Year-to-date
+#' @title Current period year-to-date
 #' @name ytd
-#' @param .data tibble or dbi object
+#' @param .data tibble or dbi object (either grouped or ungrouped)
 #' @param .date the date column to group by
 #' @param .value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
-#' @seealso [fpaR::pytd()], [fpaR::yoy()], [fpaR::yoytd()] are the year-based ti functions
-#' @description
-#' For each group, `ytd()`  will the running sum of a value based on the calendar date.
-#' This function will print out the summary of steps and actions. Use `calculate()` to return the results
-#' @details
-#' This creates a calendar object with complete dates to ensure no missing days, month, quarter or years.
-#' If a grouped object is passed through it will complete the calendar  for each combination of the group.
-#' This is part of the time intelligence family of functions.
-#' Pass the arguments to  `ytd()` and it will print out its actions and assumptions
-#' Use `calculate()` to return the results
+#' @param calendar_type select either 'standard' or '5-5-4' calendar, see 'Details' for additional information
 #'
+#' @description
+#' -  For each group, [ytd()]  will create the running annual sum of a value based on the calendar type specified
+#' -  The function returns a ti object which prints out the summary of steps and actions that will take to create the calendar table and calculations
+#' -  Use [calculate()] to return the results
+#' @details
+#' -  This function creates a complete calendar object that fills in any missing days, weeks, months, quarters, or years
+#' -  If you provide a grouped object with [dplyr::group_by()], it will generate a complete calendar for each group
+#' -  The function creates a `ti` object, which pre-processes the data and arguments for further downstream functions
+#'
+#' **standard calendar**
+#' -  The standard calendar splits the year into 12 months (with 28–31 days each) and uses a 7-day week
+#' -  It automatically accounts for leap years every four years to match the Gregorian calendar
+#'
+#' **5-5-4 calendar**
+#' -  The 5-5-4 calendar divides the fiscal year into 52 weeks (occasionally 53), organizing each quarter into two 5-week periods and one 4-week period.
+#' -  This system is commonly used in retail and financial reporting
+#' @family time_intelligence
 #' @returns ti object
 #' @export
 #'
@@ -915,25 +1023,22 @@ ytd <- function(.data,.date,.value,calendar_type){
 }
 
 
-#' Prevoius year-to-date
+#' @title Previous period year-to-date
 #' @name pytd
-#' @param .data either a tibble or  DBI object
-#' @param .date the date column to aggregate
-#' @param .value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @inheritParams ytd
+#' @param lag_n the number of periods to lag
 #' @description
-#' This calculates the annual cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
-#' @details
-#' This is part of the time intelligence family of functions.
-#' Pass the arguments to  `pytd()` and it will print out its actions and assumptions
-#' Use `calculate()` to return the results
-#'
+#' -  For each group, [pytd()]  will create the running annual sum of a value based on the calendar type for the previous year compared to the current year calendar date
+#' -  If no period exists, it will return `NA`
+#' -  The function returns a ti object which prints out the summary of steps and actions that will take to create the calendar table and calculations
+#' -  Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
 #' @returns ti object
 #' @export
 #'
 #' @examples
-#' pytd(fpaR::sales,date=date,.value=quantity,calendar_type="standard")
+#' pytd(fpaR::sales,date=order_date,.value=quantity,calendar_type="standard",lag_n=1)
 pytd <- function(.data,.date,.value,calendar_type,lag_n){
 
 
@@ -960,22 +1065,21 @@ pytd <- function(.data,.date,.value,calendar_type,lag_n){
   return(out)
 }
 
-#' Current year-to-.date compared to previous year-to-.date
-#' @param .data either a tibble or  DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
+
+#' @title Current period year-to-date compared to previous period year-to-date
+#' @name yoytd
+#' @inheritParams pytd
 #' @description
-#' This calculates the annual cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
-#'
-#' Use `calculate()` to return the results
-#'
-#' @returns ytd_tbl or ytd_dbi
+#' -  This calculates the annual cumulative sum of targeted value and compares it with the previous period's annual cumulative to date sum using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with [dplyr::group_by()]
+#' -  Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
 #'
 #' @examples
-#' ytd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+#' yoytd(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
 yoytd <- function(.data,.date,.value,calendar_type,lag_n){
 
 
@@ -1006,19 +1110,22 @@ yoytd <- function(.data,.date,.value,calendar_type,lag_n){
 }
 
 
-#' Year-over-year
+#' @title Current full period year over previous full period year
+#' @name yoy
+#' @inheritParams pytd
+#' @description
+#' -  This calculates the full year value compared to the previous year value respecting
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' @param .data tibble or DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
-#' @param lag_n the number of months to lag, default is 1
+#' -  Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
 #'
-#' @returns mom_tbl or mom_dbi
+#' @returns ti object
 #' @export
 #'
 #' @examples
-#' yoy(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
+#' yoy(fpaR::sales,.date=order_date,.value=quantity,calendar_type='standard',lag_n=1)
 yoy <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
@@ -1045,19 +1152,22 @@ yoy <- function(.data,.date,.value,calendar_type,lag_n=1){
 
 }
 
-#' Year-to-.date over full previous year
+
+
+
+#' @title Current period year-to-date compared to full previous period
+#' @name ytdopy
+#' @inheritParams pytd
+#' @description
+#' -  This calculates the full year value compared to the previous year value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' @param .data tibble or DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
-#' @param lag_n the number of years to lag, default is 1
-#'
-#' @returns mom_tbl or mom_dbi
-#' @export
-#'
+#' -  Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @examples
-#' ytdoy(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
+#' ytdopy(fpaR::sales,.date=order_date,.value=quantity,calendar_type='standard',lag_n=1)
 ytdopy <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
@@ -1086,28 +1196,23 @@ ytdopy <- function(.data,.date,.value,calendar_type,lag_n=1){
 
 }
 
-
-
-
 ## quarter related ti_tbl-----------------------------
 
-#' quarter-to-.date
-#'
-#' @param .data either a tibble or  dbi object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @title  Current period quarter-to-date
+#' @name qtd
+#' @inheritParams ytd
 #' @description
-#' this calculates the quarterly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
+#' This calculates the full year value compared to the previous year value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' use `calculate()` to return the results
-#'
-#' @returns qtd_tbl or qtd_dbi object depending on what is passed through
+#' Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
 #'
 #' @examples
-#' qtd(fpar::sales,.date=.date,.value=quantity,calendar_type="standard")
+#' qtd(fpar::sales,.date=order_date,.value=quantity,calendar_type="standard")
 qtd <- function(.data,.date,.value,calendar_type){
 
 
@@ -1137,24 +1242,21 @@ qtd <- function(.data,.date,.value,calendar_type){
 }
 
 
-
-#' quarter-to-.date
-#'
-#' @param .data either a tibble or  dbi object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @title Prior period quarter-to-date
+#' @name pqtd
+#' @inheritParams pytd
 #' @description
-#' this calculates the quarterly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
+#' -  This calculates the quarterly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' use `calculate()` to return the results
-#'
-#' @returns qtd_tbl or qtd_dbi object depending on what is passed through
+#' use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
 #'
 #' @examples
-#' qtd(fpar::sales,.date=.date,.value=quantity,calendar_type="standard")
+#' qtd(fpar::sales,.date=order_date,.value=quantity,calendar_type="standard")
 pqtd <- function(.data,.date,.value,calendar_type,lag_n){
 
 
@@ -1184,24 +1286,21 @@ pqtd <- function(.data,.date,.value,calendar_type,lag_n){
 }
 
 
-
-
-#' Previous quarter-to-date
-#' @param .data either a tibble or  DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @title Current period quarter-to-date compared to previous period quarter-to-date
+#' @name qoqtd
+#' @inheritParams pytd
 #' @description
-#' This calculates the annual cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
+#' -  This calculates the annual cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' Use `calculate()` to return the results
-#'
-#' @returns ytd_tbl or ytd_dbi
+#' -  Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
 #'
 #' @examples
-#' ytd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+#' ytd(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
 qoqtd <- function(.data,.date,.value,calendar_type,lag_n){
 
   # assigns inputs to yoytd class
@@ -1229,19 +1328,18 @@ qoqtd <- function(.data,.date,.value,calendar_type,lag_n){
 }
 
 
-#' Quarter-to-date over full previous quarter
-#'
-#' @param .data tibble or DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
-#' @param lag_n the number of years to lag, default is 1
-#'
-#' @returns mom_tbl or mom_dbi
+#' @title Current period quarter-to-date over previous period quarter
+#' @name qtdopq
+#' @inheritParams pytd
+#' @description
+#' A short description...
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
 #'
 #' @examples
-#' ytdoy(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
+#' qtdopq(fpaR::sales,.date=order_date,.value=quantity,calendar_type='standard',lag_n=1)
 qtdopq <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
@@ -1258,31 +1356,27 @@ qtdopq <- function(.data,.date,.value,calendar_type,lag_n=1){
       ,new_column_name  = "qtd"
     )
     ,fn=fn(
-      new_date_column_name = c(".date","year","quarter")
+      new_date_column_name = c("date","year","quarter")
       ,lag_n=lag_n
       ,fn_exec=qtdopq_fn
     )
   )
-
   return(out)
-
 }
-## month related functions
 
 
-#' Month-over-month
+#' @title Current period quarter over previous period quarter
+#' @name qoq
+#' @description
+#' A short description...
 #'
-#' @param .data tibble or DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
-#' @param lag_n the number of months to lag, default is 1
-#'
-#' @returns mom_tbl or mom_dbi
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
 #'
 #' @examples
-#' mom(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
+#' qoq(fpaR::sales,.date=order_date,.value=quantity,calendar_type='standard',lag_n=1)
 qoq <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
@@ -1313,23 +1407,20 @@ qoq <- function(.data,.date,.value,calendar_type,lag_n=1){
 
 ## month related ti_tbl-------------------
 
-#' Month-to-.date
-#'
-#' @param .data either a tibble or  DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @title Current period month-to-date
+#' @name mtd
+#' @inheritParams ytd
 #' @description
 #' This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' Use `calculate()` to return the results
-#'
-#' @returns mtd_tbl or mtd_dbi object depending on what is passed through
+#' Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
-#'
 #' @examples
-#' mtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+#' mtd(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
 mtd <- function(.data,.date,.value,calendar_type){
 
     out <- ti(
@@ -1355,23 +1446,22 @@ mtd <- function(.data,.date,.value,calendar_type){
 
 }
 
-#' Prior month-to-date
-#'
-#' @param .data either a tibble or  DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
+
+
+#' @title Previous period month-to-date
+#' @name pmtd
+#' @inheritParams pytd
 #' @description
 #' This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' Use `calculate()` to return the results
-#'
-#' @returns mtd_tbl or mtd_dbi object depending on what is passed through
+#' Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
-#'
 #' @examples
-#' mtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+#' pmtd(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
 pmtd <- function(.data,.date,.value,calendar_type,lag_n){
 
   out <- ti(
@@ -1396,27 +1486,22 @@ pmtd <- function(.data,.date,.value,calendar_type,lag_n){
   return(out)
 }
 
-#' Month-to-.date
-#'
-#' @param .data either a tibble or  DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @title Current period month to date compared to previous period month-to-date
+#' @name momtd
+#' @inheritParams pytd
 #' @description
 #' This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' Use `calculate()` to return the results
-#'
-#' @returns mtd_tbl or mtd_dbi object depending on what is passed through
+#' Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
-#'
 #' @examples
-#' mtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+#' momtd(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
 momtd <- function(.data,.date,.value,calendar_type,lag_n){
 
-  # Vali.date inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
   out <- ti(
     calendar(
@@ -1442,28 +1527,22 @@ momtd <- function(.data,.date,.value,calendar_type,lag_n){
 
 
 
-#' Month-to-.date
-#'
-#' @param .data either a tibble or  DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' Current month-to-date over full previous period month
+#' @name mtdopm
+#' @inheritParams pytd
 #' @description
 #' This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' Use `calculate()` to return the results
-#'
-#' @returns mtd_tbl or mtd_dbi object depending on what is passed through
+#' Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
 #'
 #' @examples
-#' mtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+#' mtdopm(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
 mtdopm <- function(.data,.date,.value,calendar_type,lag_n){
-
-  # Vali.date inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
-
   out <- ti(
     calendar(
       data=.data
@@ -1486,19 +1565,20 @@ mtdopm <- function(.data,.date,.value,calendar_type,lag_n){
   return(out)
 }
 
-#' Month-over-month
+#' @title Current full period month over previous full period month
+#' @name mom
+#' @inheritParams pytd
+#' @description
+#' This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' @param .data tibble or DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
-#' @param lag_n the number of months to lag, default is 1
-#'
-#' @returns mom_tbl or mom_dbi
+#' Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
-#'
 #' @examples
-#' mom(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
+#' mom(fpaR::sales,.date=order_date,.value=quantity,calendar_type='standard',lag_n=1)
 mom <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
@@ -1527,23 +1607,20 @@ mom <- function(.data,.date,.value,calendar_type,lag_n=1){
 ## week related ti_tbl-------------
 
 
-#' Week-to-.date
-#'
-#' @param .data either a tibble or  DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @title Current period week-to-date
+#' @name wtd
+#' @inheritParams ytd
 #' @description
-#' This calculates the weekly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
+#' This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' Use `calculate()` to return the results
-#'
-#' @returns wtd_tbl or wtd_dbi
+#' Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
-#'
 #' @examples
-#' wtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+#' wtd(fpaR::sales,.date=date,.value=quantity,calendar_type="standard")
 wtd <- function(.data,.date,.value,calendar_type){
 
   # Vali.date inputs
@@ -1570,27 +1647,25 @@ wtd <- function(.data,.date,.value,calendar_type){
   return(out)
 
 }
-#' Week-to-.date
-#'
-#' @param .data either a tibble or  DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
+
+
+
+#' @title Previous period week-to-date
+#' @name pwtd
+#' @inheritParams pytd
 #' @description
-#' This calculates the weekly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
+#' This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' Use `calculate()` to return the results
-#'
-#' @returns wtd_tbl or wtd_dbi
+#' Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
-#'
 #' @examples
-#' wtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+#' pwtd(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
 pwtd <- function(.data,.date,.value,calendar_type,lag_n){
 
-  # Vali.date inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
 
   out <- ti(
     calendar(
@@ -1615,23 +1690,23 @@ pwtd <- function(.data,.date,.value,calendar_type,lag_n){
 
 }
 
-#' Week-to-date over previous week-to-date
+
+
+
+#' @title Current period Wwek-to-date over previous period week-to-date
 #' @name wowtd
-#' @param .data either a tibble or  DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @inheritParams pytd
 #' @description
-#' This calculates the weekly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
+#' This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' Use `calculate()` to return the results
-#'
-#' @returns dbi object
+#' Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
-#'
 #' @examples
-#' wtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+#' wowtd(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
 wowtd <- function(.data,.date,.value,calendar_type,lag_n){
 
   # Vali.date inputs
@@ -1659,27 +1734,21 @@ wowtd <- function(.data,.date,.value,calendar_type,lag_n){
 }
 
 
-#' Week-to-.date
-#'
-#' @param .data either a tibble or  DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @title Current period week-to-date over full previous period week
+#' @name wtdopw
+#' @inheritParams pytd
 #' @description
-#' This calculates the weekly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
+#' This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' Use `calculate()` to return the results
-#'
-#' @returns wtd_tbl or wtd_dbi
+#' Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
-#'
 #' @examples
-#' wtd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
-wtwopw <- function(.data,.date,.value,calendar_type,lag_n){
-
-  # Vali.date inputs
-  assertthat::assert_that(base::is.data.frame(.data), msg = "data must be a data frame")
+#' wtdopw(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
+wtdopw <- function(.data,.date,.value,calendar_type,lag_n){
 
   out <- ti(
     calendar(
@@ -1705,19 +1774,20 @@ wtwopw <- function(.data,.date,.value,calendar_type,lag_n){
 }
 
 
-#' Week-over-Week
+#' @title Current full period week over full previous period week
+#' @name wow
+#' @inheritParams pytd
+#' @description
+#' This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' @param .data tibble or DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
-#' @param lag_n the number of weeks to lag, default is 1
-#'
-#' @returns wow_tbl or wow_dbi
+#' Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
-#'
 #' @examples
-#' wow(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
+#' wow(fpaR::sales,.date=order_date,.value=quantity,calendar_type='standard',lag_n=1)
 wow <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
@@ -1746,27 +1816,21 @@ wow <- function(.data,.date,.value,calendar_type,lag_n=1){
 
 ## all related ti_tbl-------------------------
 
-#' All-to-.date
-#'
-#' @param .data either a tibble or  DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @title All period-to-date
+#' @name atd
+#' @inheritParams ytd
 #' @description
-#' This calculates the total cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
+#' This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' Use `calculate()` to return the results
-#'
-#' @returns atd_tbl or atd_dbi object depending on what is passed through
+#' Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
-#'
 #' @examples
-#' atd(fpaR::sales,.date=.date,.value=quantity,calendar_type="standard")
+#' atd(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
 atd <- function(.data,.date,.value,calendar_type){
-
-  # Vali.date inputs
-
 
   out <- ti(
     calendar(
@@ -1792,22 +1856,22 @@ atd <- function(.data,.date,.value,calendar_type){
 }
 
 
-## comparison ti_tbl------------------
+## Day related functions------------------
 
-
-#' day over day calculation
+#' @title Current period day over previous period day
+#' @name dod
+#' @inheritParams pytd
+#' @description
+#' This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
+#' any groups that are passed through with [dplyr::group_by()]
 #'
-#' @param .data tibble or DBI object
-#' @param .date the .date column to aggregate
-#' @param value the value column to summarize
-#' @param calendar_type either 'standard' or '5-5-4' calendar
-#' @param lag_n the number of periods to lag, default is 1
-#'
-#' @returns dod_tbl or dbi_tbl
+#' Use [calculate()] to return the results
+#' @inherit ytd details
+#' @family time_intelligence
+#' @returns ti object
 #' @export
-#'
 #' @examples
-#' dod(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
+#' dod(fpaR::sales,.date=order_date,.value=quantity,calendar_type='standard',lag_n=1)
 dod <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(

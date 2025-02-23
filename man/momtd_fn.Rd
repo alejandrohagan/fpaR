@@ -7,11 +7,19 @@
 momtd_fn(x)
 }
 \arguments{
-\item{x}{ti_tbl}
+\item{x}{ti object}
 }
 \value{
-tibble
+dbi object
 }
 \description{
-Current year to date over previous year-to-date for tibble objects
+\code{momtd_fn()} is the function that is called by \code{momtd()} when passed through to \code{calculate()}
+}
+\details{
+This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+by \code{calculated()}
+This will return a dbi object that can converted to a tibble object with \code{dplyr::collect()}
+}
+\seealso{
+\code{\link[=momtd]{momtd()}} for the function's intent
 }

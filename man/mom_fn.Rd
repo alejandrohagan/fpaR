@@ -10,8 +10,16 @@ mom_fn(x)
 \item{x}{ti object}
 }
 \value{
-dbi
+dbi object
 }
 \description{
-month-over-month
+\code{mom_fn()} is the function that is called by \code{mom()} when passed through to \code{calculate()}
+}
+\details{
+This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+by \code{calculated()}
+This will return a dbi object that can converted to a tibble object with \code{dplyr::collect()}
+}
+\seealso{
+\code{\link[=mom]{mom()}} for the function's intent
 }

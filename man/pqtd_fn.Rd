@@ -10,18 +10,16 @@ pqtd_fn(x)
 \item{x}{ti object}
 }
 \value{
-dbi
-
-tibble
+dbi object
 }
 \description{
-\code{pqtd_fn()} summarizes a tibble to target time unit and completes the calendar to ensure
-no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
-for each combination of the group
+\code{pqtd_fn()} is the function that is called by \code{pqtd()} when passed through to \code{calculate()}
 }
 \details{
-This is in internal function to make it easier to ensure data has no missing dates to
-simplify the use of time intelligence functions downstream of the application.
-If you want to summarize to a particular group, simply pass the tibble through to the \code{group_by()} argument
-prior to function and the function will make summarize and make a complete calendar for each group item.
+This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+by \code{calculated()}
+This will return a dbi object that can converted to a tibble object with \code{dplyr::collect()}
+}
+\seealso{
+\code{\link[=pqtd]{pqtd()}} for the function's intent
 }
