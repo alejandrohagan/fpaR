@@ -1,10 +1,9 @@
 
 ## year related functions
 
-#' Year-to-date for tibble objects
+#' Year-to-date execution function
 #'
 #' @param x ti_tbl
-#' @seealso [fpaR::pytd()fpaR::yoy()fpaR::yoytd()] are the year based ti functions
 #' @description
 #' `ytd_fn()` summarizes a tibble to target time unit and completes the calendar to ensure
 #' no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
@@ -45,7 +44,6 @@ ytd_fn <- function(x){
 #' Previous year-to-date for tibble objects
 #'
 #' @param x ti object
-#' @seealso [fpaR::pytd()fpaR::yoy()fpaR::yoytd()]
 #' @description
 #' `pytd_fn()` summarizes a tibble to target time unit and completes the calendar to ensure
 #' no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
@@ -188,12 +186,12 @@ ytdopy_fn <- function(x){
 
   # year-to-date table
   ytd_dbi <-  ytd(.data = x@calendar@data,.date = !!x@calendar@date_quo,.value = !!x@value@value_quo,calendar_type = x@calendar@calendar_type) |>
-    ytd_fn()
+    calculate()
 
   #aggregate to prior year
 
   py_dbi <-   yoy(.data = x@calendar@data,.date = !!x@calendar@date_quo,.value = !!x@value@value_quo,calendar_type = x@calendar@calendar_type,lag_n = x@fn@lag_n) |>
-    yoy_fn()
+    calculate()
 
   # join together
 
@@ -245,9 +243,7 @@ qtd_fn <- function(x){
 
 
 #' Previous quarter-to-date for tibble objects
-#'
 #' @param x ti object
-#' @seealso [fpaR::pytd()fpaR::yoy()fpaR::yoytd()]
 #' @description
 #' `pqtd_fn()` summarizes a tibble to target time unit and completes the calendar to ensure
 #' no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
@@ -339,7 +335,7 @@ qtd_dbi <- qtd(.data=x@calendar@data,.date=!!x@calendar@date_quo,.value = !!x@va
       dplyr::across(dplyr::contains(x@value@value_vec),\(x) sum(x,na.rm=TRUE))
       ,.by=c(date,year,quarter,!!!x@calendar@group_quo)
     ) |>
-    fplyr::filter(
+    dplyr::filter(
       !is.na(year)
     )
 
@@ -348,18 +344,16 @@ qtd_dbi <- qtd(.data=x@calendar@data,.date=!!x@calendar@date_quo,.value = !!x@va
 }
 
 
-#' Title
+#' Quarter-over-quarter execution function
 #'
-#' @param x
+#' @param x ti object
 #'
-#' @returns
-#' @export
+#' @returns dbi object
 #'
-#' @examples
 qoq_fn <- function(x){
 
   # create calendar
-  full_dbi <-  create_calendar(x)
+  full_dbi <-  fpaR::create_calendar(x)
 
   # create lag
   lag_dbi <- full_dbi |>
@@ -437,7 +431,7 @@ mtd_fn <- function(x){
     dplyr::group_by(year,month,!!!x@calendar@group_quo) |>
     dplyr::arrange(date,.by_group = TRUE) |>
     dplyr::mutate(
-      !!x@new_column_name:=base::cumsum(!!x@value_quo)
+      !!x@value@new_column_name:=base::cumsum(!!x@value@value_quo)
     ) |>
     dplyr::ungroup()
 
@@ -509,58 +503,75 @@ pmtd_fn <- function(x){
 #'
 momtd_fn <- function(x){
 
-  # ytd table
+  # mtd table
 
-  mtd_tbl <- mtd_tbl(x)
+  mtd_dbi <- mtd(.data = x@calendar@data,.date = !!x@calendar@date_quo,.value = !!x@value@value_quo,calendar_type = x@calendar@calendar_type) |>
+    calculate()
 
-  #pytd table
+  # pmtd table
 
-  pmtd_tbl <- pmtd_tbl(x) |>
-    dplyr::rename(
-      !!x@value@second_column_name:=!!x@value@new_column_name
-    )
+  pmtd_dbi <- pmtd(.data = x@calendar@data,.date = !!x@calendar@date_quo,.value = !!x@value@value_quo,calendar_type = x@calendar@calendar_type,lag_n = x@fn@lag_n) |>
+    calculate()
 
   # join tables together
 
-  out_tbl <-   dplyr::left_join(
-    ytd_tbl
-    ,pytd_tbl
+  out_dbi <-   dplyr::left_join(
+    mtd_dbi
+    ,pmtd_dbi
     ,by=dplyr::join_by(date==date,year,month,!!!x@calendar@group_quo)
-  )
+  ) |>
+    dplyr::group_by(date,year,month,!!!x@calendar@group_quo) |>
+    tidyr::fill(date,.direction = "down") |>
+    dplyr::ungroup() |>
+    dplyr::summarise(
+      dplyr::across(dplyr::contains(x@value@value_vec),\(x) sum(x,na.rm=TRUE))
+      ,.by=c(date,year,month,!!!x@calendar@group_quo)
+    ) |>
+    dplyr::filter(
+      !is.na(year)
+    )
 
   return(out_tbl)
 
 }
 
 
-#' Year-over-year
+#' month-over-month
 #'
-#' @param x ti_tbl
+#' @param x ti object
 #'
-#' @returns tibble
+#' @returns dbi
 #'
 mom_fn <- function(x){
 
+  full_dbi <-  create_calendar(x)
 
-  full_tbl <-  create_calendar(x)
-
-  lag_tbl <- full_tbl|>
-    dplyr::arrange(date,.by_group = TRUE) |>
+  # create lag
+  lag_dbi <- full_dbi |>
+    dbplyr::window_order(date,!!!x@calendar@group_quo) |>
     dplyr::mutate(
-      date_lag=dplyr::lead(date,n = x@fn@lag_n)
-      ,!!x@value@new_column_name:=!!x@value@value_quo
+      date_lag=dplyr::lead(date,n = !!x@fn@lag_n)
+      ,!!x@value@new_column_name[[1]]:=!!x@value@value_quo
+      ,.by=c(!!!x@calendar@group_quo)
     ) |>
     dplyr::select(-c(date,!!x@value@value_quo)) |>
-    dplyr::ungroup()
+    dplyr::filter(!is.na(date_lag))
 
 
-  out_tbl <-   dplyr::left_join(
-    full_tbl
-    ,lag_tbl
+
+  # bring tables together
+  out_dbi <-   dplyr::left_join(
+    full_dbi
+    ,lag_dbi
     ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
-  )
+  ) |>
+    mutate(
+      year=lubridate::year(date)
+      ,month=lubridate::month(date)
+      ,.after=date
+    )
 
-  return(out_tbl)
+  return(out_dbi)
 
 }
 
@@ -572,35 +583,32 @@ mom_fn <- function(x){
 #'
 mtdopm_fn <- function(x){
 
-  # year-to-date table
-  ytd_tbl <-  ytd_tbl(x)
 
+  # year-to-date table
+  mtd_dbi <-  mtd(.data = x@calendar@data,.date = !!x@calendar@date_quo,.value = !!x@value@value_quo,calendar_type = x@calendar@calendar_type) |>
+    calculate()
 
   #aggregate to prior year
-  pm_tbl <-   ytd_tbl |>
-    dplyr::mutate(
-      year=lubridate::year(date)
-      ,month=lubridate::month(date)
-    ) |>
-    dplyr::group_by(year,month,!!!x@calendar@group_quo) |>
-    dplyr::summarise(
-      fm=base::sum(!!x@value@value_quo,na.rm=TRUE)
-      ,.groups="drop"
-    ) |>
-    dplyr::mutate(
-      !!x@value@second_column_name:=dplyr::lag(fm,x@fn@lag_n)
-    ) |>
-    dplyr::select(-c(fm))
+
+  pm_dbi <-   mom(.data = x@calendar@data,.date = !!x@calendar@date_quo,.value = !!x@value@value_quo,calendar_type = x@calendar@calendar_type,lag_n = x@fn@lag_n) |>
+    calculate()
 
   # join together
 
-  out_tbl <-  ytd_tbl |>
+ out_dbi <-  mtd_dbi |>
+   dplyr::select(
+     -c(!!x@value@value_quo)
+   ) |>
     dplyr::left_join(
-      pm_tbl
-      ,by=dplyr::join_by(year,month,!!!x@calendar@group_quo)
+      pm_dbi |> dplyr::select(
+        -c(!!x@value@value_quo)
+      )
+      ,by=dplyr::join_by(year,month,date,!!!x@calendar@group_quo)
     )
 
-  return(out_tbl)
+  return(out_dbi)
+
+
 }
 
 
@@ -616,25 +624,25 @@ mtdopm_fn <- function(x){
 #'
 wtd_fn <- function(x){
 
-  full_tbl <-  create_calendar(x) |>
+  full_dbi <-  create_calendar(x) |>
     dplyr::mutate(
       year=lubridate::year(date)
       ,month=lubridate::month(date)
-      ,week=lubridate::week(date)
+      ,week=sql("DATE_PART('week',date)")
       ,.before = 1
     )
 
 
 
-  out_tbl <- full_tbl |>
-    dplyr::group_by(year,month,week,!!!x@calendar@group_quo) |>
-    dplyr::arrange(date,.by_group = TRUE) |>
+  out_dbi <- full_dbi |>
+    dbplyr::window_order(date) |>
     dplyr::mutate(
-      !!x@new_column_name:=base::cumsum(!!x@value_quo)
-    ) |>
-    dplyr::ungroup()
+      !!x@value@new_column_name:=cumsum(!!x@value@value_quo)
+      ,.by=c(year,month,week,!!!x@calendar@group_quo)
+    )
 
-  return(out_tbl)
+  return(out_dbi)
+
 }
 
 
@@ -648,36 +656,47 @@ wtd_fn <- function(x){
 #'
 pwtd_fn <- function(x){
 
-
   # create calendar table
 
-  full_tbl <-  create_calendar(x) |>
+  full_dbi <-  create_calendar(x) |>
     dplyr::mutate(
       year=lubridate::year(date)
-      ,month=lubirdate::month(date)
-      ,week=lubirdate::week(date)
+      ,month=lubridate::month(date)
+      ,week=sql("DATE_PART('week',date)")
       ,.before = 1
     )
 
+
   # create lag table
-  lag_tbl <- full_tbl|>
-    dplyr::group_by(year,month,week,!!!x@calendar@group_quo) |>
-    dplyr::arrange(date,.by_group = TRUE) |>
+  lag_dbi <- full_dbi|>
+    dbplyr::window_order(date) |>
     dplyr::mutate(
-      ,date_lag=date+lubridate::weeks(x@fn@lag_n)
+      date_lag=as.Date(sql("date + INTERVAL '1 weeks' * 1"))
       ,!!x@value@new_column_name:=cumsum(!!x@value@value_quo)
+      ,week_lag=sql("DATE_PART('week',date_lag)")
+      ,.by=c(year,month,week,!!!x@calendar@group_quo)
     ) |>
-    dplyr::ungroup() |>
     dplyr::select(-c(date,month,year,week,!!x@value@value_quo))
 
 
   # join tables together
-  out_tbl <-   dplyr::left_join(
-    full_tbl
-    ,lag_tbl
+  out_dbi <-   dplyr::full_join(
+    full_dbi
+    ,lag_dbi
     ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
   ) |>
-    dplyr::select(-c(!!x@value@value_quo))
+    dplyr::select(-c(!!x@value@value_quo)) |>
+    dbplyr::window_order(date) |>
+    dplyr::group_by(date,year,month,!!!x@calendar@group_quo) |>
+    tidyr::fill(date,.direction = "down") |>
+    dplyr::ungroup() |>
+    dplyr::summarise(
+      dplyr::across(dplyr::contains(x@value@value_vec),\(x) sum(x,na.rm=TRUE))
+      ,.by=c(date,year,month,!!!x@calendar@group_quo)
+    ) |>
+    dplyr::filter(
+      !is.na(year)
+    )
 
   return(out_tbl)
 
@@ -716,7 +735,7 @@ wowtd_fn <- function(x){
 }
 
 
-#' Year-over-year
+#' Week-over-week
 #'
 #' @param x ti_tbl
 #'
@@ -725,25 +744,26 @@ wowtd_fn <- function(x){
 wow_fn <- function(x){
 
 
-  full_tbl <-  create_calendar(x)
+  full_dbi <-  create_calendar(x)
 
-  lag_tbl <- full_tbl|>
-    dplyr::arrange(date,.by_group = TRUE) |>
+
+  lag_dbi <- full_dbi|>
+    dbplyr::window_order(date) |>
     dplyr::mutate(
-      date_lag=dplyr::lead(date,n = x@fn@lag_n)
+      date_lag=dplyr::lead(date,n = !!x@fn@lag_n)
       ,!!x@value@new_column_name:=!!x@value@value_quo
+      ,.by=c(!!!x@calendar@group_quo)
     ) |>
-    dplyr::select(-c(date,!!x@value@value_quo)) |>
-    dplyr::ungroup()
+    dplyr::select(-c(date,!!x@value@value_quo))
 
 
-  out_tbl <-   dplyr::left_join(
-    full_tbl
-    ,lag_tbl
+  out_dbi <-   dplyr::left_join(
+    full_dbi
+    ,lag_dbi
     ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
   )
 
-  return(out_tbl)
+  return(out_dbi)
 
 }
 
@@ -756,35 +776,29 @@ wow_fn <- function(x){
 wtdopw_fn <- function(x){
 
   # year-to-date table
-  wtd_tbl <-  wtd_tbl(x)
-
+  wtd_dbi <-  wtd(.data = x@calendar@data,.date = !!x@calendar@date_quo,.value = !!x@value@value_quo,calendar_type = x@calendar@calendar_type) |>
+    calculate()
 
   #aggregate to prior year
-  wm_tbl <-   wtd_tbl |>
-    dplyr::mutate(
-      year=lubridate::year(date)
-      ,month=lubridate::month(date)
-      ,week=lubridate::week(date)
-    ) |>
-    dplyr::group_by(year,month,week,!!!x@calendar@group_quo) |>
-    dplyr::summarise(
-      fw=base::sum(!!x@value@value_quo,na.rm=TRUE)
-      ,.groups="drop"
-    ) |>
-    dplyr::mutate(
-      !!x@value@second_column_name:=dplyr::lag(fw,x@fn@lag_n)
-    ) |>
-    dplyr::select(-c(fw))
+
+  pw_dbi <-   wow(.data = x@calendar@data,.date = !!x@calendar@date_quo,.value = !!x@value@value_quo,calendar_type = x@calendar@calendar_type,lag_n = x@fn@lag_n) |>
+    calculate()
 
   # join together
 
-  out_tbl <-  wtd_tbl |>
+  out_dbi <-  wtd_dbi |>
+    select(
+      -c(!!x@value@value_quo)
+    ) |>
     dplyr::left_join(
-      pw_tbl
-      ,by=dplyr::join_by(year,month,week,!!!x@calendar@group_quo)
+      pw_dbi |> dplyr::select(
+        -c(!!x@value@value_quo)
+      )
+      ,by=dplyr::join_by(date,!!!x@calendar@group_quo)
     )
 
-  return(out_tbl)
+  return(out_dbi)
+
 }
 
 
@@ -797,15 +811,14 @@ wtdopw_fn <- function(x){
 #' @returns tibble
 atd_fn <- function(x){
 
-  full_tbl <-  create_calendar(x)
+  full_dbi <-  create_calendar(x)
 
-  out_tbl <- full_tbl |>
-    dplyr::group_by(!!!x@calendar@group_quo) |>
-    dplyr::arrange(date,.by_group = TRUE) |>
+  out_dbi<- full_dbi |>
+    dbplyr::window_order(date) |>
     dplyr::mutate(
-      !!x@new_column_name:=base::cumsum(!!x@value_quo)
-    ) |>
-    dplyr::ungroup()
+      !!x@value@new_column_name:=base::cumsum(!!x@value@value_quo)
+      ,.by=c(!!!x@calendar@group_quo)
+    )
 
   return(out_tbl)
 
@@ -814,68 +827,73 @@ atd_fn <- function(x){
 
 ## day related functions --------------------------
 
-#' Day-over-day for tibble objects
+#' Day-over-day
 #'
-#' @param x ti_tbl
+#' @param x ti
 #'
-#' @returns tibble
+#' @returns dbi
 #'
 dod_fn <- function(x){
 
-  full_tbl <-  create_calendar(x)
+
+  full_dbi <-  create_calendar(x)
 
 
-
-  lag_tbl <- full_tbl|>
-    dplyr::arrange(date,.by_group = TRUE) |>
+  lag_dbi <- full_dbi |>
+    dbplyr::window_order(date) |>
     dplyr::mutate(
-      date_lag=lubridate::`%m+%`(date,lubridate::days(x@lag_n))
-      ,!!x@new_column_name:=!!x@value_quo
+      date_lag=lead(date,n=!!x@fn@lag_n)
+      ,!!x@value@new_column_name:=!!x@value@value_quo
+      ,.by=c(!!!x@calendar@group_quo)
     ) |>
-    dplyr::select(-c(date,!!x@value_quo)) |>
-    dplyr::ungroup()
+    dplyr::select(-c(date,!!x@value@value_quo))
 
-  out_tbl <-   dplyr::left_join(
-    full_tbl
-    ,lag_tbl
+  out_dbi <-   dplyr::left_join(
+    full_dbi
+    ,lag_dbi
     ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
   )
-  # mutate(
-  # !!x@new_column_name:= dplyr::coalesce(.data[[rlang::englue(x@new_column_name)]],0)
-  # )
 
-  return(out_tbl)
+  return(out_dbi)
+
 }
 
 
 # functions that assign arguments to the ti_tbl class --------------------
 
-
 ## year related ti_tbl----------
 
+
+
 #' Year-to-date
-#' @param .data either a tibble or  DBI object
-#' @param date the date column to aggregate
-#' @param value the value column to summarize
+#' @name ytd
+#' @param .data tibble or dbi object
+#' @param .date the date column to group by
+#' @param .value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
+#' @seealso [fpaR::pytd()], [fpaR::yoy()], [fpaR::yoytd()] are the year-based ti functions
 #' @description
-#' This calculates the annual cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-#' any groups that are passed through with `dplyr::group_by()`.
-#'
+#' For each group, `ytd()`  will the running sum of a value based on the calendar date.
+#' This function will print out the summary of steps and actions. Use `calculate()` to return the results
+#' @details
+#' This creates a calendar object with complete dates to ensure no missing days, month, quarter or years.
+#' If a grouped object is passed through it will complete the calendar  for each combination of the group.
+#' This is part of the time intelligence family of functions.
+#' Pass the arguments to  `ytd()` and it will print out its actions and assumptions
 #' Use `calculate()` to return the results
 #'
-#' @returns ytd_tbl or ytd_dbi
+#' @returns ti object
 #' @export
 #'
 #' @examples
-#' ytd(fpaR::sales,date=date,.value=quantity,calendar_type="standard")
+#' ytd(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
 ytd <- function(.data,.date,.value,calendar_type){
 
   # assigns inputs to ytd_tbl class
 
   x <- ti(
     calendar(
-      data                 =.data
+      data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
     )
@@ -887,8 +905,8 @@ ytd <- function(.data,.date,.value,calendar_type){
       )
     ,fn=fn(
       new_date_column_name = "year"
-      ,lag_n = NA_integer_
-      ,fn_exec = ytd_fn
+      ,lag_n               = NA_integer_
+      ,fn_exec             = ytd_fn
     )
   )
 
@@ -898,17 +916,20 @@ ytd <- function(.data,.date,.value,calendar_type){
 
 
 #' Prevoius year-to-date
+#' @name pytd
 #' @param .data either a tibble or  DBI object
-#' @param date the date column to aggregate
-#' @param value the value column to summarize
+#' @param .date the date column to aggregate
+#' @param .value the value column to summarize
 #' @param calendar_type either 'standard' or '5-5-4' calendar
 #' @description
 #' This calculates the annual cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
 #' any groups that are passed through with `dplyr::group_by()`.
-#'
+#' @details
+#' This is part of the time intelligence family of functions.
+#' Pass the arguments to  `pytd()` and it will print out its actions and assumptions
 #' Use `calculate()` to return the results
 #'
-#' @returns ytd_tbl or ytd_dbi
+#' @returns ti object
 #' @export
 #'
 #' @examples
@@ -1486,15 +1507,15 @@ mom <- function(.data,.date,.value,calendar_type,lag_n=1){
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
-    ,time_unit = time_unit("day")
-    ,action=action("aggregate","shift","compare")
+    ,time_unit = time_unit("month")
+    ,action=action("aggregate")
     ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name_prefix = "mom"
+      ,new_column_name  = "mom"
     )
     ,fn=fn(
       new_date_column_name = c("date","year","month")
-      ,lag_n = NA_integer_
+      ,lag_n = lag_n
       ,fn_exec=mom_fn
     )
   )
@@ -1537,7 +1558,7 @@ wtd <- function(.data,.date,.value,calendar_type){
     ,action=action("aggregate")
     ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name_prefix = "wtd"
+      ,new_column_name = "wtd"
     )
     ,fn=fn(
       new_date_column_name = c("year","month","week")
@@ -1580,8 +1601,8 @@ pwtd <- function(.data,.date,.value,calendar_type,lag_n){
     ,time_unit = time_unit("day")
     ,action=action("aggregate")
     ,value=value(
-      value = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name_prefix = "pwtd"
+      value_vec = rlang::as_label(rlang::enquo(.value))
+      ,new_column_name  = "pwtd"
     )
     ,fn=fn(
       new_date_column_name = c("year","month","week")
@@ -1594,8 +1615,8 @@ pwtd <- function(.data,.date,.value,calendar_type,lag_n){
 
 }
 
-#' Week-to-.date
-#'
+#' Week-to-date over previous week-to-date
+#' @name wowtd
 #' @param .data either a tibble or  DBI object
 #' @param .date the .date column to aggregate
 #' @param value the value column to summarize
@@ -1606,7 +1627,7 @@ pwtd <- function(.data,.date,.value,calendar_type,lag_n){
 #'
 #' Use `calculate()` to return the results
 #'
-#' @returns wtd_tbl or wtd_dbi
+#' @returns dbi object
 #' @export
 #'
 #' @examples
@@ -1626,7 +1647,7 @@ wowtd <- function(.data,.date,.value,calendar_type,lag_n){
     ,action=action("aggregate")
     ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name_prefix = "wowtd"
+      ,new_column_name  = "wowtd"
     )
     ,fn=fn(
       new_date_column_name = c("year","month","week")
@@ -1670,7 +1691,7 @@ wtwopw <- function(.data,.date,.value,calendar_type,lag_n){
     ,action=action("aggregate")
     ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name_prefix = "wtwopw"
+      ,new_column_name  = "wtwopw"
     )
     ,fn=fn(
       new_date_column_name = c("year","month","week")
@@ -1699,18 +1720,17 @@ wtwopw <- function(.data,.date,.value,calendar_type,lag_n){
 #' wow(fpaR::sales,.date=order_.date,.value=quantity,calendar_type='standard',lag_n=1)
 wow <- function(.data,.date,.value,calendar_type,lag_n=1){
 
-
   out <- ti(
     calendar(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
-    ,time_unit = time_unit("day")
-    ,action=action("aggregate","shift","compare")
+    ,time_unit = time_unit("week")
+    ,action=action(c("aggregate","shift","compare"))
     ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name_prefix = "wow"
+      ,new_column_name  = "wow"
     )
     ,fn=fn(
       new_date_column_name = c("date")
@@ -1758,7 +1778,7 @@ atd <- function(.data,.date,.value,calendar_type){
     ,action=action("aggregate")
     ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name_prefix = "atd"
+      ,new_column_name  = "atd"
     )
     ,fn=fn(
       new_date_column_name = c("date")
@@ -1797,15 +1817,14 @@ dod <- function(.data,.date,.value,calendar_type,lag_n=1){
       ,date_vec = rlang::as_label(rlang::enquo(.date))
     )
     ,time_unit = time_unit("day")
-    ,action=action("aggregate","shift","compare")
+    ,action=action(c("aggregate","shift","compare"))
     ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name_prefix = "dod"
-      ,second_column_name_prefix = NA_character_
+      ,new_column_name = "dod"
     )
     ,fn=fn(
       new_date_column_name = c("date")
-      ,lag_n = NA_integer_
+      ,lag_n = lag_n
       ,fn_exec=dod_fn
     )
   )

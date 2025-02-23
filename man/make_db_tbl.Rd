@@ -9,6 +9,12 @@ make_db_tbl(x)
 \arguments{
 \item{x}{tibble or dbi object}
 }
+\value{
+dbi object
+}
 \description{
 Title
+}
+\examples{
+make_db_tbl(sales)
 }

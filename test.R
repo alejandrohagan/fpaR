@@ -4,8 +4,9 @@ library(S7)
 library(rlang)
 library(dbplyr)
 devtools::document()
-
-
+x <- ytd(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
+make_action_cli(x@action@value)
+?ytd()
 .data <- sales |> group_by(customer_key)
 
 x <- fpaR::ytd(.data = .data,.date = order_date,.value = margin,calendar_type = "standard")
@@ -17,9 +18,14 @@ x <- fpaR::qoq(.data,.date = order_date,.value = margin,calendar_type = "standar
 x <- fpaR::qoqtd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
 x <- fpaR::mtd(.data,.date = order_date,.value = margin,calendar_type = "standard")
 x <- fpaR::pmtd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::mom(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::wtd(.data,.date = order_date,.value = margin,calendar_type = "standard")
+x <- fpaR::pwtd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::wow(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
+x <- fpaR::atd(.data,.date = order_date,.value = margin,calendar_type = "standard")
+x <- fpaR::dod(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
 
-pytd(x@calendar@data,.value= x@value@value_quo,.date = !!x@calendar@date_quo,calendar_type = x@calendar@calendar_type,lag_n = 1)
-
+x@fn@lag_n
 fpaR::seq_date_sql("2022-01-01","2022-10-01",time_unit = "day",con=con)
 
 ## calendar sql

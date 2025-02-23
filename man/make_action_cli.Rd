@@ -15,3 +15,7 @@ list
 \description{
 Make Action field CLI args
 }
+\examples{
+x <- ytd(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
+make_action_cli(x@action@value)
+}

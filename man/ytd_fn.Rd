@@ -2,7 +2,7 @@
 % Please edit documentation in R/time_intelligence.R
 \name{ytd_fn}
 \alias{ytd_fn}
-\title{Year-to-date for tibble objects}
+\title{Year-to-date execution function}
 \usage{
 ytd_fn(x)
 }
@@ -22,7 +22,4 @@ This is in internal function to make it easier to ensure data has no missing dat
 simplify the use of time intelligence functions downstream of the application.
 If you want to summarize to a particular group, simply pass the tibble through to the \code{group_by()} argument
 prior to function and the function will make summarize and make a complete calendar for each group item.
-}
-\seealso{
-\code{\link[fpaR::pytd()fpaR::yoy()fpaR:yoytd]{fpaR::pytd()fpaR::yoy()fpaR::yoytd()}} are the year based ti functions
 }

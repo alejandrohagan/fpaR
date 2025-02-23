@@ -2,16 +2,16 @@
 % Please edit documentation in R/time_intelligence.R
 \name{mom_fn}
 \alias{mom_fn}
-\title{Year-over-year}
+\title{month-over-month}
 \usage{
 mom_fn(x)
 }
 \arguments{
-\item{x}{ti_tbl}
+\item{x}{ti object}
 }
 \value{
-tibble
+dbi
 }
 \description{
-Year-over-year
+month-over-month
 }

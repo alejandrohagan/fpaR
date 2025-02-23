@@ -2,16 +2,20 @@
 % Please edit documentation in R/utils-misc.R
 \name{make_print_message}
 \alias{make_print_message}
-\title{Make print message}
+\title{Print message}
 \usage{
 make_print_message(x)
 }
 \arguments{
-\item{x}{ti_tbl class object}
+\item{x}{ti class object}
 }
 \value{
 print message
 }
 \description{
-Make print message
+Print message
+}
+\examples{
+ x <- fpaR::ytd(fpaR::sales,date = order_date,value=quantity,calendar_type = "standard")
+ make_print_message(x)
 }

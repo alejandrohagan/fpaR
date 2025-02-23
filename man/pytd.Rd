@@ -9,19 +9,22 @@ pytd(.data, .date, .value, calendar_type, lag_n)
 \arguments{
 \item{.data}{either a tibble or  DBI object}
 
+\item{.date}{the date column to aggregate}
+
+\item{.value}{the value column to summarize}
+
 \item{calendar_type}{either 'standard' or '5-5-4' calendar}
-
-\item{date}{the date column to aggregate}
-
-\item{value}{the value column to summarize}
 }
 \value{
-ytd_tbl or ytd_dbi
+ti object
 }
 \description{
 This calculates the annual cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
 any groups that are passed through with \code{dplyr::group_by()}.
-
+}
+\details{
+This is part of the time intelligence family of functions.
+Pass the arguments to  \code{pytd()} and it will print out its actions and assumptions
 Use \code{calculate()} to return the results
 }
 \examples{

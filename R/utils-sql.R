@@ -331,9 +331,10 @@ create_contonso_duckdb <- function(){
 #'
 #' @param x tibble or dbi object
 #'
-#' @returns
+#' @returns dbi object
 #'
 #' @examples
+#' make_db_tbl(sales)
 make_db_tbl <- function(x){
 
 

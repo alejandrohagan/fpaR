@@ -25,6 +25,3 @@ simplify the use of time intelligence functions downstream of the application.
 If you want to summarize to a particular group, simply pass the tibble through to the \code{group_by()} argument
 prior to function and the function will make summarize and make a complete calendar for each group item.
 }
-\seealso{
-\code{\link[fpaR::pytd()fpaR::yoy()fpaR:yoytd]{fpaR::pytd()fpaR::yoy()fpaR::yoytd()}}
-}

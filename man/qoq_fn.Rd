@@ -2,13 +2,16 @@
 % Please edit documentation in R/time_intelligence.R
 \name{qoq_fn}
 \alias{qoq_fn}
-\title{Title}
+\title{Quarter-over-quarter execution function}
 \usage{
 qoq_fn(x)
 }
 \arguments{
-\item{x}{}
+\item{x}{ti object}
+}
+\value{
+dbi object
 }
 \description{
-Title
+Quarter-over-quarter execution function
 }

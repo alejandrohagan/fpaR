@@ -2,7 +2,7 @@
 % Please edit documentation in R/time_intelligence.R
 \name{wowtd}
 \alias{wowtd}
-\title{Week-to-.date}
+\title{Week-to-date over previous week-to-date}
 \usage{
 wowtd(.data, .date, .value, calendar_type, lag_n)
 }
@@ -16,7 +16,7 @@ wowtd(.data, .date, .value, calendar_type, lag_n)
 \item{value}{the value column to summarize}
 }
 \value{
-wtd_tbl or wtd_dbi
+dbi object
 }
 \description{
 This calculates the weekly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting

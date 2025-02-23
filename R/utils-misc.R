@@ -15,32 +15,6 @@ return(out)
 
 }
 
-
-#' Assigns fn to ti class
-#'
-#' @param x
-#'
-#' @returns
-#' @export
-#'
-#' @examples
-assign_fn_exec <- function(x){
-
-  class_name <- class(x)[1]
-
-  assertthat::assert_that(
-    any(class(x) %in% c("fpaR::ti"))
-      ,msg = glue::glue("requires x to be class 'fpaR::ti' not {class_name}")
-  )
-
-
-  fn_exec_vec <- paste0(x@fn@fn_name,"_",x@calendar@class_name)
-  return(fn_exec_vec)
-
-}
-
-
-
 #' Convert quoted or unquoted input to string
 #'
 #' @param x quoted or unquoted input
@@ -134,6 +108,8 @@ show_in_excel <- function(.data){
 #' @returns list
 #'
 #' @examples
+#'x <- ytd(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
+#'make_action_cli(x@action@value)
 make_action_cli <- function(x){
 
   out <- list()
@@ -160,13 +136,16 @@ make_action_cli <- function(x){
 
 }
 
-#' Make print message
+#' Print message
 #'
-#' @param x ti_tbl class object
+#' @param x ti class object
 #'
 #' @returns print message
 #'
 #' @examples
+#'  x <- fpaR::ytd(fpaR::sales,date = order_date,value=quantity,calendar_type = "standard")
+#'  make_print_message(x)
+
 make_print_message <- function(x){
 
   x <- fpaR::ytd(fpaR::sales,date = order_date,value=quantity,calendar_type = "standard")
@@ -249,6 +228,78 @@ make_print_message <- function(x){
 }
 
 
+
+#' Divide function with error handling for divide by zero or NA
+#' @description
+#' A safe divide function that will catch info or NA values and return an alternative result
+#' This is tibble or DBI friendly and will return same class as input
+#'
+#' @param .data a tibble or DBI object
+#' @param new_col_name new column name for result
+#' @param numerator column for numerator
+#' @param denominator column for denominator
+#' @param alternative_result alternative results if divide results are inf or NA, must be numeric
+#'
+#' @return tibble or dbi object
+#' @export
+#'
+#' @examples
+#' data(mtcars)
+#' mtcars |> divide(new_col_name=div_col,numerator=mpg,denominator=0,alternative_result=10)
+divide <- function(.data,new_col_name,numerator_col,denominator_col,alternative_result=NA_integer_){
+
+
+  # Validate alternative_result is numeric
+  assertthat::assert_that(
+    is.numeric(alternative_result),
+    msg = cli::format_error(c(
+      "x" = "Alternative result must be numeric.",
+      "!" = "You provided a value of class {.cls {class(alternative_result)}}."
+    ))
+  )
+
+  # If .data is a remote (DBI) table, build a safe SQL expression
+  if (inherits(.data, "tbl_dbi")) {
+
+    # Convert column names to symbols then to strings
+    num_str <- rlang::as_string(rlang::ensym(numerator_col))
+    denom_str <- rlang::as_string(rlang::ensym(denominator_col))
+
+    # Create SQL identifiers (this handles quoting as needed)
+    num_id <- dbplyr::ident(num_str)
+    denom_id <- dbplyr::ident(denom_str)
+
+    # Build a SQL CASE expression:
+    # CASE WHEN denominator IS NULL OR denominator = 0 THEN alternative_result ELSE numerator/denom END
+    safe_divide_expr <- dplyr::sql(sprintf(
+      "CASE WHEN %s IS NULL OR %s = 0 THEN %s ELSE %s/%s END",
+      as.character(denom_id),
+      as.character(denom_id),
+      alternative_result,
+      as.character(num_id),
+      as.character(denom_id)
+    ))
+
+    out <- .data %>%
+      dplyr::mutate({{ new_col_name }} := safe_divide_expr)
+
+    return(out)
+
+  } else {
+    # For local data (e.g., a tibble in memory), use R's evaluation
+    out <- .data %>%
+      dplyr::mutate(
+        {{ new_col_name }} := dplyr::if_else(
+          base::is.na({{ numerator_col }} / {{ denominator_col }}) | base::is.infinite({{ numerator_col }} / {{ denominator_col }}),
+          alternative_result,
+          {{ numerator_col }} / {{ denominator_col }}
+        )
+      )
+
+    return(out)
+  }
+
+}
 
 
 

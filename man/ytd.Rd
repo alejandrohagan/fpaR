@@ -7,23 +7,31 @@
 ytd(.data, .date, .value, calendar_type)
 }
 \arguments{
-\item{.data}{either a tibble or  DBI object}
+\item{.data}{tibble or dbi object}
+
+\item{.date}{the date column to group by}
+
+\item{.value}{the value column to summarize}
 
 \item{calendar_type}{either 'standard' or '5-5-4' calendar}
-
-\item{date}{the date column to aggregate}
-
-\item{value}{the value column to summarize}
 }
 \value{
-ytd_tbl or ytd_dbi
+ti object
 }
 \description{
-This calculates the annual cumulative sum of targeted value using a standard or 5-5-4 calendar respecting
-any groups that are passed through with \code{dplyr::group_by()}.
-
+For each group, \code{ytd()}  will the running sum of a value based on the calendar date.
+This function will print out the summary of steps and actions. Use \code{calculate()} to return the results
+}
+\details{
+This creates a calendar object with complete dates to ensure no missing days, month, quarter or years.
+If a grouped object is passed through it will complete the calendar  for each combination of the group.
+This is part of the time intelligence family of functions.
+Pass the arguments to  \code{ytd()} and it will print out its actions and assumptions
 Use \code{calculate()} to return the results
 }
 \examples{
-ytd(fpaR::sales,date=date,.value=quantity,calendar_type="standard")
+ytd(fpaR::sales,.date=order_date,.value=quantity,calendar_type="standard")
+}
+\seealso{
+\code{\link[=pytd]{pytd()}}, \code{\link[=yoy]{yoy()}}, \code{\link[=yoytd]{yoytd()}} are the year-based ti functions
 }

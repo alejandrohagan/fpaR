@@ -2,16 +2,16 @@
 % Please edit documentation in R/time_intelligence.R
 \name{dod_fn}
 \alias{dod_fn}
-\title{Day-over-day for tibble objects}
+\title{Day-over-day}
 \usage{
 dod_fn(x)
 }
 \arguments{
-\item{x}{ti_tbl}
+\item{x}{ti}
 }
 \value{
-tibble
+dbi
 }
 \description{
-Day-over-day for tibble objects
+Day-over-day
 }
