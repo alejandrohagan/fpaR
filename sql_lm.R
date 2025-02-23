@@ -1,13 +1,21 @@
+library(tidyverse)
+library(dbplyr)
+library(glue)
 
+con <- DBI::dbConnect(duckdb::duckdb("/home/hagan/database.duckdb"))
+
+duckdb::duckdb_register(con,"diamonds",diamonds)
+
+DBI::dbListTables(con)
+DBI::dbDisconnect(con)
 ## linear modeling
 
 y  <- "price"
 x1 <- "x"
 x2 <- "carat"
-.data <- "diamonds.db"
+.data <- "diamonds"
 
 var_1 <- list(c(y="price",x1="x",x2="carat",.data="diamonds"))
-library(glue)
 sql <-"
 WITH means AS (
   SELECT
@@ -37,17 +45,9 @@ map2(
   ,\(x,y) glue::glue_sql(x,y,.con=con)
 )
 
-tibble(
-  x=
-)
+# lm
 
-
-rm(list=ls())
-
-DBI::dbListTables(con)
-## lm
-
-  y <- iris$Sepal.Length - mean(iris$Sepal.Length)
+y <- iris$Sepal.Length - mean(iris$Sepal.Length)
 x1 <- iris$Petal.Length - mean(iris$Petal.Length)
 x2 <- iris$Sepal.Width - mean(iris$Sepal.Width)
 
@@ -68,7 +68,7 @@ all.equal(c(coef_x1, coef_x2),
 y  <- "price"
 x1 <- "x"
 x2 <- "carat"
-.data <- "diamonds.db"
+.data <- "diamonds"
 
 test_lm <- glue::glue_sql("
 -- Step 1: Create a table to hold the iris dataset
@@ -124,7 +124,7 @@ SELECT
     REGR_SLOPE(resyx1, resx2x1) AS coef_x2,
     REGR_SLOPE(resyx2, resx1x2) AS coef_x1
 FROM
-    res_y_x1, res_x2_x1, res_y_x2, res_x1_x2;
+    res_y_x1, res_x2_x1, res_y_x2, res_x1_x2
 ",
 .con=con)
 
@@ -208,484 +208,273 @@ from full_tbl
 
 DBI::dbGetQuery(con,test_lm) |> as_tibble()
 
-lm(price~0+x+carat,data=diamonds)
-
-## practice sql functions
-dbplyr::remote_con(contoso_fact_sales_db)
-dbplyr::remote_table(contoso_fact_sales_db)
-
-dbplyr::remote_query(contoso_fact_sales_db)
-
-## practice fpaR unctions
-
-out <- create_date_db(contoso_fact_sales_db,start_date = "2021-01-01",end_date = "2023-03-01")
-
-
-DBI::dbGetQuery(conn = con,statement = out)
-
-
-
-contoso_fact_sales_db |> pluck("src") |> pluck("con")
-
-
-usethis::use_package(c("cli"))
-
-contoso_fact_sales_db |>
-  mutate(
-    test=SalesKey/2
-  ) |>
-  relocate(test) |> show_query()
-  make_cohort_tbl(id_var="StoreKey",date = "DateKey",time_unit = "month",period_label = FALSE)
-
-
-vec <- c("one.md","two.md","three.md")
-
-dir.create("test")
-fpaR::clean_file_names("teset")
-online_cohorts %>%
-  cohort_table_month(CustomerID, InvoiceDate)
-
-
-time_unit <- "month"
-.data <- "contoso_fact_sales"
-id_var <- "StoreKey"
-date <- "DateKey"
-
-
-
-
-
-
-
-
-
-
-test_sql <- glue::glue_sql(
-
-"WITH date_var_calculated AS (
-    SELECT
-        {id_var}
-        ,DATE_TRUNC({time_unit}, {date}) AS date_var
-        ,MIN(DATE_TRUNC({time_unit}, {date})) OVER (PARTITION BY {id_var}) AS cohort
-
-    FROM  {.data}
-
-),
-
-summary_calculated AS (
-    SELECT
-        cohort
-        ,date_var
-        ,COUNT(DISTINCT {id_var}) AS users
-
-    FROM
-        date_var_calculated
-
-    GROUP BY
-        cohort
-        ,date_var)
-
-SELECT
-    *,
-    DENSE_RANK() OVER (ORDER BY cohort, date_var) AS group_id
-FROM
-    summary_calculated;"
-,.con=con
-)
-
-
-
-
-
-DBI::dbGetInfo(contoso_fact_sales_db)
-DBI::dbGetQuery(con,test)
-
-DBI::dbGetInfo(con)
-
-
-
-
-postgres_agg <- sql_translator(.parent = base_agg,
-                               cor = sql_aggregate_2("CORR"),
-                               cov = sql_aggregate_2("COVAR_SAMP"),
-                               sd =  sql_aggregate("STDDEV_SAMP", "sd"),
-                               var = sql_aggregate("VAR_SAMP", "var")
-)
-
-# Next we have to simulate a connection that uses this variant
-con <- simulate_dbi("TestCon")
-sql_translation.TestCon <- function(x) {
-  sql_variant(
-    base_scalar,
-    postgres_agg,
-    base_no_win
-  )
-}
-
-translate_sql(cor(x, y), con = con, window = FALSE)
-translate_sql(sd(income / years), con = con, window = FALSE)
-
-# Any functions not explicitly listed in the converter will be translated
-# to sql as is, so you don't need to convert all functions.
-translate_sql(??regr_intercept(y, x), con = con)
-
-
-lm(price~0+carat+cut,data=diamonds) |>
-  summary()
-
-usethis::use_r("create_date_tbl")
-test <- sql("
-
-
- WITH generate_date AS (
-        SELECT CAST(RANGE AS DATE) AS date_key
-          FROM RANGE(DATE '2009-01-01', DATE '2013-12-31', INTERVAL 1 DAY)
-          )
-   SELECT date_key AS date_key,
-          DAYOFYEAR(date_key) AS day_of_year,
-          YEARWEEK(date_key) AS week_key,
-          WEEKOFYEAR(date_key) AS week_of_year,
-          DAYOFWEEK(date_key) AS day_of_week,
-          ISODOW(date_key) AS iso_day_of_week,
-          DAYNAME(date_key) AS day_name,
-          DATE_TRUNC('week', date_key) AS first_day_of_week,
-          DATE_TRUNC('week', date_key) + 6 AS last_day_of_week,
-          YEAR(date_key) || RIGHT('0' || MONTH(date_key), 2) AS month_key,
-          MONTH(date_key) AS month_of_year,
-          DAYOFMONTH(date_key) AS day_of_month,
-          LEFT(MONTHNAME(date_key), 3) AS month_name_short,
-          MONTHNAME(date_key) AS month_name,
-          DATE_TRUNC('month', date_key) AS first_day_of_month,
-          LAST_DAY(date_key) AS last_day_of_month,
-          CAST(YEAR(date_key) || QUARTER(date_key) AS INT) AS quarter_key,
-          QUARTER(date_key) AS quarter_of_year,
-          CAST(date_key - DATE_TRUNC('Quarter', date_key) + 1 AS INT) AS day_of_quarter,
-          ('Q' || QUARTER(date_key)) AS quarter_desc_short,
-          ('Quarter ' || QUARTER(date_key)) AS quarter_desc,
-          DATE_TRUNC('quarter', date_key) AS first_day_of_quarter,
-          LAST_DAY(DATE_TRUNC('quarter', date_key) + INTERVAL 2 MONTH) as last_day_of_quarter,
-          CAST(YEAR(date_key) AS INT) AS year_key,
-          DATE_TRUNC('Year', date_key) AS first_day_of_year,
-          DATE_TRUNC('Year', date_key) - 1 + INTERVAL 1 YEAR AS last_day_of_year,
-          ROW_NUMBER() OVER (PARTITION BY YEAR(date_key), MONTH(date_key), DAYOFWEEK(date_key) ORDER BY date_key) AS ordinal_weekday_of_month
-     FROM generate_date
-
-    ")
-
-out
-DBI::dbGetQuery(conn = con,test)
-
-sql1 <- sql("SELECT * FROM table1")
-sql2 <- sql("SELECT * FROM table2 WHERE column1 > 100")
-sql3 <- sql("SELECT column2, column3 FROM table3")
-
-
-combined_sql <- sql(paste(sql1, sql2, sql3, sep = "; "))
-
-mtcars %>% glue::glue_data("{rownames(.)} has {hp} hp")
-
-
-x <- mtcars$hp
-inherits(x = ymd("2021-13-30"),what = "Date",)
-y <- rownames(mtcars)
-
-glue::glue("{y} has {x} hp")
-
-
-generate_445_calendar <- function(start_date, year) {
-  # Convert start_date to Date format if it's not already
-  if (!inherits(start_date, "Date")) {
-    start_date <- as.Date(start_date)
-  }
-
-  # Initialize vectors to hold month and week information
-  months <- c("January", "February", "March", "April", "May", "June",
-              "July", "August", "September", "October", "November", "December")
-  weeks <- c(4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5)  # 4-4-5 pattern
-
-  # Create a data frame to store the calendar
-  calendar <- data.frame(
-    Month = character(length(months)),
-    Week = integer(length(months)),
-    Days = integer(length(months)),
-    Start_Date = as.Date(character(length(months)))
-  )
-
-  # Initialize the start date
-  current_date <- start_date
-
-  # Fill in the calendar data frame
-  for (i in seq_along(months)) {
-    calendar$Month[i] <- months[i]
-    calendar$Week[i] <- weeks[i]
-    calendar$Days[i] <- weeks[i] * 7  # Calculate total days based on weeks
-    calendar$Start_Date[i] <- current_date
-    current_date <- current_date + calendar$Days[i]  # Move to the next month's start date
-  }
-
-  return(calendar)
-}
-start_date <- "2024-01-01"
-year <- 2024
-calendar_2024 <- generate_445_calendar(start_date, year)
-print(calendar_2024)
-
-
-generate_445_calendar <- function(start_date, year) {
-  # Convert start_date to Date format if it's not already
-  if (!inherits(start_date, "Date")) {
-    start_date <- as.Date(start_date)
-  }
-
-  # Initialize vectors to hold month and week information
-  months <- c("January", "February", "March", "April", "May", "June",
-              "July", "August", "September", "October", "November", "December")
-  weeks <- c(4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5)  # 4-4-5 pattern
-
-  # Create a data frame to store the calendar
-  calendar <- data.frame(
-    Date = as.Date(character(0)),
-    Month = character(0),
-    Week = integer(0),
-    Start_Date = as.Date(character(0))
-  )
-
-  # Initialize the start date
-  current_date <- start_date
-
-  # Fill in the calendar data frame
-  for (i in seq_along(months)) {
-    month_days <- weeks[i] * 7  # Calculate total days based on weeks
-
-    # Generate dates for the month
-    month_dates <- seq(current_date, by = "day", length.out = month_days)
-
-    # Append to the calendar data frame
-    calendar <- rbind(calendar, data.frame(
-      Date = month_dates,
-      Month = rep(months[i], month_days),
-      Week = rep(1:weeks[i], each = 7)[1:month_days],  # Assign week numbers
-      Start_Date = rep(current_date, month_days)
-    ))
-
-    current_date <- current_date + month_days  # Move to the next month's start date
-  }
-
-  return(calendar)
-}
-
-"-- Step 1: Create a table to hold the iris dataset
--- Assuming the dataset is already available in a table called `iris_data`
-
--- Step 2: Calculate the mean of each column
-WITH means AS (
-    SELECT
-        AVG(y) AS mean_y,
-        AVG(x1) AS mean_x1,
-        AVG(x2) AS mean_x2
-    FROM iris_data
-),
-
--- Step 3: Compute the centered values for y, x1, and x2
-centered AS (
-    SELECT
-        y - means.mean_y AS y_centered,
-        x1 - means.mean_x1 AS x1_centered,
-        x2 - means.mean_x2 AS x2_centered
-    FROM
-        iris_data, means
-),
-
--- Step 4: Compute the residuals of the linear models using REGR_SLOPE
-residuals AS (
-    SELECT
-        x2_centered - (x1_centered * REGR_SLOPE(x2_centered, x1_centered) OVER()) AS res_x2_x1,
-        y_centered - (x1_centered * REGR_SLOPE(y_centered, x1_centered) OVER()) AS res_y_x1,
-        x1_centered - (x2_centered * REGR_SLOPE(x1_centered, x2_centered) OVER()) AS res_x1_x2,
-        y_centered - (x2_centered * REGR_SLOPE(y_centered, x2_centered) OVER()) AS res_y_x2,
-        ROW_NUMBER() OVER () AS row_num
-    FROM centered
-)
-
--- Step 5: Compute the coefficients from the residuals
-SELECT
-    REGR_SLOPE(res_y_x1, res_x2_x1) AS coef_x2,
-    REGR_SLOPE(res_y_x2, res_x1_x2) AS coef_x1
-FROM residuals;
-"
-library(DBI)
-
-dbExecute(con, ".help;") |> as_tibble() |> print(n=100)
-
-dbGetQuery(con
-                      ,
-           "
-           SELECT generate_series(2, 5);
-           "
-                      )
-  as_tibble() |>
-  print(n=100)
+tbl(con,sql(test_lm)) |> as_tibble()
 
 DBI::dbListTables(con)
 
-ext_tbl |> pull(install_path)
 
+test3_sql <- sql("
 
+WITH means AS (
+    SELECT
+        AVG(price) AS mean_price,
+        AVG(x) AS mean_x,
+        AVG(carat) AS mean_carat
+    FROM diamonds
+),
 
-x <- mtcars
+sums AS (
+    SELECT
+        SUM((price - m.mean_price) * (x - m.mean_x)) AS S_yx,
+        SUM((price - m.mean_price) * (carat - m.mean_carat)) AS S_ycarat,
+        SUM((x - m.mean_x) * (x - m.mean_x)) AS S_xx,
+        SUM((carat - m.mean_carat) * (carat - m.mean_carat)) AS S_caratcarat,
+        SUM((x - m.mean_x) * (carat - m.mean_carat)) AS S_xcarat
+    FROM diamonds, means m
+),
+coefs AS (
+    SELECT
+        (S_yx * S_caratcarat - S_ycarat * S_xcarat) / (S_xx * S_caratcarat - S_xcarat * S_xcarat) AS coef_x,
+        (S_ycarat * S_xx - S_yx * S_xcarat) / (S_xx * S_caratcarat - S_xcarat * S_xcarat) AS coef_carat
+    FROM sums
+)
+SELECT
+    m.mean_price - c.coef_x * m.mean_x - c.coef_carat * m.mean_carat AS intercept,
+    c.coef_x,
+    c.coef_carat
+FROM means m, coefs c
 
-
-accumulate(.x=1:10,.f=\(prev,.next) mtcars |> mutate(test=prev+1) |> as_tibble() |> relocate(last_col()),.init=1)
-
-mf <- memdb_frame(g = c(1, 1, 2, 2, 2), x = 1:5, y = 5:1)
-mf
-
-mf <-  ?memdb_frame(g = diamonds$price,c=diamonds$carat)
-
-library(dbplyr)
-
-mf |>
-  summarise(
-    test=dplyr::sql("regr_intercept(g,c)")
-  )
-
-
-lazy_frame(x = diamonds$price,y=diamonds$cut, con = simulate_snowflake()) |>
-  summarise(x=mean(x))
-
-translate_sql(?str_pad(x,"left",10), con = simulate_oracle())
-translate_sql(substr(x, 1, 2), con = simulate_sqlite())
-
-
-xs = range(1,11)
-xs == [1,2,3,4,5,6,7,8,9,10]
-
-library(duckplyr)
-mtcars |>
-  duckplyr::as_duckplyr_df() |>
-  duckplyr::add_tally(vs) |> explain()
-
-
-
-library(tidyverse)
-
-
-dates_vec <- seq.Date(from=ymd("2023-01-01"),to=ymd("2023-12=31"),by = "day")
+")
 
 
 
 
-calendar_tbl <- tibble(
-  dates=dates_vec
-) |>
-  mutate(
-    quarter=lubridate::quarter(dates)
-    ,quarter_start_date=floor_date(dates,unit="quarter")
-    ,quarter_end_date=ceiling_date(dates,unit="quarter")
-  )
-
-sales_tbl <- tibble(
-  row_id=1:100
-) |>
-  rowwise() |>
-  mutate(
-    posting_date=sample(dates_vec,1,replace = TRUE)
-    ,days_clear=sample(c(1:30),1,replace=TRUE)
-) |>
-  ungroup() |>
-  mutate(
-    clearing_date=posting_date+days_clear
-  )
-
-decrease <- calendar_tbl |>
-  left_join(
-    sales_tbl
-    ,by=
-      join_by(
-        quarter_start_date>posting_date
-        ,quarter_end_date >clearing_date
-      )
-  ) |>
-  drop_na() |>
-  group_by(
-    quarter
-  ) |>
-  summarise(
-    decrease=n()
-  )
-
-
-### ABC cateogry
-
-var_vec=="sum"
-
-if(var_vec=="sum"){
- temp1 <- diamonds_db |>  #passes the dataframe through
-
-  dplyr::group_by(cut,clarity) |>  #group's the dataframe by the input group column
-
-  #creates a bunch of columns
-  dplyr::summarize(
-    var=sum(price)
-    ,.groups="drop"
-  ) |>
-    dbplyr::window_order(desc(var),.by_group = FALSE)
-
-} else{
-
-  temp1 <- diamonds |>  #passes the dataframe through
-
-    dplyr::group_by(cut,clarity) |>  #group's the dataframe by the input group column
-
-    #creates a bunch of columns
-    dplyr::summarize(
-      var=dplyr::n()
-      ,.groups="drop"
-    ) |>
-    arrange(desc(var),.by_group = FALSE)
+tbl(con,sql(test3_sql))
 
 
 
+lm(price~x+carat,data=diamonds)
+
+
+generate_means_sql <- function(table, dep_var, indep_vars) {
+  # Combine the dependent and independent variable names into a single vector
+  vars <- c(dep_var, indep_vars)
+
+  # Create a SQL fragment for each variable using purrr::map_chr
+  cols_sql <- map_chr(vars, ~ glue("AVG({.x}) AS mean_{.x}"))
+
+  # Collapse the fragments into one comma-separated string
+  cols_sql <- paste(cols_sql, collapse = ",\n    ")
+
+  # Construct the full SQL query using glue
+  query <- glue("SELECT
+    {cols_sql}
+FROM {table}")
+
+  # Return the query wrapped in sql_ql() (assuming sql_ql is defined in your workflow)
+  return(query)
 }
 
+generate_means_sql("diamonds", "price", c("x", "carat","y","z"))
 
 
-a <- .7
-b <- .25
-c <- .05
+library(glue)
+library(purrr)
 
-order_by <- "sum"
+generate_sums_sql <- function(table, dep_var, indep_vars) {
+  # Create expressions for the dependent variable with each independent variable
+  dep_indep_exprs <- map_chr(indep_vars, ~ glue(
+    "SUM(({dep_var} - m.mean_{dep_var}) * ({.x} - m.mean_{.x})) AS S_{dep_var}{.x}"
+  ))
 
-order_by_value <- base::match.arg(arg = order_by,choices = c("sum","n"))
+  # Create expressions for each independent variable's variance
+  indep_var_exprs <- map_chr(indep_vars, ~ glue(
+    "SUM(({.x} - m.mean_{.x}) * ({.x} - m.mean_{.x})) AS S_{.x}{.x}"
+  ))
 
-diamonds_db |>
+  # For every unique pair of independent variables, compute their covariance
+  comb_exprs <- character(0)
+  if (length(indep_vars) > 1) {
+    comb_exprs <- combn(indep_vars, 2, simplify = FALSE, FUN = function(pair) {
+      glue("SUM(({pair[1]} - m.mean_{pair[1]}) * ({pair[2]} - m.mean_{pair[2]})) AS S_{pair[1]}{pair[2]}")
+    }) %>% unlist()
+  }
 
-  dplyr::group_by(cut,clarity) |>
-  dplyr::summarize(
-    var=sum(price)
-    ,.groups="drop"
-  ) |>
-  arrange(var) |>
-  dplyr::mutate(
-    cum_sum=base::cumsum(var)
-    ,prop_total=var/max(cum_sum)
-    ,cum_prop_total=base::cumsum(prop_total)
-    ,row_id=dplyr::row_number()
-    ,max_row_id=max(row_id)
-    ,id_prop_total=row_id/max_row_id
-    ,group_classification_by_dim=
-      dplyr::case_when(
-        cum_prop_total  <=a      ~  "A"
-        ,cum_prop_total <=(a+b)  ~  "B"
-        ,.default                = "C"
-        ),
-    dim_threshold=
-      dplyr::case_when(
-        group_classification_by_dim=="A"~a
-        ,group_classification_by_dim=="B"~(a+b)
-        ,.default                        = c
-        )
-    ) |>
-  dplyr::select(-c(prop_total,cum_sum,max_row_id,))
+  # Combine all expressions into one SQL fragment (comma-separated)
+  all_exprs <- c(dep_indep_exprs, indep_var_exprs, comb_exprs)
+  exprs_sql <- paste(all_exprs, collapse = ",\n    ")
+
+  # Construct the final query; note that we join the 'means' CTE/table
+  query <- glue("SELECT
+    {exprs_sql}
+FROM {table}, means m")
+
+  # Wrap it in sql_ql() (assuming that's your function for executing SQL)
+  return(query)
+}
+
+# Example usage:
+# This call generates SQL that computes sums-of-products for:
+#   Dependent: price
+#   Independent: x and carat
+sql_query <- generate_sums_sql("diamonds", "price", c("x", "carat","z","y"))
+
+library(glue)
+library(purrr)
+library(glue)
+library(purrr)
+
+# Helper: for a given vector of independent variables (in order),
+# construct the symbolic (X′X) matrix.
+construct_matrix <- function(vars) {
+  n <- length(vars)
+  mat <- matrix("", n, n)
+  for(i in seq_len(n)) {
+    for(j in seq_len(n)) {
+      if(i <= j) {
+        mat[i, j] <- glue("S_{vars[i]}{vars[j]}")
+      } else {
+        mat[i, j] <- glue("S_{vars[j]}{vars[i]}")
+      }
+    }
+  }
+  return(mat)
+}
+
+# Recursive function to compute the determinant of a symbolic matrix.
+determinant_expr_matrix <- function(mat) {
+  n <- nrow(mat)
+  if(n == 1) {
+    return(mat[1,1])
+  } else {
+    terms <- map_chr(seq_len(n), function(j) {
+      sign <- ifelse((1 + j) %% 2 == 0, "", "-")
+      # Remove first row and j-th column to form the submatrix.
+      submat <- mat[-1, -j, drop = FALSE]
+      term <- glue("({mat[1, j]} * ({determinant_expr_matrix(submat)}))")
+      paste0(sign, term)
+    })
+    # Join the terms with " + "
+    paste(terms, collapse = " + ")
+  }
+}
+
+# Helper: construct a matrix like M but with column 'col_replace'
+# replaced by the vector of dependent covariances.
+construct_replaced_matrix <- function(vars, dep, col_replace) {
+  n <- length(vars)
+  mat <- matrix("", n, n)
+  for(i in seq_len(n)) {
+    for(j in seq_len(n)) {
+      if(j == col_replace) {
+        # replaced column: use the covariance between dep and the regressor in row i.
+        mat[i, j] <- glue("S_{dep}{vars[i]}")
+      } else {
+        if(i <= j) {
+          mat[i, j] <- glue("S_{vars[i]}{vars[j]}")
+        } else {
+          mat[i, j] <- glue("S_{vars[j]}{vars[i]}")
+        }
+      }
+    }
+  }
+  return(mat)
+}
+
+# Main function to generate the SQL snippet for coefficients
+generate_coefs_sql_generic <- function(dep_var, indep_vars) {
+  # Build the main (X′X) matrix.
+  M <- construct_matrix(indep_vars)
+  det_M <- determinant_expr_matrix(M)
+
+  # For each independent variable, build the column-replaced matrix and compute its determinant.
+  coefs_exprs <- map2_chr(seq_along(indep_vars), indep_vars, function(idx, var) {
+    M_replace <- construct_replaced_matrix(indep_vars, dep_var, idx)
+    det_replace <- determinant_expr_matrix(M_replace)
+    glue("({det_replace})/({det_M}) AS coef_{var}")
+  })
+
+  # Combine into a SQL snippet (wrapped in a CTE named "coefs")
+  coefs_sql <- glue("coefs AS (
+  SELECT
+    {paste(coefs_exprs, collapse = ",\n    ")}
+  FROM sums
+)")
+
+  # Wrap with your SQL function (assumed to be sql_ql)
+  return(coefs_sql)
+}
+
+# Example usage:
+# For a regression of 'price' on independent variables 'x', 'carat', and 'depth'
+sql_query <- generate_coefs_sql_generic("price", c("x", "carat", "depth"))
+cat(sql_query)
 
 
+library(glue)
+library(purrr)
+
+# Helper: Build a nested residualization expression.
+# Given an initial expression and a vector of variables to partial out,
+# it returns an expression like:
+#   ((initial_expr - var1 * regr_slope(initial_expr, var1) OVER ())
+#      - var2 * regr_slope(..., var2) OVER ()) ...
+build_residual_expr <- function(initial_expr, others) {
+  reduce(others, .init = initial_expr, .f = function(acc, other) {
+    glue("({acc} - {other} * regr_slope({acc}, {other}) OVER ())")
+  })
+}
+
+# Main function: Generate SQL code that computes the regression coefficients
+# via nested residualization using regr_slope() for an arbitrary number of regressors.
+# It assumes that a CTE (or table) named "centered" exists with the centered values of:
+#   - The dependent variable (dep_var)
+#   - Each independent variable (as provided in indep_vars)
+generate_regr_slope_coefs_sql_multi <- function(dep_var, indep_vars) {
+  # For each independent variable v, the "other" regressors are those in indep_vars excluding v.
+  coef_exprs <- map(indep_vars, function(v) {
+    others <- setdiff(indep_vars, v)
+    # Generate a nested residual expression for the dependent variable
+    # after partialling out all variables in 'others'.
+    res_y_expr <- build_residual_expr(dep_var, others)
+    # Similarly, generate a residual expression for the regressor v.
+    res_v_expr <- build_residual_expr(v, others)
+    # The coefficient for v is then the slope from regressing the residualized y on residualized v.
+    glue("regr_slope({res_y_expr}, {res_v_expr}) AS coef_{v}")
+  })
+
+  # Combine the coefficient expressions into a SELECT statement from the "centered" data.
+  coefs_sql <- glue("coefs AS (
+    SELECT
+      {paste(coef_exprs, collapse = ',\n      ')}
+    FROM centered
+)")
+
+  # Wrap with your SQL execution function (assumed here to be sql_ql)
+  return(coefs_sql)
+}
+
+# Example usage:
+# For a regression of 'price' on independent variables 'x', 'carat', and 'depth',
+# this generates SQL that sequentially residualizes out the effects of the other regressors.
+sql_query <- generate_regr_slope_coefs_sql_multi("price", c("x", "carat", "depth"))
+cat(sql_query)
+
+
+## stuck here
+coefs AS (
+  SELECT
+  -- Coefficient for x: regress the residualized y on the residualized x,
+  -- where the residuals are computed by partialing out carat.
+  regr_slope(
+    y - carat * regr_slope(y, carat) OVER (),
+    x - carat * regr_slope(x, carat) OVER ()
+  ) AS coef_x,
+
+  -- Coefficient for carat: regress the residualized y on the residualized carat,
+  -- where the residuals are computed by partialing out x.
+  regr_slope(
+    y - x * regr_slope(y, x) OVER (),
+    carat - x * regr_slope(carat, x) OVER ()
+  ) AS coef_carat
+  FROM centered

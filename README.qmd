@@ -251,8 +251,10 @@ s custom print function
 - then lastly can focus on the sql lm 
 
 2024-02-22
-- finished the yoytd logic to account for different days in period (eg. previous month as 30 and next month as 31 days  )
-
+- finished all ti functions -- finally
+- need to do unit tests
+- then need to documentation
+- then need to get to factor functions and then sql_lm
 
 # list of all functions
 
