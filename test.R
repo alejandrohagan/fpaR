@@ -8,6 +8,7 @@ devtools::document()
 devtools::check()
 
 
+
 .data <- sales |> group_by(customer_key)
 
 x <- fpaR::ytd(.data = .data,.date = order_date,.value = margin,calendar_type = "standard")

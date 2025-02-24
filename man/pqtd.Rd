@@ -48,7 +48,7 @@ use \code{\link[=calculate]{calculate()}} to return the results
 }
 }
 \examples{
-qtd(fpar::sales,.date=order_date,.value=quantity,calendar_type="standard")
+pqtd(fpar::sales,.date=order_date,.value=quantity,calendar_type="standard",lag_n=1)
 }
 \seealso{
 Other time_intelligence: 
