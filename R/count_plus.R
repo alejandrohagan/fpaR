@@ -87,9 +87,6 @@ temp_data1 <-
     dplyr::relocate(row_id)
 
 
-  obj_class <-  stringr::str_flatten_comma(base::class(tempdata_3),last = " or ")
-
-  cli::cli_alert_info("Returning obj of '{obj_class}' class")
 
   return(tempdata_3)
 

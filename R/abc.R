@@ -10,7 +10,6 @@
 #' @param b incremental segment threshold expressed as a percentage eg .26
 #' @param c final segment threshold expressed as a percentage eg .04
 #' @param func either "sum" or "n"; sum to sum your dim or n for row count
-#' @param ... columns to group by
 #'
 #' @return a tibble or DBI object
 #' @export

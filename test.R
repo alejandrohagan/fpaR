@@ -6,31 +6,7 @@ library(dbplyr)
 library(testthat)
 devtools::document()
 
-devtools::test()
 
 
 
 
-
-
-
-.data <- sales |> group_by(customer_key)
-
-x <- fpaR::ytd(.data = .data,.date = order_date,.value = margin,calendar_type = "standard")
-x <- fpaR::pytd(.data =.data ,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
-x <- fpaR::yoytd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
-x <- fpaR::yoy(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
-x <- fpaR::ytdopy(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
-x <- fpaR::qoq(.data,.date = order_date,.value = margin,calendar_type = "standard")
-x <- fpaR::qoqtd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
-x <- fpaR::mtd(.data,.date = order_date,.value = margin,calendar_type = "standard")
-x <- fpaR::pmtd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
-x <- fpaR::mom(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
-x <- fpaR::wtd(.data,.date = order_date,.value = margin,calendar_type = "standard")
-x <- fpaR::pwtd(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
-x <- fpaR::wow(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
-x <- fpaR::atd(.data,.date = order_date,.value = margin,calendar_type = "standard")
-x <- fpaR::dod(.data,.date = order_date,.value = margin,calendar_type = "standard",lag_n = 1)
-
-
-devtools::check()

@@ -256,6 +256,26 @@ s custom print function
 - then need to documentation
 - then need to get to factor functions and then sql_lm
 
+
+2024-03-01
+- define unit testing plan
+  
+  - does create_calendar() fill in missing dates
+  - how are period to period imbalances handled
+- finalize ti documentation
+- harmonize apparoch to
+  - abc
+  - chort_date
+  - count_plus 
+    -  adjust for when a grouped object is passed
+  - make segmentation
+- clean up publication 
+- use github actions to automatme some bill
+- clean up readme
+- factor analysis will come in second package release
+- lets get ti going and instractucture devleoped
+  
+
 # list of all functions
 
 ```{r}
