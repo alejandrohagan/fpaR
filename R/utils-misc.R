@@ -248,7 +248,6 @@ make_print_message <- function(x){
 #' mtcars |> divide(new_col_name=div_col,numerator=mpg,denominator=0,alternative_result=10)
 divide <- function(.data,new_col_name,numerator_col,denominator_col,alternative_result=NA_integer_){
 
-
   # Validate alternative_result is numeric
   assertthat::assert_that(
     is.numeric(alternative_result),

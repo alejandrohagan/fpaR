@@ -1,7 +1,6 @@
 # Load necessary libraries
 library(testthat)
 library(dplyr)
-devtools::load_all()
 
 # Define the test context
 test_that("divide function works as expected", {

@@ -5,7 +5,12 @@ library(rlang)
 library(dbplyr)
 library(testthat)
 devtools::document()
-devtools::check()
+
+devtools::test()
+
+
+
+
 
 
 
