@@ -258,10 +258,13 @@ s custom print function
 
 
 2024-03-01
+- need printing method for ti object
 - define unit testing plan
-  
-  - does create_calendar() fill in missing dates
   - how are period to period imbalances handled
+  - pick a month
+    - do ytd for both periods
+    - then do a join
+    - then control for the behavior
 - finalize ti documentation
 - harmonize apparoch to
   - abc

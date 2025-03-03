@@ -5,6 +5,227 @@ devtools::load_all()
 # load arguments / data
 
 
+
+
+## create calendar fills missing
+
+test_that("create calendar fills in missing periods",{
+
+ new_tbl <-  sales |>
+   group_by(currency_code) |>
+    mutate(
+      year=year(order_date)
+    ) |>
+    filter(
+      TRUE
+      ,!year %in% c(2022,2023)
+    ) |>
+    yoy(order_date,margin,"standard",1) |>
+    calculate() |>
+    arrange(date) |>
+   collect()
+
+ validation_vec <- new_tbl |> pull(year) %in% c(2022,2023) |> sum()
+
+  testthat::expect_true(
+   validation_vec==10
+  )}
+
+ )
+
+
+## correct aggregation when unequal periods
+
+test_that("period imabalance balidation -- month",{
+
+  pm_mtd_tbl <- sales |>
+    group_by(currency_code) |>
+    mtd(order_date,margin,"standard") |>
+    calculate() |>
+    filter(
+      TRUE
+      ,month(date) %in% c(1)
+      ,year(date) %in% c(2022)
+    ) |>
+    arrange(date)
+
+
+  cm_pmtd_tbl <- sales |>
+    group_by(currency_code) |>
+    pmtd(order_date,margin,"standard",1) |>
+    calculate() |>
+    filter(
+      TRUE
+      ,month(date) %in% c(2)
+      ,year(date) %in% c(2022)
+    ) |>
+    arrange(date)
+
+
+pm_mtd_vec <-   pm_mtd_tbl |>
+    filter(
+      date=="2022-01-27"
+    ) |>
+    pull(mtd_margin) |> sum()
+
+
+cm_pmtd_vec <-   cm_pmtd_tbl |>
+  filter(
+    date=="2022-02-27"
+  ) |>
+  pull(pmtd_margin) |> sum()
+
+pm_mtd_rem_vec <-   pm_mtd_tbl |>
+  filter(
+    date>"2022-01-27"
+  ) |>
+
+  pull(mtd_margin) |> sum()
+
+cm_pmtd_rem_vec <-   cm_pmtd_tbl |>
+    filter(
+      date>"2022-02-27"
+    ) |>
+    pull(pmtd_margin) |> sum()
+
+testthat::expect_true(
+  cm_pmtd_vec==pm_mtd_vec
+)
+
+testthat::expect_true(
+  pm_mtd_rem_vec==cm_pmtd_rem_vec
+)
+
+})
+
+
+
+test_that("period imabalance balidation -- year",{
+
+  pm_ytd_tbl <- sales |>
+    group_by(currency_code) |>
+    ytd(order_date,margin,"standard") |>
+    calculate() |>
+    filter(
+      TRUE
+      ,month(date) %in% c(2)
+      ,year(date) %in% c(2022)
+    ) |>
+    arrange(date)
+
+
+  cm_pytd_tbl <- sales |>
+    group_by(currency_code) |>
+    pytd(order_date,margin,"standard",1) |>
+    calculate() |>
+    filter(
+      TRUE
+      ,month(date) %in% c(2)
+      ,year(date) %in% c(2023)
+    ) |>
+    arrange(date)
+
+
+  pm_ytd_vec <-   pm_ytd_tbl |>
+    filter(
+      date=="2022-02-27"
+    ) |>
+    pull(ytd_margin) |> sum()
+
+
+  cm_pytd_vec <-   cm_pytd_tbl |>
+    filter(
+      date=="2023-02-27"
+    ) |>
+    pull(pytd_margin) |> sum()
+
+  pm_ytd_rem_vec <-   pm_ytd_tbl |>
+    filter(
+      date>"2022-02-27"
+    ) |>
+
+    pull(ytd_margin) |> sum(... = _,na.rm=TRUE)
+
+  cm_pytd_rem_vec <-   cm_pytd_tbl |>
+    filter(
+      date>"2023-02-27"
+    ) |>
+    pull(pytd_margin) |> sum(...=_,na.rm=TRUE)
+
+  testthat::expect_true(
+    cm_pytd_vec==pm_ytd_vec
+  )
+
+  testthat::expect_true(
+    pm_ytd_rem_vec==cm_pytd_rem_vec
+  )
+
+})
+
+test_that("period imabalance validation -- quarter",{
+
+  pm_qtd_tbl <- sales |>
+    # group_by(currency_code) |>
+    qtd(order_date,margin,"standard") |>
+    calculate() |>
+    filter(
+      TRUE
+      ,month(date) %in% c(1)
+      ,year(date) %in% c(2022)
+    ) |>
+    arrange(date)
+
+
+  cm_pqtd_tbl <- sales |>
+    # group_by(currency_code) |>
+    pqtd(order_date,margin,"standard",1) |>
+    calculate() |>
+    filter(
+      TRUE
+      ,month(date) %in% c(4)
+      ,year(date) %in% c(2022)
+    ) |>
+    arrange(date)
+
+
+  pm_qtd_vec <-   pm_qtd_tbl |>
+    filter(
+      date=="2022-01-27"
+    ) |>
+    pull(qtd_margin) |> sum()
+
+
+  cm_pqtd_vec <-   cm_pqtd_tbl |>
+    filter(
+      date=="2022-04-27"
+    ) |>
+    pull(pqtd_margin) |> sum()
+
+  pm_qtd_rem_vec <-   pm_qtd_tbl |>
+    filter(
+      date>"2022-02-27"
+    ) |>
+
+    pull(qtd_margin) |> sum(... = _,na.rm=TRUE)
+
+  cm_pqtd_rem_vec <-   cm_pqtd_tbl |>
+    filter(
+      date>"2023-02-27"
+    ) |>
+    pull(pqtd_margin) |> sum(...=_,na.rm=TRUE)
+
+  testthat::expect_true(
+    cm_pqtd_vec==pm_qtd_vec
+  )
+
+  testthat::expect_true(
+    pm_qtd_rem_vec==cm_pqtd_rem_vec
+  )
+
+})
+
+
+
 ### functions correctly run --------------
 
 test_that("ti functions correctly run",{

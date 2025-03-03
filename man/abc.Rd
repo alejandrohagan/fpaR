@@ -9,8 +9,6 @@ abc(.data, ..., dim, a = 0.7, b = 0.26, c = 0.04, func = c("sum"))
 \arguments{
 \item{.data}{tibble or DBI object}
 
-\item{...}{columns to group by}
-
 \item{dim}{dimension to classify by (should be additive and positive)}
 
 \item{a}{initial segment threshold expressed as a percentage eg .7}

@@ -8,5 +8,7 @@ devtools::document()
 
 
 
+x <- pqtd(sales,order_date,margin,calendar_type="standard",lag_n = 1)
+
 
 
