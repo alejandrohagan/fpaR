@@ -1,0 +1,9 @@
+^fpaR\.Rproj$
+^\.Rproj\.user$
+^fpaR\.Rcheck$
+^fpaR.*\.tar\.gz$
+^fpaR.*\.tgz$
+^LICENSE\.md$
+^README\.Rmd$
+^\.github$
+^data-raw$
