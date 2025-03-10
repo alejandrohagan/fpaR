@@ -2,16 +2,19 @@
 
 # find sql logic for 554, 445, 13 month calendars
 # put indicator for imbalanced periods
+## alredy started for pmtd -- period short fall -- period long fall
+## also fixed error for period imbalance where it takes the sum instead of the max
+
 # put print method for imbalanced period for comparison functions
 # Put description in print method of calendar description
 # update readme examples
 
-
-library(tinytable)
 library(tidyverse)
+library(tidyverse)
+devtools::load_all()
 
-x <- mtcars[1:5, 1:5]
-
+x
+x <- pmtd(sales,order_date,margin,"standard",1)
 tt(x,theme = "bootstrap")
 
 

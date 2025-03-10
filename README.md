@@ -52,6 +52,7 @@ anlaysis such as **Year-over-Year (YoY)**, **Month-to-Date (MTD)**, and
 - **Flexible calendar options**: Handle comparisons based on a
   **standard calendar** or a **5-5-4 fiscal calendar** to accommodate
   different reporting frameworks
+  
 
 Time intelligence can be summarized if they aggregate a value, shift a
 value or compare against another value.

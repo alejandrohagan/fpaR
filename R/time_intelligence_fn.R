@@ -111,6 +111,8 @@ pytd_fn <- function(x){
 #'
 yoytd_fn <- function(x){
 
+
+
   # ytd table
 
   ytd_dbi <- ytd(.data=x@calendar@data,.date=!!x@calendar@date_quo,.value = !!x@value@value_quo,calendar_type = x@calendar@calendar_type) |>
@@ -529,17 +531,23 @@ pmtd_fn <- function(x){
     ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
   ) |>
     dplyr::select(-c(!!x@value@value_quo)) |>
+    mutate(
+      previous_period_short=dplyr::if_else(is.na(pmtd_margin),1,0)
+    ) |>
     dbplyr::window_order(date) |>
-    dplyr::group_by(date,year,month,!!!x@calendar@group_quo) |>
-    tidyr::fill(date,.direction = "down") |>
+    # dplyr::group_by(date,year,month,!!!x@calendar@group_quo) |>
+    # tidyr::fill(date,.direction = "down") |>
     dplyr::ungroup() |>
     dplyr::summarise(
-      dplyr::across(dplyr::contains(x@value@value_vec),\(x) sum(x,na.rm=TRUE))
+      dplyr::across(dplyr::contains(x@value@value_vec),\(x) max(x,na.rm=TRUE))
+      ,previous_period_short=sum(previous_period_short,na.rm=TRUE)
+      ,previous_period_long=if_else(n()==1,0,n())
       ,.by=c(date,year,month,!!!x@calendar@group_quo)
-    ) |>
-    dplyr::filter(
-      !is.na(year)
     )
+    # dplyr::filter(
+    #   !is.na(year)
+    # )
+
 
   return(out_dbi)
 
@@ -572,12 +580,15 @@ momtd_fn <- function(x){
 
   # join tables together
 
-  out_dbi <-   dplyr::left_join(
+  out_dbi <-   dplyr::full_join(
     mtd_dbi
     ,pmtd_dbi
     ,by=dplyr::join_by(date==date,year,month,!!!x@calendar@group_quo)
   ) |>
-    dplyr::group_by(date,year,month,!!!x@calendar@group_quo) |>
+    # dplyr::mutate(
+    #   imbalance_period=is.na(x@value@new_column_name)
+    # )
+    dplyr::group_by(date,year,month,!!!x@calendar@group_quo) |> arrange(date) |> view()
     tidyr::fill(date,.direction = "down") |>
     dplyr::ungroup() |>
     dplyr::summarise(
