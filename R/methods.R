@@ -151,14 +151,13 @@ S7::method(print,ti) <- function(x,...){
 
 
   cli::cli_text(paste0(x@action@value[[3]]," ",cli::col_br_magenta(na.omit(x@fn@compare))))
-
-
+  cli::cat_line("")
   ## print groups if groups exist
 
   if(x@calendar@group_indicator){
 
-    cli::cli_text("{stringr::str_flatten_comma(x@calendar@group_vec,last = ' and ')} groups are in the table")
-
+  cli::cli_text("{stringr::str_flatten_comma(x@calendar@group_vec,last = ' and ')} groups are in the table")
+  cli::cat_line("")
   }
 
   ## Next Steps information

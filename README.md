@@ -1,5 +1,19 @@
 # README
 
+
+``` r
+devtools::load_all()
+```
+
+    ℹ Loading fpaR
+
+``` r
+devtools::document()
+```
+
+    ℹ Updating fpaR documentation
+    ℹ Loading fpaR
+
 # **fpaR: A Business Intelligence Toolkit for Financial Planning & Analysis (FP&A)**
 
 ## **Introduction**
@@ -44,29 +58,29 @@ value or compare against another value.
 
 Below is the full list of time intelligence functions
 
-| Short Name | Description                                              | Shift | Aggregate | Compare |
-|------------|----------------------------------------------------------|-------|-----------|---------|
-| YoY        | Full Year over Year                                      |       |           | X       |
-| YTD        | Year-to-Date                                             | X     |           |         |
-| PYTD       | Prior Year-to-Date amount                                | X     | X         |         |
-| YoYTD      | Current Year-to-Date over Prior Year-to-Date             | X     | X         | X       |
-| YTDOPY     | Year-to-Date over Full Previous Year                     | X     | X         | X       |
-| QoQ        | Full Quarter over Quarter                                |       |           | X       |
-| QTD        | Quarter-to-Date                                          | X     |           |         |
-| PQTD       | Prior Quarter-to-Date                                    | X     | X         |         |
-| QOQTD      | Quarter-over-Quarter-to-Date                             | X     | X         | X       |
-| QTDOPQ     | Quarter-to-Date over Full Previous Quarter               | X     | X         | X       |
-| MTD        | Month-to-Date                                            | X     |           |         |
-| MoM        | Full Month over Full Month                               |       |           | X       |
-| MoMTD      | Current Month-to-Date over Prior Month-to-Date           | X     | X         | X       |
-| PMTD       | Prior Month's MTD amount                                 | X     | X         |         |
-| MTDOPM     | Month-to-Date over Full Previous Month                   | X     | X         | X       |
-| WTD        | Week-to-Date                                             | X     |           |         |
-| WoW        | Full Week over Full Week                                 |       |           | X       |
-| WoWTD      | Current Week-to-Date over Prior Week-to-Date             | X     | X         | X       |
-| PWTD       | Prior Week-to-Date                                       | X     | X         |         |
-| ATD        | Cumulative total from inception to date                  | X     |           |         |
-| DoD        | Full Day over Full Day                                   |       |           | X       |
+| short_name | description                                    | shift | aggregate | compare |
+|------------|------------------------------------------------|-------|-----------|---------|
+| YoY        | Full Year over Year                            |       |           | X       |
+| YTD        | Year-to-Date                                   |       | X         |         |
+| PYTD       | Prior Year-to-Date amount                      | X     | X         |         |
+| YoYTD      | Current Year-to-Date over Prior Year-to-Date   | X     | X         | X       |
+| YTDOPY     | Year-to-Date over Full Previous Year           | X     | X         | X       |
+| QoQ        | Full Quarter over Quarter                      |       |           | X       |
+| QTD        | Quarter-to-Date                                |       | X         |         |
+| PQTD       | Prior Quarter-to-Date                          | X     | X         |         |
+| QOQTD      | Quarter-over-Quarter-to-Date                   | X     | X         | X       |
+| QTDOPQ     | Quarter-to-Date over Full Previous Quarter     | X     | X         | X       |
+| MTD        | Month-to-Date                                  |       | X         |         |
+| MoM        | Full Month over Full Month                     |       |           | X       |
+| MoMTD      | Current Month-to-Date over Prior Month-to-Date | X     | X         | X       |
+| PMTD       | Prior Month’s MTD amount                       | X     | X         |         |
+| MTDOPM     | Month-to-Date over Full Previous Month         | X     | X         | X       |
+| WTD        | Week-to-Date                                   |       | X         |         |
+| WoW        | Full Week over Full Week                       |       |           | X       |
+| WoWTD      | Current Week-to-Date over Prior Week-to-Date   | X     | X         | X       |
+| PWTD       | Prior Week-to-Date                             | X     | X         |         |
+| ATD        | cumlaitve total from inception to date         |       | x         |         |
+| DoD        | Full Day over Full Day                         |       |           | X       |
 
 `fpaR` simplifies these workflows by providing **ready-to-use
 functions** that work seamlessly with both **tibble data frames** and
@@ -105,14 +119,11 @@ tracking business performance. However, they come with challenges:
 
 **Example Issue:**
 
-
-| Date       | Revenue |
-|------------|---------|
-| 2024-01-01 | 1,200   |
-| 2024-01-03 | 1,100   |
-| 2024-01-06 | 1,300   |
-
-
+| order_date | margin |
+|------------|--------|
+| 2024-01-01 | 1200   |
+| 2024-01-03 | 1100   |
+| 2024-01-06 | 1300   |
 
 If we use `dplyr::lag()` to compare **Day-over-Day (DoD)** revenue, we
 would be missing `2024-01-02` and `2024-01-04` which will lead to
@@ -122,10 +133,155 @@ To correct this, `fpaR` automatically **fills in missing dates** for
 each group of your data to ensure there are no missing periods when
 comparing periods
 
+## how to use fpaR?
+
+When you execute a time intelligence function, it will return a ti
+object with a custom print method that explains what the function is
+doing and a summary of transformation steps and the calendar attributes
+
+``` r
+sales |> 
+   mtd(.date=order_date,.value = margin,calendar_type = "standard") 
+```
+
+    ── Month-to-date ───────────────────────────────────────────────────────────────
+
+    Function: `mtd` was executed
+
+    ── Description: ──
+
+    This creates a daily `cumsum()` of the current month margin from the start of
+    the standard calendar month to the end of the month
+
+    ── Calendar: ──
+
+    • The calendar was aggregated to the day time unit
+    • A standard calendar is created with 0 groups
+    • Calendar ranges from 2021-05-18 to 2024-04-20
+    • 222 days were missing and replaced with 0
+    • New date column date, year and month was created
+
+    ── Actions: ──
+
+    ✔ Aggregate margin
+
+    ✖ Shift
+
+    ✖ Compare
+
+    ── Next Steps: ──
+
+    • Use `calculate()` to return the results
+
+    ────────────────────────────────────────────────────────────────────────────────
+
+to return a tibble of results, pass the ti object through to
+`calculated()`
+
+``` r
+sales |> 
+   mtd(.date=order_date,.value = margin,calendar_type = "standard") |> 
+   calculate()
+```
+
+    # Source:     SQL [?? x 5]
+    # Database:   DuckDB v1.1.3 [hagan@Linux 6.9.3-76060903-generic:R 4.4.2//tmp/RtmpeNY6FZ/file1399f114f84fd]
+    # Ordered by: date
+        year month date       margin mtd_margin
+       <dbl> <dbl> <date>      <dbl>      <dbl>
+     1  2023     9 2023-09-11   796.     36443.
+     2  2023     9 2023-09-12 10441.     46884.
+     3  2023     9 2023-09-13  1558.     48442.
+     4  2023     9 2023-09-14  2599.     51041.
+     5  2023     9 2023-09-15  1642.     52684.
+     6  2023     9 2023-09-16  3885.     56568.
+     7  2023     9 2023-09-17     0      56568.
+     8  2023     9 2023-09-18   447.     57015.
+     9  2023     9 2023-09-19  5164.     62180.
+    10  2023     9 2023-09-20  3211.     65390.
+    # ℹ more rows
+
+If you using a tibble data, under the hood, `fpaR` is converting that
+tibble to a [duckdb]() database and using [dbplyr]() to execute all the
+calculations. Use `dplyr::collect()` to return it as a regular tibble
+
+``` r
+sales |> 
+   mtd(.date=order_date,.value = margin,calendar_type = "standard") |> 
+   calculate() |> 
+   dplyr::arrange(date) |> 
+   dplyr::collect() |> 
+   head(10)
+```
+
+    # A tibble: 10 × 5
+        year month date        margin mtd_margin
+       <dbl> <dbl> <date>       <dbl>      <dbl>
+     1  2021     5 2021-05-18   407.        407.
+     2  2021     5 2021-05-19   711.       1118.
+     3  2021     5 2021-05-20  1424.       2542.
+     4  2021     5 2021-05-21 11339.      13881.
+     5  2021     5 2021-05-22  5359.      19240.
+     6  2021     5 2021-05-23     0       19240.
+     7  2021     5 2021-05-24     0       19240.
+     8  2021     5 2021-05-25   793.      20033.
+     9  2021     5 2021-05-26    74.6     20107.
+    10  2021     5 2021-05-27  1433.      21540.
+
+what if you need the analysis at the group level?
+
+Simply pass through the groups that you want with `dplyr::group_by()`
+and time intelligence function will create a custom calendar for each
+group.
+
+``` r
+sales |> 
+   dplyr::group_by(customer_key,store_key) |> 
+   yoy(.date=order_date,.value = margin,calendar_type = "standard")
+```
+
+    ── Year over year ──────────────────────────────────────────────────────────────
+
+    Function: `yoy` was executed
+
+    ── Description: ──
+
+    This creates a full year `sum()` of the previous year margin and compares it
+    with the full year `sum()` current year margin from the start of the standard
+    calendar year to the end of the year
+
+    ── Calendar: ──
+
+    • The calendar was aggregated to the year time unit
+    • A standard calendar is created with 2 groups
+    • Calendar ranges from 2021-05-18 to 2024-04-20
+    • 222 days were missing and replaced with 0
+    • New date column date and year was created
+
+    ── Actions: ──
+
+    ✔ Aggregate margin
+
+    ✔ Shift 1 year
+
+    ✔ Compare previous year
+
+    customer_key and store_key groups are in the table
+
+    ── Next Steps: ──
+
+    • Use `calculate()` to return the results
+
+    ────────────────────────────────────────────────────────────────────────────────
+
 **Practice Datasets**
 
-- Microsoft’s Contoso Dataset to help with practice with transaction
-  data
+- This package leverages the `contoso` package for its analysis. The
+  contoso datasets are fictional datasets of sales transaction which are
+  helpful for business intelligence related analysis (or general
+  database management practices)
+
+![Contoso](fig/contoso_schema.svg)
 
 This is an **active work-in-progress**, and feedback, testing, and
 contributions are welcome!
