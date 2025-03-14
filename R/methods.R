@@ -8,6 +8,9 @@ create_calendar <- S7::new_generic("create_calendar","x")
 calculate <- S7::new_generic("calculate","x")
 
 
+complete_calendar <- S7::new_generic("calculate","x")
+
+
 #' Create Calendar Table
 #' @name create_calendar
 #' @param x ti object
@@ -51,7 +54,12 @@ S7::method(create_calendar,ti) <- function(x){
       dplyr::cross_join(
         summary_dbi |>
           dplyr::distinct(!!!x@calendar@group_quo)
+      ) |>
+      dplyr::mutate(
+        missing_date_indicator=dplyr::if_else(is.na(!!x@value@value_quo),1,0)
+        ,!!x@value@value_vec:= dplyr::coalesce(!!x@value@value_quo, 0)
       )
+
   }
 
   # Perform a full join to ensure all time frames are represented
@@ -61,7 +69,8 @@ S7::method(create_calendar,ti) <- function(x){
     ,by = dplyr::join_by(date,!!!x@calendar@group_quo)
   ) |>
     dplyr::mutate(
-      !!x@value@value_vec:= dplyr::coalesce(!!x@value@value_quo, 0)
+      missing_date_indicator=dplyr::if_else(is.na(!!x@value@value_quo),1,0)
+      ,!!x@value@value_vec:= dplyr::coalesce(!!x@value@value_quo, 0)
     )
 
   return(full_dbi)
@@ -84,6 +93,51 @@ S7::method(calculate,ti) <- function(x){
     out <- x@fn@fn_exec(x) |>
       dbplyr::window_order(date)
 
+  return(out)
+
+}
+
+
+
+
+#' @title complete_calendar
+#' @name complete_calendar
+#' @param x ti object
+#'
+#' @returns dbi object
+#' @export
+S7::method(complete_calendar,ti) <- function(x){
+
+
+
+x <- pmtd(sales,order_date,margin,"standard",1)
+
+out <- x |>
+  calculate() |>
+  mutate(
+    year_start=1
+    ,year_end=1
+    ,quarter_start=1
+    ,quarter_end=1
+    ,month_start=1
+    ,month_end=1
+    ,week_start=1
+    ,week_end=1
+    ,day_of_week=1
+    ,days_in_year=1
+    ,days_in_quarter=1
+    ,days_in_month=1
+    ,days_in_week=1
+    ,days_remaining_in_year=1
+    ,days_remaining_in_quarter=1
+    ,days_remaining_in_month=1
+    ,days_remaining_in_week=1
+    ,days_passed_in_year=1
+    ,days_passed_in_quarter=1
+    ,days_passed_in_month=1
+    ,days_passed_in_year=1
+    ,weekend_indicator=1
+  )
   return(out)
 
 }
@@ -131,26 +185,23 @@ S7::method(print,ti) <- function(x,...){
 
 
   cli::cli_h2("Calendar:")
-  cli::cat_bullet(paste("The calendar was aggregated to the",cli::col_yellow(x@time_unit@value),"time unit"))
+  cli::cat_bullet(paste("The calendar aggregated",cli::col_br_magenta(x@calendar@date_vec),"to the",cli::col_yellow(x@time_unit@value),"time unit"))
   cli::cat_bullet("A ",cli::col_br_red(x@calendar@calendar_type)," calendar is created with ",cli::col_green(x@calendar@group_count," groups"))
   cli::cat_bullet(paste("Calendar ranges from",cli::col_br_green(x@calendar@min_date),"to",cli::col_br_green(x@calendar@max_date)))
   cli::cat_bullet(paste(cli::col_blue(x@calendar@date_missing),"days were missing and replaced with 0"))
-  cli::cat_bullet("New date column ",stringr::str_flatten_comma(cli::col_br_red(x@fn@new_date_column_name),last = " and ")," was created")
+  cli::cat_bullet("New date column ",stringr::str_flatten_comma(cli::col_br_red(x@fn@new_date_column_name),last = " and ")," was created from ",cli::col_br_magenta(x@calendar@date_vec))
   cli::cat_line("")
 
   ## Action information
 
   cli::cli_h2("Actions:")
 
-
   cli::cli_text(paste0(x@action@value[[1]]," ",cli::col_blue(x@value@value_vec)))
-
 
   cli::cli_text(paste0(x@action@value[[2]]," ",cli::col_green(na.omit(x@fn@lag_n))," ",cli::col_green(na.omit(x@fn@shift))))
 
-
-
   cli::cli_text(paste0(x@action@value[[3]]," ",cli::col_br_magenta(na.omit(x@fn@compare))))
+
   cli::cat_line("")
   ## print groups if groups exist
 

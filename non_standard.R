@@ -1,23 +1,35 @@
 
 
-# find sql logic for 554, 445, 13 month calendars
-# put indicator for imbalanced periods
-## alredy started for pmtd -- period short fall -- period long fall
+# put indicator for imbalanced periods, missing dates indicator
+## logic created -- but check functionality and put it into functions
+## already started for pmtd -- period short fall -- period long fall
 ## also fixed error for period imbalance where it takes the sum instead of the max
+# find sql logic for 554, 445, 13 month calendars
 
 # put print method for imbalanced period for comparison functions
 # Put description in print method of calendar description
 # update readme examples
 
-library(tidyverse)
+## complete_calendar() -- augment calendar attributes (Eg. days in month, week, start date end date, year start date, end date, etc)
+## summary method -- summary calendar attributes (number of missing dates?)
 library(tidyverse)
 devtools::load_all()
 
-x
 x <- pmtd(sales,order_date,margin,"standard",1)
+
 tt(x,theme = "bootstrap")
 
-
+x |>
+  calculate() |>
+  select(date,year,month,previous_period_short,previous_period_long) |>
+  mutate(
+    days_in_month=n()
+    ,.by=c(year,month)
+  ) |>
+  mutate(
+    days_in_year=n()
+    ,.by=c(year)
+  )
 
 
 

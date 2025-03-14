@@ -10,6 +10,7 @@ format: gfm
 #| error: false
 #| label: setup
 
+library(tidyverse)
 devtools::load_all()
 ```
 
@@ -30,18 +31,30 @@ reusable framework.
 In particular, the time intelligence functions are heavily inspired by
 [PowerBI DAX](https://www.sqlbi.com/) functions
 
-Under the hood, these functions are built upon the great foundations of
-[dbplyr](https://dbplyr.tidyverse.org/),
-[duckdb](https://github.com/duckdb/duckdb-r), and
-[lubridate](https://lubridate.tidyverse.org/)
-
+Under the hood, these functions are built upon the great foundations of:
+-  [dbplyr](https://dbplyr.tidyverse.org/),
+-  [duckdb](https://github.com/duckdb/duckdb-r)
+-  [lubridate](https://lubridate.tidyverse.org/)
 
 `fpaR` is designed to seamlessly work with either tibbles or modern database
-(DuckDB, Snowflake, SQLite, etc). 
+(DuckDB, Snowflake, SQLite, etc) with a common syntax.
+
 
 Even if you are working with tibbles, most functions are optimized to
 leverage [DuckDB](https://github.com/duckdb/duckdb-r) for superior
-speed and performance.
+speed and performance.^[I plan use [duckplyr](https://duckplyr.tidyverse.org/index.html) once it expands support for lubridate functions]
+
+By default most `fpaR` function returns a lazy DBI object which you can return as a tibble with `dplyr::collect()`
+
+## Key features & benefits
+
+- **Flexible support** common syntax for both local tibbles and databases 
+- **Optimized for speed and scale** tibbles rewritten to take advantage of [duckdb]() database
+- **Every transformation step is explained and summarized** instant clarity to what the
+underlying functions transformations are doing so you can validate and understand 
+your outputs
+
+
 
 ## Installation
 
@@ -63,24 +76,24 @@ pak::pak("alejandrohagan/fpaR")
 **Time intelligence**
 
 `fpaR` provides readily available functions for most time intelligence
-anlaysis such as **Year-over-Year (YoY)**, **Month-to-Date (MTD)**, and
-**Current Year-to-Date over Previous Year-to-Date (YoYTD)** efficiently.
+analysis such as **Year-over-Year (YoY)**, **Month-to-Date (MTD)**, and
+**Current Year-to-Date over Previous Year-to-Date (YoYTD)**.
+
+These functions are designed to quickly answer most common time intelligence related analysis in
+a consistent, fast and transparent way.
 
 **These features offer key benefits: **
 
 - **Auto-fill missing dates**: Ensures no missing periods in your
-  calculations, even if your dataset doesn’t include every single day.
+  calculations to ensure there are no missing dates or periods
 
 - **Flexible calendar options**: Handle comparisons based on a
-  **standard calendar** or a **5-5-4 fiscal calendar** to accommodate
+  **standard** or **5-5-4** fiscal calendar to accommodate
   different reporting frameworks
     
 - **Period imbalance indicator**: When comparing periods with dates imbalance, the time intelligence
 functions will alert you to the type and number of period imbalances to ensure you are aware of 
 misleading likewise comparisons
-
-Time intelligence can be summarized if they aggregate a value, shift a
-value or compare against another value.
 
 Below is the full list of time intelligence functions:
 
@@ -89,6 +102,7 @@ Below is the full list of time intelligence functions:
 #| warning: false
 #| message: false
 #| error: false
+#| label: ti-fn
 
 tibble::tribble(
    ~"short_name", ~"description", ~"shift", ~"aggregate", ~"compare",
@@ -124,62 +138,6 @@ tibble::tribble(
 
 ```
 
-
-
-
-### **Key Features & benefits**
-
-- **Flexible support** common syntax for both local tibbles and databases 
-- **Optimized for speed and scale** tibbles rewritten to take advantage of [duckdb]() database
-- **Every transformation step is explained and summarized** instant clarity to what the
-underlying functions transformations are doing so you can validate and understand 
-your outputs
-
-------------------------------------------------------------------------
-
-## Why do we need this package when we have lubridate?
-
-Time-based comparisons, such as **Year-over-Year (YoY),
-Quarter-over-Quarter (QoQ), and Month-to-Date (MTD)**, are common for
-tracking business performance. However, they come with challenges:
-
--  Many datasets **do not have continuous dates**, especially if data is
-  recorded only on business days or for active transactions
-
--  Period imbalances between periods (Eg. the different number of days between February vs. January) can create misleading
-
--  Your organization many use a non-standard calendar such as a 5-5-4, 4-4-5, or 13 month calendar and you need the ability to do time intelligence functions
-
-**Example Issue:**
-
-```{r}
-#| echo: false
-#| warning: false
-#| message: false
-#| error: false
-
-tibble::tibble(
-  order_date=c(" 2024-01-01","2024-01-03","2024-01-06")
-  ,margin=c(1200,1100,1300)
-) |> 
-  tinytable::tt()
-```
-
-
-
-If we use `dplyr::lag()` to compare **Day-over-Day (DoD)** revenue, we
-would be missing `2024-01-02` and `2024-01-04` which will lead to
-incorrect answers or trends
-
-To correct this, `fpaR` automatically **fills in missing dates** for
-each group of your data to ensure there are no missing periods when
-comparing periods
-
-
-## Issue 2
-
-
-## Issue 3
 
 ## How to use fpaR?
 
@@ -246,6 +204,75 @@ sales |>
    dplyr::group_by(customer_key,store_key) |> 
    yoy(.date=order_date,.value = margin,calendar_type = "standard")
 ```
+
+------------------------------------------------------------------------
+
+## Why do we need this package when we have lubridate?
+
+Time-based comparisons, such as Year-over-Year (YoY),
+Quarter-over-Quarter (QoQ), and Month-to-Date (MTD), are common for
+tracking business performance. However, they come with challenges:
+
+-  Many datasets **do not have continuous dates**, especially if data is
+  recorded only on business days or for active transactions
+
+-  Period imbalances between periods (Eg. the different number of days between February vs. January) can create misleading analysis or trends
+
+-  Your organization may use a non-standard calendar such as a 5-5-4, 4-4-5, or 13 month calendar and you need the ability to do time intelligence functions
+
+-  Your data may be in excel sheets, csv or databases and you need to inter-operable framework to
+switch between all your data types
+
+## Issue 1
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| error: false
+#| label: missing-date-example
+
+tibble::tibble(
+  order_date=c(" 2024-01-01","2024-01-03","2024-01-06")
+  ,margin=c(1200,1100,1300)
+) |> 
+  tinytable::tt()
+```
+
+
+
+If we use `dplyr::lag()` to compare **Day-over-Day (DoD)** revenue, we
+would be missing `2024-01-02` and `2024-01-04` which will lead to
+incorrect answers or trends
+
+To correct this, `fpaR` automatically **fills in missing dates** for
+each group of your data to ensure there are no missing periods when
+comparing periods
+
+
+## Issue 2
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| error: false
+#| label: issue2-example
+
+sales |> 
+   pmtd(order_date,margin,"standard",1) |> 
+   calculate() |> 
+    filter(
+      TRUE
+      ,month(date) %in% c(2)
+      ,year(date) %in% c(2022)
+   ) |> 
+   arrange(desc(date))  |> 
+   collect() |> 
+   head(10)
+   
+```
+
+## Issue 3
 
 
 **Practice Datasets**
