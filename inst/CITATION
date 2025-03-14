@@ -1,0 +1,8 @@
+bibentry(
+  bibtype      = "Manual",
+  title        = "fpaR: A Toolkit for Financial and Performance Analysis in R",
+  author       = person("Alejandro", "Hagan"),
+  year         = "2025",
+  note         = "version 1.0.0",
+  url          = "https://github.com/alejandrohagan/fpaR/"
+)
