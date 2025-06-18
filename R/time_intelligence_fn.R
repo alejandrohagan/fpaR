@@ -802,24 +802,23 @@ wowtd_fn <- function(x){
 
   # ytd table
 
-  wtd_tbl <- wtd_tbl(x)
+  wtd_dbi <- wtd(.data = x@calendar@data,.date = !!x@calendar@date_quo,.value = !!x@value@value_quo,calendar_type = x@calendar@calendar_type) |>
+    calculate()
 
   #pytd table
 
-  pwtd_tbl <- pwtd_tbl(x) |>
-    dplyr::rename(
-      !!x@value@second_column_name:=!!x@value@new_column_name
-    )
+  pwtd_dbi <- pwtd(.data = x@calendar@data,.date = !!x@calendar@date_quo,.value = !!x@value@value_quo,calendar_type = x@calendar@calendar_type,lag_n = x@fn@lag_n) |>
+    calculate()
 
   # join tables together
 
-  out_tbl <-   dplyr::left_join(
-    wtd_tbl
-    ,pwtd_tbl
-    ,by=dplyr::join_by(date,year,month,week,!!!x@calendar@group_quo)
+  out_dbi <-   dplyr::left_join(
+    wtd_dbi
+    ,pwtd_dbi
+    ,by=dplyr::join_by(date,year,month,!!!x@calendar@group_quo)
   )
 
-  return(out_tbl)
+  return(out_dbi)
 
 }
 
@@ -894,10 +893,12 @@ wtdopw_fn <- function(x){
     dplyr::left_join(
       pw_dbi |>
         dplyr::select(
-        -c(!!x@value@value_quo)
-      )
+          -c(!!x@value@value_quo)
+        )
       ,by=dplyr::join_by(date,!!!x@calendar@group_quo)
     )
+
+
 
   return(out_dbi)
 
