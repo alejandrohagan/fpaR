@@ -142,7 +142,7 @@ A comprehensive set of time-based analytical functions to track trends
 over different periods.
 
 *Support for non-standard calendars (e.g., 5-5-4 fiscal calendar) is
-under development.*
+under development*
 
 ------------------------------------------------------------------------
 

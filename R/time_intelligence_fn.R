@@ -193,7 +193,6 @@ yoy_fn <- function(x){
 #' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
 #' by [calculate]
 #' This will return a dbi object that can converted to a tibble object with[dplyr::collect()]
-#' @export
 #' @returns dbi object
 #'
 ytdopy_fn <- function(x){
@@ -588,7 +587,7 @@ momtd_fn <- function(x){
       !is.na(year)
     )
 
-  return(out_tbl)
+  return(out_dbi)
 
 }
 
@@ -782,7 +781,7 @@ pwtd_fn <- function(x){
       !is.na(year)
     )
 
-  return(out_tbl)
+  return(out_dbi)
 
 }
 
@@ -929,7 +928,7 @@ atd_fn <- function(x){
       !!x@value@new_column_name:=base::cumsum(!!x@value@value_quo)
       ,.by=c(!!!x@calendar@group_quo)
     )
-  return(out_tbl)
+  return(out_dbi)
 }
 
 
