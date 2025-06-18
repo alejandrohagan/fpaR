@@ -201,11 +201,18 @@ value <- S7::new_class(
       }
     )
 
-    ,new_column_name=S7::new_property(
+    ,new_column_name_vec=S7::new_property(
       class=S7::class_character
       ,setter = \(self,value){
-        self@new_column_name <- base::paste0(value,"_",self@value_vec)
+        self@new_column_name_vec <- base::paste0(value,"_",self@value_vec)
         self
+      }
+    )
+    ,new_column_name_quo=S7::new_property(
+      class=S7::class_any
+      ,getter= \(self){
+       x <- rlang::parse_expr(self@new_column_name_vec)
+       x
       }
     )
   )

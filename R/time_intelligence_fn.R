@@ -166,6 +166,8 @@ yoy_fn <- function(x){
     dplyr::mutate(
       date_lag=dplyr::lead(date,n = !!x@fn@lag_n)
       ,!!x@value@new_column_name:=!!x@value@value_quo
+      ,days_in_current_period=sql("day(last_day(date))")
+      , days_in_previous_period=sql("day(last_day(date_lag))")
       ,.by=c(!!!x@calendar@group_quo)
     ) |>
     dplyr::select(-c(date,!!x@value@value_quo))
@@ -174,11 +176,14 @@ yoy_fn <- function(x){
   out_dbi <-   dplyr::left_join(
     full_dbi
     ,lag_dbi
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo,missing_date_indicator)
   ) |>
     dplyr::mutate(
       year=lubridate::year(date)
       ,.after=date
+    ) |>
+    dplyr::mutate(
+      month=lubridate::month(date)
     )
 
   return(out_dbi)
@@ -476,10 +481,12 @@ mtd_fn <- function(x){
   out_dbi <- full_dbi |>
     dbplyr::window_order(date) |>
     dplyr::mutate(
-      !!x@value@new_column_name:=base::cumsum(!!x@value@value_quo)
+      !!x@value@new_column_name_vec:=base::cumsum(!!x@value@value_quo)
       ,.by=c(year,month,!!!x@calendar@group_quo)
     ) |>
-    dplyr::ungroup()
+    mutate(
+      days_in_current_period=lubridate::day(date)
+    )
 
   return(out_dbi)
 
@@ -510,46 +517,44 @@ pmtd_fn <- function(x){
       year=lubridate::year(date)
       ,month=lubridate::month(date)
       ,.before = 1
-    )
+    ) |>
+    select(-c(missing_date_indicator))
 
   # create lag table
   lag_dbi <- full_dbi |>
     dbplyr::window_order(date) |>
     dplyr::mutate(
-      date_lag=as.Date(sql(glue::glue("date + INTERVAL '1 months' * {lag_n_vec}")))
-      ,!!x@value@new_column_name:=cumsum(!!x@value@value_quo)
+      date_lag=as.Date(dplyr::sql(glue::glue("date + INTERVAL '1 months' * {lag_n_vec}")))
+      ,!!x@value@new_column_name_vec:=cumsum(!!x@value@value_quo)
       ,.by=c(year,month,!!!x@calendar@group_quo)
     ) |>
-    dplyr::ungroup() |>
-    dplyr::select(-c(date,month,year,!!x@value@value_quo))
-
+    dplyr::select(-c(month,year,!!x@value@value_quo)) |>
+    dplyr::mutate(
+      month=lubridate::month(date_lag)
+      ,year=lubridate::year(date_lag)
+    ) |>
+    mutate(
+      days_in_comparison_period=lubridate::day(date)
+    ) |>
+    dplyr::select(-c(year,month,date))
 
   # join tables together
-  out_dbi <-   dplyr::left_join(
+  out_dbi <-  dplyr::full_join(
     full_dbi
     ,lag_dbi
     ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
   ) |>
     dplyr::select(-c(!!x@value@value_quo)) |>
-    mutate(
-      previous_period_short=dplyr::if_else(is.na(pmtd_margin),1,0)
-    ) |>
-    dbplyr::window_order(date) |>
-    # dplyr::group_by(date,year,month,!!!x@calendar@group_quo) |>
-    # tidyr::fill(date,.direction = "down") |>
-    dplyr::ungroup() |>
+    dbplyr::window_order(date,!!!x@calendar@group_quo) |>
+    tidyr::fill(c(days_in_comparison_period,!!x@value@new_column_name_quo),.direction = "down") |>
     dplyr::summarise(
-      dplyr::across(dplyr::contains(x@value@value_vec),\(x) max(x,na.rm=TRUE))
-      ,previous_period_short=sum(previous_period_short,na.rm=TRUE)
-      ,previous_period_long=if_else(n()==1,0,n())
+      !!x@value@new_column_name_quo:=max(!!x@value@new_column_name_quo,na.rm=TRUE)
+      ,days_in_comparison_period=max(days_in_comparison_period,na.rm=TRUE)
       ,.by=c(date,year,month,!!!x@calendar@group_quo)
     )
-    # dplyr::filter(
-    #   !is.na(year)
-    # )
-
 
   return(out_dbi)
+
 
 }
 
@@ -583,23 +588,13 @@ momtd_fn <- function(x){
   out_dbi <-   dplyr::full_join(
     mtd_dbi
     ,pmtd_dbi
-    ,by=dplyr::join_by(date==date,year,month,!!!x@calendar@group_quo)
+    ,by=dplyr::join_by(date==date,year,month,!!!x@calendar@group_quo,missing_date_indicator)
   ) |>
-    # dplyr::mutate(
-    #   imbalance_period=is.na(x@value@new_column_name)
-    # )
-    dplyr::group_by(date,year,month,!!!x@calendar@group_quo) |> arrange(date) |> view()
-    tidyr::fill(date,.direction = "down") |>
-    dplyr::ungroup() |>
     dplyr::summarise(
       dplyr::across(dplyr::contains(x@value@value_vec),\(x) sum(x,na.rm=TRUE))
-      ,.by=c(date,year,month,!!!x@calendar@group_quo)
-    ) |>
-    dplyr::filter(
-      !is.na(year)
+      ,.by=c(missing_date_indicator,date,year,month,!!!x@calendar@group_quo,pp_missing_dates_cnt,pp_extra_dates_cnt)
     )
-
-  return(out_tbl)
+  return(out_dbi)
 
 }
 
@@ -626,6 +621,8 @@ mom_fn <- function(x){
     dplyr::mutate(
       date_lag=dplyr::lead(date,n = !!x@fn@lag_n)
       ,!!x@value@new_column_name:=!!x@value@value_quo
+      ,days_in_current_period=sql("day(last_day(date))")
+      ,days_in_previous_period=sql("day(last_day(date_lag))")
       ,.by=c(!!!x@calendar@group_quo)
     ) |>
     dplyr::select(-c(date,!!x@value@value_quo)) |>
@@ -637,7 +634,7 @@ mom_fn <- function(x){
   out_dbi <-   dplyr::left_join(
     full_dbi
     ,lag_dbi
-    ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo)
+    ,by=dplyr::join_by(date==date_lag,!!!x@calendar@group_quo,missing_date_indicator)
   ) |>
     dplyr::mutate(
       year=lubridate::year(date)
@@ -684,7 +681,7 @@ mtdopm_fn <- function(x){
         dplyr::select(
         -c(!!x@value@value_quo)
       )
-      ,by=dplyr::join_by(year,month,date,!!!x@calendar@group_quo)
+      ,by=dplyr::join_by(year,month,date,!!!x@calendar@group_quo,missing_date_indicator)
     )
 
   return(out_dbi)

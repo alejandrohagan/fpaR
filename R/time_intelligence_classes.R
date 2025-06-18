@@ -49,7 +49,7 @@ ytd <- function(.data,.date,.value,calendar_type){
         )
     ,value = value(
       value_vec            =  rlang::as_label(rlang::enquo(.value))
-      ,new_column_name     = "ytd"
+      ,new_column_name_vec     = "ytd"
       )
     ,fn=fn(
       new_date_column_name = c("date","year")
@@ -100,7 +100,7 @@ pytd <- function(.data,.date,.value,calendar_type,lag_n){
         )
     ,value=value(
       value_vec             = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name      = "pytd"
+      ,new_column_name_vec      = "pytd"
     )
     ,fn=fn(
       lag_n                 = lag_n
@@ -153,7 +153,7 @@ yoytd <- function(.data,.date,.value,calendar_type,lag_n){
     )
     ,value=value(
       value_vec             = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name      = "ytd"
+      ,new_column_name_vec      = "ytd"
     )
     ,fn=fn(
       lag_n                 = lag_n
@@ -205,7 +205,7 @@ yoy <- function(.data,.date,.value,calendar_type,lag_n=1){
 
     ,value=value(
       value_vec             = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name      = "yoy"
+      ,new_column_name_vec      = "yoy"
     )
     ,fn=fn(
       new_date_column_name  = c("date","year")
@@ -256,7 +256,7 @@ ytdopy <- function(.data,.date,.value,calendar_type,lag_n=1){
 
     ,value=value(
       value_vec             = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name      = "ytd"
+      ,new_column_name_vec      = "ytd"
     )
 
     ,fn=fn(
@@ -311,7 +311,7 @@ qtd <- function(.data,.date,.value,calendar_type){
         )
     ,value = value(
       value_vec                  = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name           = "qtd"
+      ,new_column_name_vec           = "qtd"
     )
     ,fn=fn(
       new_date_column_name       = c("year","quarter")
@@ -361,7 +361,7 @@ pqtd <- function(.data,.date,.value,calendar_type,lag_n){
         )
     ,value = value(
       value_vec                  = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name           = "pqtd"
+      ,new_column_name_vec           = "pqtd"
     )
     ,fn=fn(
       new_date_column_name       = c("date","year","quarter")
@@ -413,7 +413,7 @@ qoqtd <- function(.data,.date,.value,calendar_type,lag_n){
     )
     ,value=value(
       value_vec             = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name      = "pqtd"
+      ,new_column_name_vec      = "pqtd"
     )
     ,fn=fn(
       lag_n                 = lag_n
@@ -461,7 +461,7 @@ qtdopq <- function(.data,.date,.value,calendar_type,lag_n=1){
 
     ,value=value(
       value_vec            = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name     = "qtd"
+      ,new_column_name_vec     = "qtd"
     )
     ,fn=fn(
       new_date_column_name = c("date","year","quarter")
@@ -507,7 +507,7 @@ qoq <- function(.data,.date,.value,calendar_type,lag_n=1){
     )
     ,value=value(
       value_vec             = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name      = "qoq"
+      ,new_column_name_vec      = "qoq"
     )
     ,fn=fn(
       lag_n                 = lag_n
@@ -560,7 +560,7 @@ mtd <- function(.data,.date,.value,calendar_type){
         )
       ,value=value(
         value_vec            = rlang::as_label(rlang::enquo(.value))
-        ,new_column_name     = "mtd"
+        ,new_column_name_vec     = "mtd"
       )
       ,fn=fn(
         new_date_column_name = c("date","year","month")
@@ -608,7 +608,7 @@ pmtd <- function(.data,.date,.value,calendar_type,lag_n){
         )
     ,value=value(
       value_vec            = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name     = "pmtd"
+      ,new_column_name_vec     = "pmtd"
     )
     ,fn=fn(
       new_date_column_name = c("date","year","month")
@@ -656,7 +656,7 @@ momtd <- function(.data,.date,.value,calendar_type,lag_n){
     )
     ,value=value(
       value_vec            = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name     = "momtd"
+      ,new_column_name_vec     = "momtd"
     )
     ,fn=fn(
       new_date_column_name = c("date","year","month")
@@ -706,7 +706,7 @@ mtdopm <- function(.data,.date,.value,calendar_type,lag_n){
     )
     ,value=value(
       value_vec            = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name     = "mtdopm"
+      ,new_column_name_vec     = "mtdopm"
     )
     ,fn=fn(
       new_date_column_name = c("date","year","month")
@@ -754,7 +754,7 @@ mom <- function(.data,.date,.value,calendar_type,lag_n=1){
     )
     ,value=value(
       value_vec            = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name     = "mom"
+      ,new_column_name_vec     = "mom"
     )
     ,fn=fn(
       new_date_column_name = c("date","year","month")
@@ -807,7 +807,7 @@ wtd <- function(.data,.date,.value,calendar_type){
         )
     ,value=value(
       value_vec            = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name     = "wtd"
+      ,new_column_name_vec     = "wtd"
     )
     ,fn=fn(
       new_date_column_name = c("date","year","month","week")
@@ -854,7 +854,7 @@ pwtd <- function(.data,.date,.value,calendar_type,lag_n){
         )
     ,value=value(
       value_vec            = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name     = "pwtd"
+      ,new_column_name_vec     = "pwtd"
     )
     ,fn=fn(
       new_date_column_name = c("date","year","month","week")
@@ -907,7 +907,7 @@ wowtd <- function(.data,.date,.value,calendar_type,lag_n){
     )
     ,value=value(
       value_vec            = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name     = "wowtd"
+      ,new_column_name_vec     = "wowtd"
     )
     ,fn=fn(
       new_date_column_name = c("date","year","month","week")
@@ -956,7 +956,7 @@ wtdopw <- function(.data,.date,.value,calendar_type,lag_n){
     )
     ,value=value(
       value_vec = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name  = "wtwopw"
+      ,new_column_name_vec  = "wtwopw"
     )
     ,fn=fn(
       new_date_column_name = c("date","year","month","week")
@@ -1006,7 +1006,7 @@ wow <- function(.data,.date,.value,calendar_type,lag_n=1){
     )
     ,value=value(
       value_vec           = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name    = "wow"
+      ,new_column_name_vec    = "wow"
     )
     ,fn=fn(
       new_date_column_name = c("date","week","year","month")
@@ -1057,7 +1057,7 @@ atd <- function(.data,.date,.value,calendar_type){
         )
     ,value=value(
       value_vec            = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name     = "atd"
+      ,new_column_name_vec     = "atd"
     )
     ,fn=fn(
       new_date_column_name = c("date")
@@ -1107,7 +1107,7 @@ dod <- function(.data,.date,.value,calendar_type,lag_n=1){
     )
     ,value=value(
       value_vec             = rlang::as_label(rlang::enquo(.value))
-      ,new_column_name      = "dod"
+      ,new_column_name_vec      = "dod"
     )
     ,fn=fn(
       new_date_column_name = c("date")

@@ -2,6 +2,7 @@
 
 export(atd)
 export(calculate)
+export(complete_calendar)
 export(create_calendar)
 export(dod)
 export(make_db_tbl)
