@@ -209,14 +209,14 @@ ytdopy_fn <- function(x){
   # join together
 
  out_dbi <-  ytd_dbi |>
-   select(
+   dplyr::select(
      -c(!!x@value@value_quo)
    ) |>
     dplyr::left_join(
       py_dbi |> dplyr::select(
-        -c(!!x@value@value_quo)
+        -c(!!x@value@value_quo,date)
       )
-      ,by=dplyr::join_by(year,date,!!!x@calendar@group_quo)
+      ,by=dplyr::join_by(year,!!!x@calendar@group_quo)
     )
 
   return(out_dbi)
@@ -384,7 +384,7 @@ qtd_dbi <- qtd(.data=x@calendar@data,.date=!!x@calendar@date_quo,.value = !!x@va
 qoq_fn <- function(x){
 
   # create calendar
-  full_dbi <-  fpaR::create_calendar(x)
+  full_dbi <-  create_calendar(x)
 
   # create lag
   lag_dbi <- full_dbi |>
@@ -438,11 +438,16 @@ qtdopq_fn <- function(x){
   # join together
 
   out_dbi <-  qtd_dbi |>
+    dplyr::select(
+      -c(!!x@value@value_quo)
+    ) |>
     dplyr::left_join(
-      qoq_dbi
-      ,by=dplyr::join_by(year,quater,!!!x@calendar@group_quo)
+      qoq_dbi |> dplyr::select(
+        -c(!!x@value@value_quo,date)
+      )
+      ,by=dplyr::join_by(year,quarter,!!!x@calendar@group_quo)
+      ,copy = TRUE
     )
-
   return(out_dbi)
 }
 
@@ -670,9 +675,9 @@ mtdopm_fn <- function(x){
     dplyr::left_join(
       pm_dbi |>
         dplyr::select(
-        -c(!!x@value@value_quo)
+        -c(!!x@value@value_quo,date)
       )
-      ,by=dplyr::join_by(year,month,date,!!!x@calendar@group_quo)
+      ,by=dplyr::join_by(year,month,!!!x@calendar@group_quo)
     )
 
   return(out_dbi)
@@ -886,6 +891,8 @@ wtdopw_fn <- function(x){
 
   # join together
 
+
+  ## need to follow up with this with a unit test
   out_dbi <-  wtd_dbi |>
     dplyr::select(
       -c(!!x@value@value_quo)
@@ -896,6 +903,7 @@ wtdopw_fn <- function(x){
           -c(!!x@value@value_quo)
         )
       ,by=dplyr::join_by(date,!!!x@calendar@group_quo)
+      ,copy=TRUE
     )
 
 

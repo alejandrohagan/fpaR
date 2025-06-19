@@ -7,7 +7,7 @@ library(tidyr)
 
 
 
-## create calendar fills missing
+## create calendar fills missing-----------
 
 test_that("create calendar fills in missing periods",{
 
@@ -33,8 +33,356 @@ test_that("create calendar fills in missing periods",{
 
  )
 
+## functions work--------------
 
-## correct aggregation when unequal periods
+test_that("yoy |> calculate pipeline runs and returns table", {
+  # Mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # Run the pipeline
+  result <- sales |>
+    yoy(order_date, margin, "standard", 1) |>
+    calculate()
+
+  # Check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+
+
+test_that("ytdopy |> calculate pipeline runs and returns table", {
+  # Mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # Run the pipeline
+  result <- sales |>
+    ytdopy(order_date, margin, "standard", 1) |>
+    calculate()
+
+  # Check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+test_that("ytd |> calculate pipeline runs and returns table", {
+  # Mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # Run the pipeline
+  result <- sales |>
+    ytd(order_date, margin, "standard") |>
+    calculate()
+
+  # Check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+
+
+test_that("yoytd |> calculate pipeline runs and returns table", {
+  # Mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # Run the pipeline
+  result <- sales |>
+    yoytd(order_date, margin, "standard", 1) |>
+    calculate()
+
+  # Check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+
+
+test_that("wow() |> calculate pipeline runs and returns table", {
+  # mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # run the pipeline
+  result <- sales |>
+    wow(order_date, margin, "standard", 1) |>
+    calculate()
+
+  # check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+test_that("wowtd() |> calculate pipeline runs and returns table", {
+  # mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # run the pipeline
+  result <- sales |>
+    wtdopw(order_date, margin, "standard",1) |>
+    calculate()
+
+  # check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+
+
+
+
+test_that("wtdopw() |> calculate pipeline runs and returns table", {
+  # mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # run the pipeline
+  result <- sales |>
+    wtdopw(order_date, margin, "standard",1) |>
+    calculate()
+
+  # check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+
+
+test_that("wtd() |> calculate pipeline runs and returns table", {
+  # mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # run the pipeline
+  result <- sales |>
+    wtd(order_date, margin, "standard") |>
+    calculate()
+
+  # check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+test_that("qtdopq() |> calculate pipeline runs and returns table", {
+  # mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # run the pipeline
+  result <- sales |>
+    qtdopq(order_date, margin, "standard", 1) |>
+    calculate()
+
+  # check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+
+
+test_that("qtd() |> calculate pipeline runs and returns table", {
+  # mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # run the pipeline
+  result <- sales |>
+    qtd(order_date, margin, "standard") |>
+    calculate()
+
+  # check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+test_that("qoqtd() |> calculate pipeline runs and returns table", {
+  # mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # run the pipeline
+  result <- sales |>
+    qoqtd(order_date, margin, "standard", 1) |>
+    calculate()
+
+  # check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+
+test_that("qoq() |> calculate pipeline runs and returns table", {
+  # mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # run the pipeline
+  result <- sales |>
+    qoq(order_date, margin, "standard", 1) |>
+    calculate()
+
+  # check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+
+
+
+test_that("pqtd() |> calculate pipeline runs and returns table", {
+  # mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # run the pipeline
+  result <- sales |>
+    pqtd(order_date, margin, "standard", 1) |>
+    calculate()
+
+  # check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+
+
+test_that("pmtd() |> calculate pipeline runs and returns table", {
+  # Mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # Run the pipeline
+  result <- sales |>
+    pmtd(order_date, margin, "standard", 1) |>
+    calculate()
+
+  # Check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+
+
+
+test_that("mtdopm |> calculate pipeline runs and returns table", {
+  # Mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # Run the pipeline
+  result <- sales |>
+    mtdopm(order_date, margin, "standard", 1) |>
+    calculate()
+
+  # Check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+test_that("mtd |> calculate pipeline runs and returns table", {
+  # Mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # Run the pipeline
+  result <- sales |>
+    mtd(order_date, margin, "standard") |>
+    calculate()
+
+  # Check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+
+test_that("momtd |> calculate pipeline runs and returns table", {
+  # Mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # Run the pipeline
+  result <- sales |>
+    momtd(order_date, margin, "standard", 1) |>
+    calculate()
+
+  # Check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+
+test_that("mom |> calculate pipeline runs and returns table", {
+  # Mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # Run the pipeline
+  result <- sales |>
+    mom(order_date, margin, "standard", 1) |>
+    calculate()
+
+  # Check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+test_that("dod |> calculate pipeline runs and returns table", {
+  # Mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # Run the pipeline
+  result <- sales |>
+    wowtd(order_date, margin, "standard", 1) |>
+    calculate()
+
+  # Check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+
+test_that("atd |> calculate pipeline runs and returns table", {
+  # Mock sales data
+  sales <- data.frame(
+    order_date = as.Date(c("2025-06-01", "2025-06-08", "2025-06-15")),
+    margin = c(100, 150, 200)
+  )
+
+  # Run the pipeline
+  result <- sales |>
+    atd(order_date, margin, "standard") |>
+    calculate()
+
+  # Check that it returns a data frame
+  expect_s3_class(result, "tbl")
+})
+
+
+## correct aggregation when unequal periods-------------
 
 test_that("period imabalance validation -- month",{
 
@@ -87,12 +435,12 @@ cm_pmtd_rem_vec <-   cm_pmtd_tbl |>
     ) |>
     pull(pmtd_margin) |> sum()
 
-testthat::expect_true(
-  cm_pmtd_vec==pm_mtd_vec
+testthat::expect_equal(
+  cm_pmtd_vec,pm_mtd_vec
 )
 
-testthat::expect_true(
-  pm_mtd_rem_vec==cm_pmtd_rem_vec
+testthat::expect_equal(
+  pm_mtd_rem_vec,cm_pmtd_rem_vec
 )
 
 })
