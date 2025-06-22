@@ -286,3 +286,69 @@ ti <- S7::new_class(
     }
   }
 )
+
+
+## abc class---------
+
+
+
+abc <- S7::new_class(
+
+  ,name="abc"
+  ,package = "fpaR"
+  ,properties = list(
+    data=S7::new_property(
+      class=S7::class_any
+      ,setter = \(self,value){
+
+        self@data <- make_db_tbl(value)
+        self
+      }
+    )
+    ,value_vec=S7::new_property(
+      class=S7::class_any
+    )
+    ,value_quo=S7::new_property(
+      class=S7::class_any
+      ,getter=\(self){
+        x <- rlang::parse_expr(self@value_vec)
+        x
+      }
+    )
+    ,group_indicator=S7::new_property(
+      class=S7::class_logical
+      ,getter=\(self){
+        x <- dplyr::if_else(!purrr::is_empty(dplyr::groups(self@data)),TRUE,FALSE)
+        x
+      }
+    )
+    ,group_quo=S7::new_property(
+      class=S7::class_any
+      ,getter = \(self){
+        x <- dplyr::groups(self@data)
+        x
+      }
+    )
+    ,group_vec=S7::new_property(
+      class=S7::class_any
+      ,getter = \(self){
+        x <-  as.character(unlist(dplyr::groups(self@data)))
+        x
+      }
+    )
+    ,category_values=S7::new_property(
+      class=S7:::class_numeric
+      ,default=c(.10,.30,.6)
+      ,validator = \(value){
+        if(!assertthat::are_equal(x=sum(value),y=1)) cli::format_error("Please ensure values sum to one")
+      }
+    )
+    ,category_names=S7::new_property(
+      class=S7::class_any
+      ,setter = \(self,value){
+        self@category_names <- letters[1:length(self@category_values)]
+        self
+      }
+    )
+  )
+)

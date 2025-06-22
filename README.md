@@ -209,6 +209,7 @@ tracking business performance. However, they come with challenges:
 - Your data may be in excel sheets, csv or databases and you need to
   inter-operable framework to switch between all your data types
 
+<<<<<<< Updated upstream
 **Example Issue:**
 
 | order_date | margin |
@@ -216,6 +217,13 @@ tracking business performance. However, they come with challenges:
 | 2024-01-01 | 1200   |
 | 2024-01-03 | 1100   |
 | 2024-01-06 | 1300   |
+=======
+| Date       | Revenue |
+|------------|---------|
+| 2024-01-01 | 1,200   |
+| 2024-01-03 | 1,100   |
+| 2024-01-06 | 1,300   |
+>>>>>>> Stashed changes
 
 If we use `dplyr::lag()` to compare **Day-over-Day (DoD)** revenue, we
 would be missing `2024-01-02` and `2024-01-04` which will lead to
@@ -263,7 +271,7 @@ The package is centered around **three main areas of analysis**:
 
 ### **Time Intelligence Functions**
 
-A comprehensive set of time-based analytical functions to track trends
+A comprehensive set of time-based functions to track trends
 over different periods.
 
 *Support for non-standard calendars (e.g., 5-5-4 fiscal calendar) is
