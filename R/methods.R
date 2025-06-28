@@ -98,6 +98,27 @@ S7::method(calculate,ti) <- function(x){
 }
 
 
+#' @title Calculate
+#' @name calculate
+#' @param x segment object
+#'
+#' @returns dbi object
+#' @export
+#' @examples
+#' sales |>
+#'     group_by(store_key) |>
+#'     abc(.value = margin,category_values = c(.3,.5,.75,.85),type = "n") |>
+#'     calculate() |>
+S7::method(calculate,segment) <- function(x){
+
+
+  out <- x@fn@fn_exec(x) |>
+    arrange(row_id)
+
+  return(out)
+
+}
+
 
 
 #' @title complete_calendar

@@ -292,9 +292,9 @@ ti <- S7::new_class(
 
 
 
-abc <- S7::new_class(
+segment <- S7::new_class(
 
-  ,name="abc"
+  ,name="segment"
   ,package = "fpaR"
   ,properties = list(
     data=S7::new_property(
@@ -338,9 +338,11 @@ abc <- S7::new_class(
     )
     ,category_values=S7::new_property(
       class=S7:::class_numeric
-      ,default=c(.10,.30,.6)
+      ,default=c(.7,.96,1)
       ,validator = \(value){
-        if(!assertthat::are_equal(x=sum(value),y=1)) cli::format_error("Please ensure values sum to one")
+
+        if(assertthat::assert_that(all(value<=1),msg = cli::format_error("Please ensure the category_values are less than or equal to 1"))){}
+
       }
     )
     ,category_names=S7::new_property(
@@ -350,5 +352,13 @@ abc <- S7::new_class(
         self
       }
     )
+    ,type=S7::new_property(
+      class=S7::class_character
+      ,default="n"
+      ,validator = \(value){
+        if(assertthat::assert_that(all(value %in% c("n","sum")),msg = cli::format_error("Please fn is either {.fn n} or {.fn sum}"))){}
+      }
+    )
+    ,fn=fn
   )
 )

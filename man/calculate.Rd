@@ -4,15 +4,23 @@
 \alias{calculate}
 \title{Calculate}
 \arguments{
-\item{x}{ti object}
+\item{x}{segment object}
 }
 \value{
 dbi object
+
+dbi object
 }
 \description{
+Calculate
+
 Calculate
 }
 \examples{
 x <- ytd(sales,.date=order_date,.value=quantity,calendar_type="standard")
 calculate(x)
+sales |>
+    group_by(store_key) |>
+    abc(.value = margin,category_values = c(.3,.5,.75,.85),type = "n") |>
+    calculate() |>
 }
