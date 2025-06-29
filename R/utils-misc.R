@@ -50,8 +50,53 @@ make_action_cli <- function(x){
     out$compare <- c(cli::col_red(cli::symbol$cross)," Compare")
   }
 
+  if(any(x %in% c("% of total"))){
+
+    out$compare <- paste0(cli::col_green(cli::symbol$tick)," % of total")
+
+  }else{
+
+    out$compare <- c(cli::col_red(cli::symbol$cross)," % of total")
+  }
+
+
+
   return(out)
 
+}
+
+
+
+#' Prints function header info
+#'
+#' @param x ti or segment obj
+#'
+#' @returns print
+#' @export
+#'
+print_fn_info <- function(x) {
+
+  cli::cli_h1(x@fn@fn_long_name)
+  cli::cli_text("Function: {.code {x@fn@fn_name}} was executed")
+  cli::cli_h2("Description:")
+  cli::cli_par()
+  cli::cli_text(x@action@method)
+}
+
+#' Prints functions next steps
+#'
+#' @returns print
+#' @export
+#'
+#' @examples
+#' print_next_steps()
+print_next_steps <- function(){
+
+  cli::cli_h2("Next Steps:")
+
+  cli::cli_li("Use {.code calculate()} to return the results")
+
+  cli::cli_rule()
 }
 
 

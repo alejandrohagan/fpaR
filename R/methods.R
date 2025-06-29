@@ -245,3 +245,72 @@ S7::method(print,ti) <- function(x,...){
 
 }
 
+
+#' Print segment objects
+#' @name print
+#' @param x segment object
+#' @param ...
+#'
+#' @returns segment object
+#' @export
+#'
+S7::method(print,segment) <- function(x,...){
+
+
+  n_values_len <- length(x@category_values)
+
+  print_fn_info(x)
+  ### Category Values information
+  cli::cli_h2("Category Information")
+
+  if(x@value_vec=="n"){
+
+    cli::cat_bullet(
+
+      paste(
+        "The data set is summarized by"
+        ,cli::col_br_magenta(str_flatten_comma(x@group_vec))
+        ,"and then"
+        ,cli::col_br_magenta("counts")
+        ,"each group member's contribution of the total and then finally calculates the"
+        ,cli::col_br_magenta("count")
+        ,"rolling cumulative distribution"
+      )
+
+    )
+
+  }else{
+
+    cli::cat_bullet(
+      paste(
+        "The data set is summarized by"
+        ,cli::col_br_magenta(str_flatten_comma(x@group_vec))
+        ,"and then sums each group member's"
+        ,cli::col_br_magenta(x@value_vec)
+        ,"contribution of the total"
+        ,cli::col_br_magenta(x@value_vec)
+        ,"and then finally calculates the rolling cumulative distribution"
+      )
+    )
+
+  }
+  cli::cat_bullet(
+    paste(
+      "Then cumulative distribution was then arranged from lowest to highest and finally classified into"
+      ,n_values_len
+      ,"break points"
+      ,cli::col_yellow(str_flatten_comma(scales::percent(x@category_values)))
+      ," and labelled into the following categories"
+      ,cli::col_br_blue(str_flatten_comma(x@category_names))
+    )
+  )
+  cli::cat_line("")
+
+
+  cli::cat_line("")
+
+
+  print_next_steps()
+
+}
+

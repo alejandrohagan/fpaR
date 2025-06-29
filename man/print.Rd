@@ -4,15 +4,19 @@
 \alias{print}
 \title{Print ti objects}
 \arguments{
-\item{x}{ti object}
+\item{x}{segment object}
 
-\item{...}{additional arguments}
+\item{...}{}
 }
 \value{
 ti object
+
+segment object
 }
 \description{
 Print ti objects
+
+Print segment objects
 }
 \examples{
 x <- ytd(sales,.date=order_date,.value=quantity,calendar_type="standard")

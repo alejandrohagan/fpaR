@@ -1,14 +1,42 @@
-abc <- function(.data,.value,category_values,type=c("sum")){
+abc <- function(.data,category_values,.value){
 
   # capture value as text
-
-  value_quo <- rlang::enquo(.value)
-  value_chr <- rlang::as_name(value_quo)
-
-  abc_obj <-   segment(data = .data, value_vec = value_chr,category_values = category_values,type=type,fn = fn(fn_exec=abc_fn))
+  # .value=
+  # category_values <- c(.4,.7,.8,.96,1)
 
 
-return(abc_obj)
+  if(!missing(.value)){
+
+  value_vec <- deparse(substitute(.value))
+
+  }else{
+
+    value_vec="n"
+
+  }
+
+
+  x <-   segment(
+    data                      = .data
+    ,value_vec              = value_vec
+    ,category_values        = category_values
+    ,fn = fn(
+      fn_exec               = abc_fn
+      ,fn_name              = "ABC"
+      ,fn_long_name         = "ABC Classification"
+      ,lag_n                = NA_integer_
+      ,new_date_column_name = NA_character_
+      )
+    ,action=action(
+      method= "This calculates a rolling cumulative distribution of variable
+      and segments each group member's contribution by the break points provided.
+      Helpful to know which group member's proportational contribution to the total.
+      ")
+    )
+
+
+return(x)
+
 }
 
 
@@ -35,21 +63,20 @@ abc_fn <- function(x){
   # category_values <- c(.2,.5,.3)
   # fn="n"
 
-
   # create summary table by the group
 
-  if(x@type=="sum"){
+  if(x@value_vec!="n"){
 
-  summary_tbl  <- x@data |>
+  summary_dbi  <- x@data |>
       dplyr::summarize(
-        value=sum(!!x@value_quo)
+        value=sum(!!x@value_quo,na.rm=TRUE)
         ,.groups="drop"
       ) |>
       dbplyr::window_order(desc(value))
 
   } else {
 
-  summary_tbl <- x@data |>
+  summary_dbi <- x@data |>
     dplyr::summarize(
       value=dplyr::n()
       ,.groups="drop"
@@ -69,7 +96,7 @@ abc_fn <- function(x){
 
    ## create summary stats table
 
-  stats_dbi <- summary_tbl |>
+  stats_dbi <- summary_dbi |>
     dplyr::mutate(
       cum_sum=cumsum(value)
       ,prop_total=value/max(cum_sum,na.rm=TRUE)
@@ -107,7 +134,7 @@ abc_fn <- function(x){
   category_dbi <-  dplyr::tbl(con,dplyr::sql(sql_category_dbi))
 
   # join together stats table and category table and then filter to reduce duplicate matches
-out <- stats_dbi |>
+  out <- stats_dbi |>
     dplyr::left_join(
       category_dbi
       ,by=dplyr::join_by(cum_unit_prop<=category_value)

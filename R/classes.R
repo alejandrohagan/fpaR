@@ -306,7 +306,7 @@ segment <- S7::new_class(
       }
     )
     ,value_vec=S7::new_property(
-      class=S7::class_any
+      class=S7::class_character
     )
     ,value_quo=S7::new_property(
       class=S7::class_any
@@ -352,13 +352,7 @@ segment <- S7::new_class(
         self
       }
     )
-    ,type=S7::new_property(
-      class=S7::class_character
-      ,default="n"
-      ,validator = \(value){
-        if(assertthat::assert_that(all(value %in% c("n","sum")),msg = cli::format_error("Please fn is either {.fn n} or {.fn sum}"))){}
-      }
-    )
     ,fn=fn
+    ,action=action
   )
 )
