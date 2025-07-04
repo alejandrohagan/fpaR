@@ -41,7 +41,7 @@ abc <- function(.data,category_values,.value){
   x <-   segment(
     data                      = data(.data,date_vec = NA,calendar_type = NA)
     ,value                    = value(value_vec = value_vec,new_column_name_vec = "abc")
-    ,category_values          = category_values
+    ,category                 = category(category_values=category_values)
     ,fn = fn(
       fn_exec                 = abc_fn
       ,fn_name                = "ABC"
@@ -133,13 +133,13 @@ abc_fn <- function(x){
 
 
   # assign names to category list
-  names(x@category_values) <- x@category_names
+  names(x@category@category_values) <- x@category@category_names
 
   ## create sql scripts for category CTE----------
 
-  category_values_vec <- glue::glue("({x@category_values}")
+  category_values_vec <- glue::glue("({x@category@category_values}")
 
-  category_names_vec <- glue::glue("'{names(x@category_values)}')")
+  category_names_vec <- glue::glue("'{names(x@category@category_values)}')")
 
 
   sql_values <- stringr::str_flatten_comma(paste0(category_values_vec,", ",category_names_vec))
@@ -189,5 +189,9 @@ abc_fn <- function(x){
 
 
 }
+
+
+
+
 
 
