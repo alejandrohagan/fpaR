@@ -50,7 +50,8 @@ abc <- function(.data,category_values,.value){
       ,new_date_column_name  = NA_character_
       )
     ,action=action(
-      method= "This calculates a rolling cumulative distribution of variable
+      value = c("proportion of total","Aggregate")
+      ,method= "This calculates a rolling cumulative distribution of variable
       and segments each group member's contribution by the break points provided.
       Helpful to know which group member's proportational contribution to the total.
       ")

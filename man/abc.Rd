@@ -11,7 +11,7 @@ abc(.data, category_values, .value)
 
 \item{category_values}{vector of break points between 0 and 1}
 
-\item{.value}{optional: if left blank will use the number of rows per group to category, alternatively you can pass a column name to categorize}
+\item{.value}{optional: if left blank,\code{\link[=abc]{abc()}} will use the number of rows per group to categorize, alternatively you can pass a column name to categorize}
 }
 \value{
 segment object
@@ -19,15 +19,15 @@ segment object
 \description{
 \itemize{
 \item For your group variable, \code{\link[=abc]{abc()}}  will categorize which groups make up what proportion of the totals according to the category_values that you have entered
-\item The function returns a segment object which prints out the summary of steps and actions that it will to categorize your data
+\item The function returns a segment object which prints out the execution steps and actions that it will take to categorize your data
 \item Use \link{calculate} to return the results
 }
 }
 \details{
 \itemize{
-\item This function xxxxx
-\item If you provide a grouped object with \code{\link[dplyr:group_by]{dplyr::group_by()}}, it will generate a complete calendar for each group
-\item The function creates a \code{segment} object, which pre-processes the data and arguments for further downstream functions
+\item This function is helpful to understand which groups of make up what proportion of the cumulative contribution
+\item If you do not provide a \code{.value} then it will count the transactions per group, if you provide \code{.value} then it will \code{\link[=sum]{sum()}} the \code{.value} per group
+\item The function creates a \code{segment} object, which pre-processes the data into its components
 }
 }
 \examples{

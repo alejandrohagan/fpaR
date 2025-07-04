@@ -214,13 +214,8 @@ S7::method(print,ti) <- function(x,...){
 
   ## Action information
 
-  cli::cli_h2("Actions:")
+  print_actions_steps(x)
 
-  cli::cli_text(paste0(x@action@value[[1]]," ",cli::col_blue(x@value@value_vec)))
-
-  cli::cli_text(paste0(x@action@value[[2]]," ",cli::col_green(na.omit(x@fn@lag_n))," ",cli::col_green(na.omit(x@fn@shift))))
-
-  cli::cli_text(paste0(x@action@value[[3]]," ",cli::col_br_magenta(na.omit(x@fn@compare))))
 
   cli::cat_line("")
   ## print groups if groups exist
@@ -304,6 +299,7 @@ S7::method(print,segment) <- function(x,...){
 
   cli::cat_line("")
 
+  print_actions_steps(x)
 
   print_next_steps()
 

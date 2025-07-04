@@ -18,16 +18,27 @@ return(out)
 
 
 
+#' Generate CLI actions
+#'
+#' @param x input to test against
+#' @param word the key word to validate
+#'
+#' @returns list
+#'
 generate_cli_action <- function(x,word){
 
+
+  # x <- "test"
+  # word <- "test"
   out <- list()
+
   if(any(x %in% stringr::str_to_lower(word))){
 
-    out$word <- c(cli::col_green(cli::symbol$tick),stringr::str_to_title(word))
+    out[[word]] <- c(cli::col_green(cli::symbol$tick),stringr::str_to_title(word))
 
   }else{
 
-    out$aggregate <- c(cli::col_red(cli::symbol$cross),stringr::str_to_title(word))
+    out[[word]] <- c(cli::col_red(cli::symbol$cross),stringr::str_to_title(word))
   }
 
   return(out)
@@ -54,43 +65,13 @@ make_action_cli <- function(x){
   #   out$aggregate <- c(cli::col_red(cli::symbol$cross),"Aggregate")
   # }
 
-  out <- generate_cli_action(x,"aggregate")
+  out[1] <- generate_cli_action(x,"aggregate")
 
-  out <- generate_cli_action(x,"shift")
+  out[2] <- generate_cli_action(x,"shift")
 
-  out <- generate_cli_action(x,"compare")
+  out[3] <- generate_cli_action(x,"compare")
 
-
-
-
-
-  # if(any(x %in% c("shift"))){
-  #
-  #   out$shift <- paste0(cli::col_green(cli::symbol$tick)," Shift")
-  #
-  # }else{
-  #   out$shift <- c(cli::col_red(cli::symbol$cross)," Shift")
-  # }
-
-  # if(any(x %in% c("compare"))){
-  #
-  #   out$compare <- paste0(cli::col_green(cli::symbol$tick)," Compare")
-  #
-  # }else{
-  #
-  #   out$compare <- c(cli::col_red(cli::symbol$cross)," Compare")
-  # }
-#
-#   if(any(x %in% c("% of total"))){
-#
-#     out$compare <- paste0(cli::col_green(cli::symbol$tick)," % of total")
-#
-#   }else{
-#
-#     out$compare <- c(cli::col_red(cli::symbol$cross)," % of total")
-#   }
-
-
+  out[4] <- generate_cli_action(x,"proportion of total")
 
   return(out)
 
@@ -129,6 +110,24 @@ print_next_steps <- function(){
 
   cli::cli_rule()
 }
+
+
+print_actions_steps <- function(x){
+
+  cli::cli_h2("Actions:")
+
+
+  cli::cli_text(x@action@value[[1]]," ",cli::col_blue(x@value@value_vec))
+
+  cli::cli_text(x@action@value[[2]]," ",cli::col_green(na.omit(x@fn@lag_n))," ",cli::col_green(na.omit(x@fn@shift)))
+
+  cli::cli_text(x@action@value[[3]]," ",cli::col_br_magenta(na.omit(x@fn@compare)))
+
+  cli::cli_text(x@action@value[[4]]," ",cli::col_br_magenta(na.omit(x@fn@compare)))
+
+
+}
+
 
 
 utils::globalVariables(
