@@ -77,22 +77,26 @@ cm_pmtd_vec <-   cm_pmtd_tbl |>
 
 pm_mtd_rem_vec <-   pm_mtd_tbl |>
   filter(
-    date>"2022-01-27"
+    month==1
+    ,year==2022
+    ,day(date)==31
   ) |>
   pull(mtd_margin) |> sum()
 
 cm_pmtd_rem_vec <-   cm_pmtd_tbl |>
     filter(
-      date>"2022-02-27"
+      month==2
+      ,year==2022
+      ,day(date)==28
     ) |>
     pull(pmtd_margin) |> sum()
 
-testthat::expect_true(
-  cm_pmtd_vec==pm_mtd_vec
+testthat::expect_equal(
+  cm_pmtd_vec,pm_mtd_vec
 )
 
-testthat::expect_true(
-  pm_mtd_rem_vec==cm_pmtd_rem_vec
+testthat::expect_equal(
+  pm_mtd_rem_vec,cm_pmtd_rem_vec
 )
 
 })

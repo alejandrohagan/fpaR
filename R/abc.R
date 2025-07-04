@@ -1,8 +1,30 @@
+#' @title ABC classification function
+#' @name abc
+#'
+#' @param .data tibble or dbi object (either grouped or ungrouped)
+#' @param category_values vector of break points between 0 and 1
+#' @param .value optional: if left blank,[abc()] will use the number of rows per group to categorize, alternatively you can pass a column name to categorize
+#'
+#' @description
+#' -  For your group variable, [abc()]  will categorize which groups make up what proportion of the totals according to the category_values that you have entered
+#' -  The function returns a segment object which prints out the execution steps and actions that it will take to categorize your data
+#' -  Use [calculate] to return the results
+#' @details
+#' -  This function is helpful to understand which groups of make up what proportion of the cumulative contribution
+#' -  If you do not provide a `.value` then it will count the transactions per group, if you provide `.value` then it will [sum()] the `.value` per group
+#' -  The function creates a `segment` object, which pre-processes the data into its components
+#'
+#' @returns segment object
+#' @export
+#'
+#' @examples
+#' abc(sales,c(.1,.5,.7,.96,1),.value=margin)
 abc <- function(.data,category_values,.value){
 
   # capture value as text
-  # .value=
-  # category_values <- c(.4,.7,.8,.96,1)
+    # .data <- sales
+    # value_vec <- value_vec <- deparse(substitute(margin))
+    # category_values <- c(.4,.7,.8,.96,1)
 
 
   if(!missing(.value)){
@@ -17,15 +39,15 @@ abc <- function(.data,category_values,.value){
 
 
   x <-   segment(
-    data                      = .data
-    ,value_vec              = value_vec
-    ,category_values        = category_values
+    data                      = data(.data,date_vec = NA,calendar_type = NA)
+    ,value                    = value(value_vec = value_vec,new_column_name_vec = "abc")
+    ,category_values          = category_values
     ,fn = fn(
-      fn_exec               = abc_fn
-      ,fn_name              = "ABC"
-      ,fn_long_name         = "ABC Classification"
-      ,lag_n                = NA_integer_
-      ,new_date_column_name = NA_character_
+      fn_exec                 = abc_fn
+      ,fn_name                = "ABC"
+      ,fn_long_name           = "ABC Classification"
+      ,lag_n                  = NA_integer_
+      ,new_date_column_name  = NA_character_
       )
     ,action=action(
       method= "This calculates a rolling cumulative distribution of variable
@@ -34,6 +56,10 @@ abc <- function(.data,category_values,.value){
       ")
     )
 
+  assertthat::assert_that(
+    x@data@group_indicator,msg=cli::format_error(message="{.fn abc} expects a grouped tibble or dbi object. Please use {.fn group_by} to pass a grouped objected")
+  )
+
 
 return(x)
 
@@ -41,14 +67,12 @@ return(x)
 
 
 #' Classify a group by proportion of a variable (A,B,C,...)
+#'
+#' @param x segment object
+#'
 #' @description
 #' This returns a table that will segment your data into A,B or C segments based on custom
 #' thresholds
-#'
-#' @param .value the column to aggregate
-#' @param category_values the break points you want for your categories, each should be less than or equal to 1
-#' @param fn 'sum' to aggregate the value or 'n' to do the count of the group
-#' @param .data tibble or DBI object
 #'
 #' @return a dbi objection
 #' @export
@@ -65,23 +89,23 @@ abc_fn <- function(x){
 
   # create summary table by the group
 
-  if(x@value_vec!="n"){
+  if(x@value@value_vec!="n"){
 
-  summary_dbi  <- x@data |>
+  summary_dbi  <- x@data@data |>
       dplyr::summarize(
-        value=sum(!!x@value_quo,na.rm=TRUE)
+        !!x@value@new_column_name_vec:=sum(!!x@value@value_quo,na.rm=TRUE)
         ,.groups="drop"
       ) |>
-      dbplyr::window_order(desc(value))
+      dbplyr::window_order(desc(!!x@value@new_column_name_quo))
 
   } else {
 
-  summary_dbi <- x@data |>
+  summary_dbi <- x@data@data |>
     dplyr::summarize(
-      value=dplyr::n()
+      !!x@value@new_column_name_vec:=dplyr::n()
       ,.groups="drop"
     ) |>
-      dbplyr::window_order(desc(value))
+      dbplyr::window_order(desc(!!x@value@new_column_name_quo))
 
   }
 
@@ -98,8 +122,8 @@ abc_fn <- function(x){
 
   stats_dbi <- summary_dbi |>
     dplyr::mutate(
-      cum_sum=cumsum(value)
-      ,prop_total=value/max(cum_sum,na.rm=TRUE)
+      cum_sum=cumsum(!!x@value@new_column_name_quo)
+      ,prop_total=!!x@value@new_column_name_quo/max(cum_sum,na.rm=TRUE)
       ,cum_prop_total=cumsum(prop_total)
       ,row_id=dplyr::row_number()
       ,max_row_id=max(row_id,na.rm=TRUE)

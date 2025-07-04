@@ -35,7 +35,7 @@ ytd <- function(.data,.date,.value,calendar_type){
   # assigns inputs to ytd_tbl class
 
   x <- ti(
-    calendar(
+    data(
       data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -86,7 +86,7 @@ pytd <- function(.data,.date,.value,calendar_type,lag_n){
 
   # assigns inputs to ytd_tbl class
   out <- ti(
-    calendar(
+    data(
       data                  = .data
       ,calendar_type        = calendar_type
       ,date_vec             = rlang::as_label(rlang::enquo(.date))
@@ -138,7 +138,7 @@ yoytd <- function(.data,.date,.value,calendar_type,lag_n){
   # assigns inputs to yoytd class
 
   x <- ti(
-    calendar(
+    data(
       data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            =  rlang::as_label(rlang::enquo(.date))
@@ -189,7 +189,7 @@ yoytd <- function(.data,.date,.value,calendar_type,lag_n){
 yoy <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
-    calendar(
+    data(
       data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -239,7 +239,7 @@ yoy <- function(.data,.date,.value,calendar_type,lag_n=1){
 ytdopy <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
-    calendar(
+    data(
       data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -297,7 +297,7 @@ qtd <- function(.data,.date,.value,calendar_type){
   # Aggregate data based on provided time unit
 
   out <- ti(
-    calendar(
+    data(
       data                       = .data
       ,calendar_type             = calendar_type
       ,date_vec                  =  rlang::as_label(rlang::enquo(.date))
@@ -347,7 +347,7 @@ pqtd <- function(.data,.date,.value,calendar_type,lag_n){
   # Aggregate data based on provided time unit
 
   out <- ti(
-    calendar(
+    data(
       data                        = .data
       ,calendar_type              = calendar_type
       ,date_vec                   =  rlang::as_label(rlang::enquo(.date))
@@ -398,7 +398,7 @@ qoqtd <- function(.data,.date,.value,calendar_type,lag_n){
   # assigns inputs to yoytd class
 
   out <- ti(
-    calendar(
+    data(
       data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -445,7 +445,7 @@ qoqtd <- function(.data,.date,.value,calendar_type,lag_n){
 qtdopq <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
-    calendar(
+    data(
       data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -492,7 +492,7 @@ qtdopq <- function(.data,.date,.value,calendar_type,lag_n=1){
 qoq <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
-    calendar(
+    data(
       data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -546,7 +546,7 @@ qoq <- function(.data,.date,.value,calendar_type,lag_n=1){
 mtd <- function(.data,.date,.value,calendar_type){
 
     out <- ti(
-      calendar(
+      data(
         data                 = .data
         ,calendar_type       = calendar_type
         ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -594,7 +594,7 @@ mtd <- function(.data,.date,.value,calendar_type){
 pmtd <- function(.data,.date,.value,calendar_type,lag_n){
 
   out <- ti(
-    calendar(
+    data(
       data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -641,7 +641,7 @@ momtd <- function(.data,.date,.value,calendar_type,lag_n){
 
 
   out <- ti(
-    calendar(
+    data(
       data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -691,7 +691,7 @@ momtd <- function(.data,.date,.value,calendar_type,lag_n){
 #' mtdopm(sales,.date=order_date,.value=quantity,calendar_type="standard",lag_n=1)
 mtdopm <- function(.data,.date,.value,calendar_type,lag_n){
   out <- ti(
-    calendar(
+    data(
       data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -739,7 +739,7 @@ mtdopm <- function(.data,.date,.value,calendar_type,lag_n){
 mom <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
-    calendar(
+    data(
       data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -793,7 +793,7 @@ wtd <- function(.data,.date,.value,calendar_type){
   # Validate inputs
 
   out <- ti(
-    calendar(
+    data(
       data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -840,7 +840,7 @@ pwtd <- function(.data,.date,.value,calendar_type,lag_n){
 
 
   out <- ti(
-    calendar(
+    data(
       data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -892,7 +892,7 @@ wowtd <- function(.data,.date,.value,calendar_type,lag_n){
   # Vali.date inputs
 
   out <- ti(
-    calendar(
+    data(
       data=.data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -941,7 +941,7 @@ wowtd <- function(.data,.date,.value,calendar_type,lag_n){
 wtdopw <- function(.data,.date,.value,calendar_type,lag_n){
 
   out <- ti(
-    calendar(
+    data(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(.date))
@@ -991,7 +991,7 @@ wtdopw <- function(.data,.date,.value,calendar_type,lag_n){
 wow <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
-    calendar(
+    data(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(.date))
@@ -1043,7 +1043,7 @@ wow <- function(.data,.date,.value,calendar_type,lag_n=1){
 atd <- function(.data,.date,.value,calendar_type){
 
   out <- ti(
-    calendar(
+    data(
       data                 = .data
       ,calendar_type       = calendar_type
       ,date_vec            = rlang::as_label(rlang::enquo(.date))
@@ -1092,7 +1092,7 @@ atd <- function(.data,.date,.value,calendar_type){
 dod <- function(.data,.date,.value,calendar_type,lag_n=1){
 
   out <- ti(
-    calendar(
+    data(
       data=.data
       ,calendar_type=calendar_type
       ,date_vec = rlang::as_label(rlang::enquo(.date))

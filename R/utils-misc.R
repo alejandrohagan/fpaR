@@ -14,6 +14,27 @@ return(out)
 }
 
 
+
+
+
+
+generate_cli_action <- function(x,word){
+
+  out <- list()
+  if(any(x %in% stringr::str_to_lower(word))){
+
+    out$word <- c(cli::col_green(cli::symbol$tick),stringr::str_to_title(word))
+
+  }else{
+
+    out$aggregate <- c(cli::col_red(cli::symbol$cross),stringr::str_to_title(word))
+  }
+
+  return(out)
+}
+
+
+
 #' Make Action field CLI args
 #'
 #' @param x action class
@@ -24,40 +45,50 @@ make_action_cli <- function(x){
 
   out <- list()
 
-  if(any(x %in% c("aggregate"))){
+  # if(any(x %in% c("aggregate"))){
+  #
+  #   out$aggregate <- paste0(cli::col_green(cli::symbol$tick)," Aggregate")
+  #
+  # }else{
+  #
+  #   out$aggregate <- c(cli::col_red(cli::symbol$cross),"Aggregate")
+  # }
 
-    out$aggregate <- paste0(cli::col_green(cli::symbol$tick)," Aggregate")
+  out <- generate_cli_action(x,"aggregate")
 
-  }else{
+  out <- generate_cli_action(x,"shift")
 
-    out$aggregate <- c(cli::col_red(cli::symbol$cross),"Aggregate")
-  }
+  out <- generate_cli_action(x,"compare")
 
-  if(any(x %in% c("shift"))){
 
-    out$shift <- paste0(cli::col_green(cli::symbol$tick)," Shift")
 
-  }else{
-    out$shift <- c(cli::col_red(cli::symbol$cross)," Shift")
-  }
 
-  if(any(x %in% c("compare"))){
 
-    out$compare <- paste0(cli::col_green(cli::symbol$tick)," Compare")
+  # if(any(x %in% c("shift"))){
+  #
+  #   out$shift <- paste0(cli::col_green(cli::symbol$tick)," Shift")
+  #
+  # }else{
+  #   out$shift <- c(cli::col_red(cli::symbol$cross)," Shift")
+  # }
 
-  }else{
-
-    out$compare <- c(cli::col_red(cli::symbol$cross)," Compare")
-  }
-
-  if(any(x %in% c("% of total"))){
-
-    out$compare <- paste0(cli::col_green(cli::symbol$tick)," % of total")
-
-  }else{
-
-    out$compare <- c(cli::col_red(cli::symbol$cross)," % of total")
-  }
+  # if(any(x %in% c("compare"))){
+  #
+  #   out$compare <- paste0(cli::col_green(cli::symbol$tick)," Compare")
+  #
+  # }else{
+  #
+  #   out$compare <- c(cli::col_red(cli::symbol$cross)," Compare")
+  # }
+#
+#   if(any(x %in% c("% of total"))){
+#
+#     out$compare <- paste0(cli::col_green(cli::symbol$tick)," % of total")
+#
+#   }else{
+#
+#     out$compare <- c(cli::col_red(cli::symbol$cross)," % of total")
+#   }
 
 
 

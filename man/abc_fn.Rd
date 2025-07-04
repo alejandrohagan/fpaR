@@ -7,13 +7,7 @@
 abc_fn(x)
 }
 \arguments{
-\item{.value}{the column to aggregate}
-
-\item{category_values}{the break points you want for your categories, each should be less than or equal to 1}
-
-\item{fn}{'sum' to aggregate the value or 'n' to do the count of the group}
-
-\item{.data}{tibble or DBI object}
+\item{x}{segment object}
 }
 \value{
 a dbi objection
