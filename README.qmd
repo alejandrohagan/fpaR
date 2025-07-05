@@ -272,6 +272,9 @@ sales |>
    
 ```
 
+
+- TBD
+
 ## Issue 3
 
 
@@ -279,14 +282,14 @@ sales |>
 
 -  This package leverages the `contoso` package for its analysis. The contoso datasets are fictional datasets of sales transaction which are helpful for business intelligence related analysis (or general database management practices)
 
-![Contoso](fig/contoso_schema.svg)
+![](fig/contoso_schema.svg)
 
 This is an **active work-in-progress**, and feedback, testing, and
 contributions are welcome!
 
 ------------------------------------------------------------------------
 
-## **Core Functionalities**
+## **Core Capabilities**
 
 The package is centered around **three main areas of analysis**:
 
