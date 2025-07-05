@@ -370,7 +370,6 @@ category <- S7::new_class(
   )
 )
 
-
 segment <- S7::new_class(
 
   ,name="segment"

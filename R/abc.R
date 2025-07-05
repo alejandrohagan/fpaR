@@ -22,7 +22,7 @@
 abc <- function(.data,category_values,.value){
 
   # capture value as text
-    # .data <- sales
+    # .data <- sales |> group_by(customer_key)
     # value_vec <- value_vec <- deparse(substitute(margin))
     # category_values <- c(.4,.7,.8,.96,1)
 
@@ -49,6 +49,7 @@ abc <- function(.data,category_values,.value){
       ,lag_n                  = NA_integer_
       ,new_date_column_name  = NA_character_
       )
+    ,time_unit                =time_unit(value="day")
     ,action=action(
       value = c("proportion of total","Aggregate")
       ,method= "This calculates a rolling cumulative distribution of variable
@@ -191,17 +192,24 @@ abc_fn <- function(x){
 }
 
 #' @title Cohort Analysis
+#' @name cohort
 #'
 #' @param .data tibble or dbi object
 #' @param .date date column
 #' @param .value id column
-#' @param calendar_type standard calendar
-#' @param time_unit do you want daily, montly, quarterly or annual view
+#' @param calendar_type clarify the calendar type; 'standard' or '554'
+#' @param period_label do you want period labels or the dates c(TRUE,FALSE)
+#' @param time_unit do you want summarize the date column to 'day', 'week','month','quarter' or 'year'
+#'
 #' @description
-#' A database is remake of 'https://github.com/PeerChristensen/cohorts' cohort package combining
+#' A database is remake of 'https://github.com/PeerChristensen/cohorts' excellent cohort package combining
 #' chort_table_month, cohort_table_year, cohort_table_day into a single package.
 #' Re-written to be database friendly tested against snowflake and duckdb databases
-#'
+#' @details
+#' -  This will group your `.value` column by shared time attributes from the `.date` column
+#' -  It will assign to each member a time base cohort based on the member's first entry in the `.date` column
+#' -  The cohort will be generalized by the time_unit argument you selected
+#' -  Then the distinct count of each cohort member over time is calculated
 #' @returns segment object
 #' @export
 #'
@@ -242,7 +250,6 @@ cohort <- function(.data,.date,.value,calendar_type,time_unit="month",period_lab
       This segments groups based on a shared time related dimension
       so you can track a cohort's trend over time
       "
-
       )
   )
 
@@ -251,7 +258,7 @@ cohort <- function(.data,.date,.value,calendar_type,time_unit="month",period_lab
 
 
 
-#' Title
+#' Internal function for the cohort segment object
 #'
 #' @param x segment object
 #' @param period_label optional label

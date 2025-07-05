@@ -2,7 +2,7 @@
 % Please edit documentation in R/abc.R
 \name{cohort}
 \alias{cohort}
-\title{Title}
+\title{Cohort Analysis}
 \usage{
 cohort(
   .data,
@@ -20,15 +20,25 @@ cohort(
 
 \item{.value}{id column}
 
-\item{calendar_type}{standard calendar}
+\item{calendar_type}{clarify the calendar type; 'standard' or '554'}
 
-\item{time_unit}{do you want daily, montly, quarterly or annual view}
+\item{time_unit}{do you want summarize the date column to 'day', 'week','month','quarter' or 'year'}
+
+\item{period_label}{do you want period labels or the dates c(TRUE,FALSE)}
 }
 \value{
 segment object
 }
 \description{
-A database is remake of 'https://github.com/PeerChristensen/cohorts' cohort package combining
+A database is remake of 'https://github.com/PeerChristensen/cohorts' excellent cohort package combining
 chort_table_month, cohort_table_year, cohort_table_day into a single package.
 Re-written to be database friendly tested against snowflake and duckdb databases
+}
+\details{
+\itemize{
+\item This will group your \code{.value} column by shared time attributes from the \code{.date} column
+\item It will assign to each member a time base cohort based on the member's first entry in the \code{.date} column
+\item The cohort will be generalized by the time_unit argument you selected
+\item Then the distinct count of each cohort member over time is calculated
+}
 }

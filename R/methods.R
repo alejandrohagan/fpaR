@@ -154,7 +154,7 @@ S7::method(calculate,ti) <- function(x){
 #' @examples
 #' sales |>
 #'     group_by(store_key) |>
-#'     abc(.value = margin,category_values = c(.3,.5,.75,.85),type = "n") |>
+#'     abc(category_values = c(.3,.5,.75,.85)) |>
 #'     calculate() |>
 S7::method(calculate,segment) <- function(x){
 

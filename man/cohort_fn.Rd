@@ -2,7 +2,7 @@
 % Please edit documentation in R/abc.R
 \name{cohort_fn}
 \alias{cohort_fn}
-\title{Title}
+\title{Internal function for the cohort segment object}
 \usage{
 cohort_fn(x)
 }
@@ -15,5 +15,5 @@ cohort_fn(x)
 function
 }
 \description{
-Title
+Internal function for the cohort segment object
 }
