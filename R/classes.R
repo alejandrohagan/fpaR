@@ -296,6 +296,10 @@ fn <- S7::new_class(
       class=S7::class_character
       ,default = NA_character_
     )
+    ,label=S7::new_property(
+      class=S7::class_logical
+      ,default = FALSE
+    )
     ,new_date_column_name=S7::new_property(
       class=S7::class_any
       ,default = NA_character_
@@ -345,14 +349,11 @@ ti <- S7::new_class(
 ## abc class---------
 
 
-
-segment <- S7::new_class(
-
-  ,name="segment"
+category <- S7::new_class(
+  name="category"
   ,package = "fpaR"
   ,properties = list(
-    data=data
-    ,category_values=S7::new_property(
+    category_values=S7::new_property(
       class=S7:::class_numeric
       ,default=c(.7,.96,1)
       ,validator = \(value){
@@ -366,6 +367,18 @@ segment <- S7::new_class(
         self
       }
     )
+  )
+)
+
+
+segment <- S7::new_class(
+
+  ,name="segment"
+  ,package = "fpaR"
+  ,properties = list(
+    data=data
+    ,category=category
+    ,time_unit=time_unit
     ,fn=fn
     ,action=action
     ,value=value

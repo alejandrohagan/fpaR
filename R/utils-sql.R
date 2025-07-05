@@ -79,9 +79,6 @@ seq_date_sql <- function(start_date,end_date,time_unit,con){
 }
 
 
-
-
-
 #' Make an in memory database from a table
 #'
 #' @param x tibble or dbi object

@@ -8,7 +8,7 @@ create_calendar <- S7::new_generic("create_calendar","x")
 calculate <- S7::new_generic("calculate","x")
 
 
-complete_calendar <- S7::new_generic("calculate","x")
+complete_calendar <- S7::new_generic("complete_calendar","x")
 
 
 #' Create Calendar Table
@@ -78,6 +78,54 @@ S7::method(create_calendar,ti) <- function(x){
 
 
 
+#' Create Calendar Table
+#' @name create_calendar
+#' @param x segment object
+#'
+#' @returns dbi object
+#' @export
+#' @description
+#' `create_calendar()` summarizes a tibble to target time unit and completes the calendar to ensure
+#' no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
+#' for each combination of the group
+#' @details
+#' This is in internal function to make it easier to ensure data has no missing dates to
+#'  simplify the use of time intelligence functions downstream of the application.
+#' If you want to summarize to a particular group, simply pass the tibble through to the [dplyr::group_by()] argument
+#' prior to function and the function will make summarize and make a complete calendar for each group item.
+#'
+S7::method(create_calendar,segment) <- function(x){
+
+  ## summarize data table
+  summary_dbi <- x@data@data |>
+    dplyr::mutate(
+      date = lubridate::floor_date(!!x@data@date_quo,unit = "day")
+    ) |>
+    dplyr::summarise(
+      !!x@value@value_vec:= sum(!!x@value@value_quo,na.rm=TRUE)
+      ,.by=c(date,!!!x@data@group_quo)
+    )
+
+  #create calendar table
+
+  calendar_dbi <- fpaR::seq_date_sql(start_date = x@data@min_date,end_date = x@data@max_date,time_unit = x@time_unit@value,con=dbplyr::remote_con(x@data@data)) |>
+      dplyr::cross_join(
+        summary_dbi |>
+          dplyr::distinct(!!!x@value@value_quo)
+      )
+
+
+
+  # Perform a full join to ensure all time frames are represented
+  full_dbi <- dplyr::full_join(
+    calendar_dbi
+    ,summary_dbi
+    ,by = dplyr::join_by(date,!!!x@value@value_quo)
+  )
+
+  return(full_dbi)
+}
+
 #' @title Calculate
 #' @name calculate
 #' @param x ti object
@@ -111,8 +159,7 @@ S7::method(calculate,ti) <- function(x){
 S7::method(calculate,segment) <- function(x){
 
 
-  out <- x@fn@fn_exec(x) |>
-    arrange(row_id)
+  out <- x@fn@fn_exec(x)
 
   return(out)
 
@@ -245,12 +292,14 @@ fpaR::print_next_steps()
 S7::method(print,segment) <- function(x,...){
 
 
-  n_values_len <- length(x@category_values)
+  n_values_len <- length(x@category@category_values)
 
   print_fn_info(x)
 
   ### Category Values information
   cli::cli_h2("Category Information")
+
+  if(x@fn@fn_name=="abc"){
 
   if(x@value@value_vec=="n"){
 
@@ -268,7 +317,7 @@ S7::method(print,segment) <- function(x,...){
 
     )
 
-  }else{
+  }else {
 
     cli::cat_bullet(
       paste(
@@ -289,13 +338,45 @@ S7::method(print,segment) <- function(x,...){
       "Then cumulative distribution was then arranged from lowest to highest and finally classified into"
       ,n_values_len
       ,"break points"
-      ,cli::col_yellow(stringr::str_flatten_comma(scales::percent(x@category_values)))
+      ,cli::col_yellow(stringr::str_flatten_comma(scales::percent(x@category@category_values)))
       ," and labelled into the following categories"
-      ,cli::col_br_blue(stringr::str_flatten_comma(x@category_names))
+      ,cli::col_br_blue(stringr::str_flatten_comma(x@category@category_names))
     )
   )
+  }else{
   cli::cat_line("")
 
+    cli::cat_bullet(
+      paste(
+        "The data set is grouped by the"
+        ,cli::col_br_magenta(x@value@value_vec)
+        ,"and segments each group member by their first"
+        ,cli::col_br_magenta(x@data@date_vec)
+        ,"entry to define their cohort"
+        ,cli::col_br_magenta(x@value@value_vec)
+      )
+    )
+    cli::cat_bullet("This creates cohort ID that each member is assigned to eg; January 2020, February 2020, etc")
+
+    cli::cat_bullet(
+      paste(
+        "The distinct count of each"
+        ,cli::col_br_magenta(x@value@value_vec)
+        ,"member in the cohort is then tracked over time"
+      )
+    )
+
+
+
+  ## add if condition for abc vs. cohort
+  cli::cli_h2("Calendar:")
+  cli::cat_bullet(paste("The calendar aggregated",cli::col_br_magenta(x@data@date_vec),"to the",cli::col_yellow(x@time_unit@value),"time unit"))
+  cli::cat_bullet("A ",cli::col_br_red(x@data@calendar_type)," calendar is created with ",cli::col_green(x@data@group_count," groups"))
+  cli::cat_bullet(paste("Calendar ranges from",cli::col_br_green(x@data@min_date),"to",cli::col_br_green(x@data@max_date)))
+  cli::cat_bullet(paste(cli::col_blue(x@data@date_missing),"days were missing and replaced with 0"))
+  cli::cat_bullet("New date column ",stringr::str_flatten_comma(cli::col_br_red(x@fn@new_date_column_name),last = " and ")," was created from ",cli::col_br_magenta(x@data@date_vec))
+  cli::cat_line("")
+}
 
   cli::cat_line("")
 
