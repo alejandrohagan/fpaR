@@ -190,9 +190,7 @@ abc_fn <- function(x){
 
 }
 
-
-
-#' Title
+#' @title Cohort Analysis
 #'
 #' @param .data tibble or dbi object
 #' @param .date date column
@@ -208,6 +206,8 @@ abc_fn <- function(x){
 #' @export
 #'
 cohort <- function(.data,.date,.value,calendar_type,time_unit="month",period_label=FALSE){
+
+  ## test data
 
   # .data <- sales
   # .date <- "order_date"
@@ -260,18 +260,13 @@ cohort <- function(.data,.date,.value,calendar_type,time_unit="month",period_lab
 #'
 cohort_fn <- function(x){
 
-  # .data <- cohorts::online_cohorts |> janitor::clean_names()
+  ## test data
 
+  # .data <- cohorts::online_cohorts |> janitor::clean_names()
 
   # x <- cohort(.data,.date=invoice_date,calendar_type = "standard",.value = customer_id,time_unit = "day")
 
-
-  ## validation tests
-
-  #
-
-
-
+  ## summary table
 
   summary_dbi <-   x@data@data  |>
     dplyr::mutate(date = lubridate::floor_date(!!x@data@date_quo,unit=!!x@time_unit@value)) |>
