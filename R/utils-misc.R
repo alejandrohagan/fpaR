@@ -73,6 +73,8 @@ make_action_cli <- function(x){
 
   out[4] <- generate_cli_action(x,"proportion of total")
 
+  out[5] <- generate_cli_action(x,"count distinct")
+
   return(out)
 
 }
@@ -84,7 +86,6 @@ make_action_cli <- function(x){
 #' @param x ti or segment obj
 #'
 #' @returns print
-#' @export
 #'
 print_fn_info <- function(x) {
 
@@ -98,10 +99,7 @@ print_fn_info <- function(x) {
 #' Prints functions next steps
 #'
 #' @returns print
-#' @export
 #'
-#' @examples
-#' print_next_steps()
 print_next_steps <- function(){
 
   cli::cli_h2("Next Steps:")
@@ -112,18 +110,63 @@ print_next_steps <- function(){
 }
 
 
+#' Print action steps
+#'
+#' @param x an S7 class
+#'
+#' @returns cli messages
+#'
 print_actions_steps <- function(x){
 
   cli::cli_h2("Actions:")
 
 
-  cli::cli_text(x@action@value[[1]]," ",cli::col_blue(x@value@value_vec))
+  if(any(str_detect(x@action@value[[1]],"32m"))){
+
+
+    cli::cli_text(x@action@value[[1]]," ",cli::col_blue(x@value@value_vec))
+
+  }else{
+
+    cli::cli_text(x@action@value[[1]])
+
+  }
+
+  #shift
 
   cli::cli_text(x@action@value[[2]]," ",cli::col_green(na.omit(x@fn@lag_n))," ",cli::col_green(na.omit(x@fn@shift)))
 
+  #compare
+
   cli::cli_text(x@action@value[[3]]," ",cli::col_br_magenta(na.omit(x@fn@compare)))
 
-  cli::cli_text(x@action@value[[4]]," ",cli::col_br_magenta(na.omit(x@fn@compare)))
+
+  ## prop of total
+
+  if(any(str_detect(x@action@value[[4]],"32m"))){
+
+
+    cli::cli_text(x@action@value[[4]])
+
+  }else{
+
+    cli::cli_text(x@action@value[[4]])
+
+  }
+
+  ## distinct count
+
+
+  if(any(str_detect(x@action@value[[5]],"32m"))){
+
+
+    cli::cli_text(x@action@value[[5]]," ",cli::col_blue(x@value@value_vec))
+
+  }else{
+
+    cli::cli_text(x@action@value[[5]])
+
+  }
 
 
 }

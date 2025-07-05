@@ -159,8 +159,7 @@ S7::method(calculate,ti) <- function(x){
 S7::method(calculate,segment) <- function(x){
 
 
-  out <- x@fn@fn_exec(x) |>
-    arrange(row_id)
+  out <- x@fn@fn_exec(x)
 
   return(out)
 
@@ -300,6 +299,8 @@ S7::method(print,segment) <- function(x,...){
   ### Category Values information
   cli::cli_h2("Category Information")
 
+  if(x@fn@fn_name=="abc"){
+
   if(x@value@value_vec=="n"){
 
     cli::cat_bullet(
@@ -316,7 +317,7 @@ S7::method(print,segment) <- function(x,...){
 
     )
 
-  }else{
+  }else {
 
     cli::cat_bullet(
       paste(
@@ -342,8 +343,40 @@ S7::method(print,segment) <- function(x,...){
       ,cli::col_br_blue(stringr::str_flatten_comma(x@category@category_names))
     )
   )
+  }else{
   cli::cat_line("")
 
+    cli::cat_bullet(
+      paste(
+        "The data set is grouped by the"
+        ,cli::col_br_magenta(x@value@value_vec)
+        ,"and segments each group member by their first"
+        ,cli::col_br_magenta(x@data@date_vec)
+        ,"entry to define their cohort"
+        ,cli::col_br_magenta(x@value@value_vec)
+      )
+    )
+    cli::cat_bullet("This creates cohort ID that each member is assigned to eg; January 2020, February 2020, etc")
+
+    cli::cat_bullet(
+      paste(
+        "The distinct count of each"
+        ,cli::col_br_magenta(x@value@value_vec)
+        ,"member in the cohort is then tracked over time"
+      )
+    )
+
+
+
+  ## add if condition for abc vs. cohort
+  cli::cli_h2("Calendar:")
+  cli::cat_bullet(paste("The calendar aggregated",cli::col_br_magenta(x@data@date_vec),"to the",cli::col_yellow(x@time_unit@value),"time unit"))
+  cli::cat_bullet("A ",cli::col_br_red(x@data@calendar_type)," calendar is created with ",cli::col_green(x@data@group_count," groups"))
+  cli::cat_bullet(paste("Calendar ranges from",cli::col_br_green(x@data@min_date),"to",cli::col_br_green(x@data@max_date)))
+  cli::cat_bullet(paste(cli::col_blue(x@data@date_missing),"days were missing and replaced with 0"))
+  cli::cat_bullet("New date column ",stringr::str_flatten_comma(cli::col_br_red(x@fn@new_date_column_name),last = " and ")," was created from ",cli::col_br_magenta(x@data@date_vec))
+  cli::cat_line("")
+}
 
   cli::cat_line("")
 

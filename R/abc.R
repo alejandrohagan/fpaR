@@ -192,6 +192,166 @@ abc_fn <- function(x){
 
 
 
+#' Title
+#'
+#' @param .data tibble or dbi object
+#' @param .date date column
+#' @param .value id column
+#' @param calendar_type standard calendar
+#' @param time_unit do you want daily, montly, quarterly or annual view
+#' @description
+#' A database is remake of 'https://github.com/PeerChristensen/cohorts' cohort package combining
+#' chort_table_month, cohort_table_year, cohort_table_day into a single package.
+#' Re-written to be database friendly tested against snowflake and duckdb databases
+#'
+#' @returns segment object
+#' @export
+#'
+cohort <- function(.data,.date,.value,calendar_type,time_unit="month",period_label=FALSE){
+
+  # .data <- sales
+  # .date <- "order_date"
+  # .value <- "customer_key"
+
+
+  x <-  segment(
+    data=data(
+      .data
+      ,calendar_type = "standard"
+      ,date_vec = rlang::as_label(rlang::enquo(.date))
+    )
+    ,category = category(category_values = 0)
+    ,fn = fn(
+      fn_exec = cohort_fn
+      ,fn_name = "cohort"
+      ,fn_long_name = "Time Based Cohort"
+      ,new_date_column_name = "cohort_date"
+      ,shift = NA_character_
+      ,compare = NA_character_
+      ,lag_n = NA_integer_
+      ,label=period_label
+    )
+    ,time_unit = time_unit(value=time_unit)
+    ,value = value(
+      value_vec = rlang::as_label(rlang::enquo(.value))
+      ,new_column_name_vec = "cohort"
+    )
+    ,action = action(
+      value="count distinct"
+      ,method="
+      This segments groups based on a shared time related dimension
+      so you can track a cohort's trend over time
+      "
+
+      )
+  )
+
+  return(x)
+}
+
+
+
+#' Title
+#'
+#' @param x segment object
+#' @param period_label optional label
+#'
+#' @returns function
+#'
+cohort_fn <- function(x){
+
+  # .data <- cohorts::online_cohorts |> janitor::clean_names()
+
+
+  # x <- cohort(.data,.date=invoice_date,calendar_type = "standard",.value = customer_id,time_unit = "day")
+
+
+  ## validation tests
+
+  #
+
+
+
+
+  summary_dbi <-   x@data@data  |>
+    dplyr::mutate(date = lubridate::floor_date(!!x@data@date_quo,unit=!!x@time_unit@value)) |>
+    dplyr::group_by(!!!x@value@value_quo) |>
+    dplyr::mutate(cohort_date = min(date,na.rm=TRUE)) |>
+    # dbplyr::window_order(date) |>
+    dplyr::group_by(cohort_date, date) |>
+    dplyr::summarise(
+      !!x@value@new_column_name_vec:= dplyr::n_distinct(!!!x@value@value_quo)
+      ,.groups = "drop"
+    ) |>
+    dplyr::mutate(period_id=dplyr::sql("DENSE_RANK() OVER (ORDER BY date)"))
+
+
+  # complete_summary_dbi <- fpaR::seq_date_sql(
+  #   start_date = x@data@min_date
+  #   ,end_date = x@data@max_date
+  #   ,time_unit = x@time_unit@value
+  #   ,con=dbplyr::remote_con(x@data@data)
+  #   ) |>
+  #   dplyr::cross_join(
+  #     summary_dbi |> select(-date)
+  #   )
+
+  # complete_summary_dbi
+
+  # min_date <- min(complete_summary_dbi |> pull(date),na.rm=TRUE)
+  #
+  # max_date <- max(complete_summary_dbi |> pull(date),na.rm=TRUE)
+
+
+  if(!x@fn@label){
+
+    out <- summary_dbi |>
+      dplyr::select(-period_id) |>
+      tidyr::pivot_wider(
+        names_from=date
+        ,values_from=!!x@value@new_column_name_quo
+        ,values_fill=0
+      ) |>
+      dbplyr::window_order(cohort_date) |>
+      dplyr::mutate(
+        cohort_id = dplyr::row_number()
+      ) |>
+      dplyr::relocate(
+        cohort_date
+        ,cohort_id
+        ,tidyselect::any_of(
+          as.character(
+            as.Date(x@data@min_date:x@data@max_date)
+          )
+        )
+      ) |>
+      janitor::clean_names()
+
+  }else{
+
+    out <- summary_dbi |>
+      dplyr::select(-date) |>
+      tidyr::pivot_wider(
+        names_from=period_id
+        ,values_from=x@value@new_column_name_quo
+        ,names_prefix = "p_"
+        ,values_fill = 0
+      ) |>
+      dplyr::ungroup() |>
+      # dplyr::compute() |>
+      dbplyr::window_order(cohort_date) |>
+      # dplyr::arrange(cohort_date) |>
+      dplyr::mutate(cohort_id = dplyr::row_number()) |>
+      dplyr::relocate(
+        cohort_date
+        ,cohort_id
+        ,tidyselect::num_range(prefix="p_",1:last_col())
+      )
+
+  }
+  return(out)
+
+}
 
 
 

@@ -12,6 +12,3 @@ print
 \description{
 Prints functions next steps
 }
-\examples{
-print_next_steps()
-}

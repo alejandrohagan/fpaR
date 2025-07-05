@@ -296,6 +296,10 @@ fn <- S7::new_class(
       class=S7::class_character
       ,default = NA_character_
     )
+    ,label=S7::new_property(
+      class=S7::class_logical
+      ,default = FALSE
+    )
     ,new_date_column_name=S7::new_property(
       class=S7::class_any
       ,default = NA_character_
