@@ -73,7 +73,7 @@ pak::pak("alejandrohagan/fpaR")
 
 ## What is in fpaR?
 
-**Time intelligence**
+### Time intelligence
 
 `fpaR` provides readily available functions for most time intelligence
 analysis such as **Year-over-Year (YoY)**, **Month-to-Date (MTD)**, and
@@ -309,13 +309,12 @@ business categories.
 
 #### **Example Segmentation Methods:**
 
-- **ABC Classification** – Categorizing products/customers based on
-  revenue contribution.  
+- **ABC Classification** – Categorizing products/customers based on revenue contribution
+-  **Cohort Analysis** - Categorize your data by a shared time based attribute to track over time
 - **New vs. Returning** – Distinguishing first-time buyers from repeat
-  customers.  
-- **K-means Clustering** – Grouping data points based on patterns.  
-- **UMAP (Uniform Manifold Approximation and Projection)** –
-  Dimensionality reduction for clustering.
+  customers
+- **K-means Clustering** – Grouping data points based on patterns
+- **UMAP (Uniform Manifold Approximation and Projection)** –   Dimensionaltiy reduction for clustering
 
 ------------------------------------------------------------------------
 
@@ -326,8 +325,7 @@ effects**.
 
 #### **Use Cases:**
 
-- Analyzing revenue growth **due to price increases vs. increased sales
-  volume**.  
+- Analyzing revenue growth **due to price increases vs. increased sales volume**
 - Measuring the impact of **product mix changes on profitability**.
 
 ------------------------------------------------------------------------

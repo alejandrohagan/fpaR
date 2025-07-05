@@ -275,12 +275,12 @@ cohort_fn <- function(x){
 
   summary_dbi <-   x@data@data  |>
     dplyr::mutate(date = lubridate::floor_date(!!x@data@date_quo,unit=!!x@time_unit@value)) |>
-    dplyr::group_by(!!!x@value@value_quo) |>
+    dplyr::group_by(!!x@value@value_quo) |>
     dplyr::mutate(cohort_date = min(date,na.rm=TRUE)) |>
     # dbplyr::window_order(date) |>
     dplyr::group_by(cohort_date, date) |>
     dplyr::summarise(
-      !!x@value@new_column_name_vec:= dplyr::n_distinct(!!!x@value@value_quo)
+      !!x@value@new_column_name_vec:= dplyr::n_distinct(!!x@value@value_quo)
       ,.groups = "drop"
     ) |>
     dplyr::mutate(period_id=dplyr::sql("DENSE_RANK() OVER (ORDER BY date)"))
