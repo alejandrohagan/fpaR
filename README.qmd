@@ -20,8 +20,7 @@ devtools::load_all()
 
 `fpaR` is a collection of business intelligence tools designed to
 simplify common **financial planning and analysis (FP&A)** tasks such as
-time intelligence calculations, customer, vendor or product segmentation, and factor/variance
-analysis.
+time intelligence calculations, customer, vendor or product segmentation, and factor/variance analysis.
 
 The package is inspired by best practices from a collection of blogs,
 books, industry research, and hands-on work experience, consolidating
@@ -33,28 +32,25 @@ In particular, the time intelligence functions are heavily inspired by
 
 Under the hood, these functions are built upon the great foundations of:
 
-      -  [dbplyr](https://dbplyr.tidyverse.org/)   
-      -  [duckdb](https://github.com/duckdb/duckdb-r)
-      -  [lubridate](https://lubridate.tidyverse.org/)
+-  [dbplyr](https://dbplyr.tidyverse.org/)   
+-  [duckdb](https://github.com/duckdb/duckdb-r)
+-  [lubridate](https://lubridate.tidyverse.org/)
 
-`fpaR` is designed to seamlessly work with either tibbles or modern database
-(DuckDB, Snowflake, SQLite, etc) with a common syntax.
+`fpaR` is designed to seamlessly work with either tibbles or modern databases
+(DuckDB, Snowflake, SQLite, etc) with a unified syntax.
 
 
 Even if you are working with tibbles, most functions are optimized to
 leverage [DuckDB](https://github.com/duckdb/duckdb-r) for superior
-speed and performance.^[I plan use [duckplyr](https://duckplyr.tidyverse.org/index.html) once it expands support for lubridate functions]
+speed and performance.^[I plan use [duckplyr](https://duckplyr.tidyverse.org/index.html) once it expands support for lubricate functions]
 
 By default most `fpaR` function returns a lazy DBI object which you can return as a tibble with `dplyr::collect()`
 
 ## Key features & benefits
 
-- **Flexible support** common syntax for both local tibbles and databases 
-- **Optimized for speed and scale** tibbles rewritten to take advantage of [duckdb]() database
-- **Every transformation step is explained and summarized** instant clarity to what the
-underlying functions transformations are doing so you can validate and understand 
-your outputs
-
+- **Unified syntax** regardless if your data is in a tibble or a database
+- **Optimized for speed and scale** your data is converted to a local [duckdb](https://github.com/duckdb/duckdb-r) database to scale your calculations
+- **Instant clarity** as every function summarizes its transformation actions so that you can understand and validate the functions results 
 
 
 ## Installation
@@ -74,27 +70,27 @@ pak::pak("alejandrohagan/fpaR")
 
 ## What is in fpaR?
 
+There are 3 main categories of functions:
+-  Time intelligence (Ready for testing and feedback)
+-  Segmentation strategies (work in progress)
+-  Factor Analysis (work in progress)
+
 ### Time intelligence
 
 `fpaR` provides readily available functions for most time intelligence
 analysis such as **Year-over-Year (YoY)**, **Month-to-Date (MTD)**, and
-**Current Year-to-Date over Previous Year-to-Date (YoYTD)**.
+**Current Year-to-Date over Previous Year-to-Date (YoYTD)** analysis.
 
-These functions are designed to quickly answer most common time intelligence related analysis in
-a consistent, fast and transparent way.
+These functions are designed to quickly answer most common time intelligence related analysis in a consistent, fast and transparent way.
 
-**These features offer key benefits: **
+**Key benefits:**
 
 - **Auto-fill missing dates**: Ensures no missing periods in your
-  calculations to ensure there are no missing dates or periods
+  datasets so that right period comparisons are performed
 
-- **Flexible calendar options**: Handle comparisons based on a
-  **standard** or **5-5-4** fiscal calendar to accommodate
-  different reporting frameworks
+- **Flexible calendar options**: Handle comparisons based on a  **standard** or **5-5-4** fiscal calendar to accommodate different reporting frameworks
     
-- **Period imbalance indicator**: When comparing periods with dates imbalance, the time intelligence
-functions will alert you to the type and number of period imbalances to ensure you are aware of 
-misleading likewise comparisons
+- **Period imbalance indicator**: When comparing periods with dates imbalance, the time intelligence functions will alert you to the type and number of period imbalances to ensure you are aware of misleading likewise comparisons
 
 Below is the full list of time intelligence functions:
 
@@ -148,8 +144,8 @@ When you execute a time intelligence function, it will return a `ti` class objec
 
 
 ```{r}
-#| echo: false
-#| eval: false
+#| echo: true
+#| eval: true
 #| label: print-example-not-run
 
 sales |> 
@@ -168,13 +164,22 @@ To return a tibble of results, pass the ti object through to `calculate()`
 #| warning: false
 #| error: false
 #| message: false
+#| code-line-numbers: true
+#| 
 #| label: calculate-example
-sales |> 
-   mtd(.date=order_date,.value = margin,calendar_type = "standard") |> 
-   calculate()
+sales |>                                                                
+   mtd(.date=order_date,.value = margin,calendar_type = "standard") |>  
+   calculate()                                                          
 ```
 
-If you using a tibble data, under the hood, `fpaR` is converting that tibble to a [duckdb]() database and using [dbplyr]() to execute all the calculations. Use `dplyr::collect()` to return it as a regular tibble
+
+
+
+If you using a tibble, under the hood, `fpaR` is converting your data to a [duckdb](https://github.com/duckdb/duckdb-r) database.
+
+If your data is a datable, the package will leverage [dbplyr](https://dbplyr.tidyverse.org/) to execute all the calculations.
+
+Either case use `dplyr::collect()` to return your results to a local tibble.
 
 ```{r}
 #| echo: true
@@ -182,15 +187,15 @@ If you using a tibble data, under the hood, `fpaR` is converting that tibble to 
 #| warning: false
 #| error: false
 #| label: collect-example
-sales |> 
-   mtd(.date=order_date,.value = margin,calendar_type = "standard") |> 
-   calculate() |> 
-   dplyr::arrange(date) |> 
-   dplyr::collect() |> 
+
+sales |>                                                                
+   mtd(.date=order_date,.value = margin,calendar_type = "standard") |>  
+   calculate() |>                                                       
+   dplyr::collect() |>                                               
    head(10)
 ```
 
-what if you need the analysis at the group level?
+### what if you need the analysis at the group level?
 
 Simply pass through the groups that you want with `dplyr::group_by()` and time intelligence function will create a custom calendar for each group level.
 
@@ -201,14 +206,19 @@ Simply pass through the groups that you want with `dplyr::group_by()` and time i
 #| error: false
 #| message: false
 #| label: group_by-example
-sales |> 
-   dplyr::group_by(customer_key,store_key) |> 
-   yoy(.date=order_date,.value = margin,calendar_type = "standard")
+#| code-line-numbers: true
+sales |>   
+   dplyr::group_by(customer_key,store_key) |>  
+   yoy(.date=order_date,.value = margin,calendar_type = "standard") 
 ```
 
-------------------------------------------------------------------------
+1. Take your dataset
+2. Select the groups you want with `group_by()` 
+3. Prints the sumamrized instructions the actions the functions performs to calculate the year over year analysis
 
 ## Why do we need this package when we have lubridate?
+
+[Lubridate](https://lubridate.tidyverse.org/) is an excellent package and is heavily used by the package. The issue isn't lubridate but rather issues you may not be aware of in your package. 
 
 Time-based comparisons, such as Year-over-Year (YoY),
 Quarter-over-Quarter (QoQ), and Month-to-Date (MTD), are common for
@@ -219,12 +229,12 @@ tracking business performance. However, they come with challenges:
 
 -  Period imbalances between periods (Eg. the different number of days between February vs. January) can create misleading analysis or trends
 
--  Your organization may use a non-standard calendar such as a 5-5-4, 4-4-5, or 13 month calendar and you need the ability to do time intelligence functions
+-  Your analysis may need to reference a non-standard calendar such as a 5-5-4, 4-4-5, or 13 month calendar 
 
 -  Your data may be in excel sheets, csv or databases and you need to inter-operable framework to
 switch between all your data types
 
-## Issue 1
+### Continuous Dates
 
 ```{r}
 #| echo: false
@@ -234,22 +244,18 @@ switch between all your data types
 #| label: missing-date-example
 
 tibble::tibble(
-  order_date=c(" 2024-01-01","2024-01-03","2024-01-06")
-  ,margin=c(1200,1100,1300)
+  order_date=c(" 2024-01-01","2024-01-03","2024-01-06","2024-01-07","2024-01-08","2024-01-09","2024-01-11")
+  ,margin=c(1200,1100,1300,900,1200,850,1450)
 ) |> 
   tinytable::tt()
 ```
 
-
-
 If we use `dplyr::lag()` to compare **Day-over-Day (DoD)** revenue, we
-would be missing `2024-01-02` and `2024-01-04` which will lead to
-incorrect answers or trends
+would be missing `2024-01-02`, `2024-01-04`, and `2024-01-05` which will lead to
+incorrect answers or trends.
 
-To correct this, `fpaR` automatically **fills in missing dates** for
-each group of your data to ensure there are no missing periods when
-comparing periods
-
+To correct this, `fpaR` will complete your calendar for each group for the 
+missing periods to ensure there are no missing periods when calculating trends.
 
 ## Issue 2
 ```{r}
@@ -277,32 +283,15 @@ sales |>
 - TBD
 
 ## Issue 3
+- TBD
 
 
-**Practice Datasets**
+## Datasets
 
--  This package leverages the `contoso` package for its analysis. The contoso datasets are fictional datasets of sales transaction which are helpful for business intelligence related analysis (or general database management practices)
-
-![](fig/contoso_schema.svg)
+-  This package leverages the [Contoso](https://github.com/alejandrohagan/contoso) package for its analysis. The contoso datasets are fictional business transaction of Contoso toy company which are helpful for business intelligence related analysis
 
 This is an **active work-in-progress**, and feedback, testing, and
 contributions are welcome!
-
-------------------------------------------------------------------------
-
-## **Core Capabilities**
-
-The package is centered around **three main areas of analysis**:
-
-### **Time Intelligence Functions**
-
-A comprehensive set of time-based analytical functions to track trends
-over different periods.
-
-*Support for non-standard calendars (e.g., 5-5-4 fiscal calendar) is
-under development.*
-
-------------------------------------------------------------------------
 
 ## Future capabilities
 
@@ -334,3 +323,6 @@ effects**.
 
 ------------------------------------------------------------------------
 
+## Additional references and inspirations
+
+-  [PeerChristensen's Cohort Package](https://github.com/PeerChristensen/cohorts)

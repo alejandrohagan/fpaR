@@ -15,9 +15,6 @@ return(out)
 
 
 
-
-
-
 #' Generate CLI actions
 #'
 #' @param x input to test against

@@ -275,7 +275,7 @@ S7::method(print,ti) <- function(x,...){
 
   ## Next Steps information
 
-fpaR::print_next_steps()
+print_next_steps()
 
 
 }
