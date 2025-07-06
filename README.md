@@ -116,7 +116,7 @@ Below is the full list of time intelligence functions:
 When you execute a time intelligence function, it will return a `ti`
 class object with a custom print method that explains what the function
 is doing and a summary of transformation steps and the calendar
-attributes
+attributes.
 
 ``` r
 sales |> 
@@ -160,10 +160,10 @@ sales |>
 
 You will see a print method that explains the function’s actions,
 details the calendar’s attributes, summarizes the main transformation
-steps and lists out possible next actions
+steps and lists out possible next actions.
 
 To return a tibble of results, pass the ti object through to
-`calculate()`
+`calculate()`.
 
 ``` r
 sales |>                                                                
@@ -172,27 +172,27 @@ sales |>
 ```
 
     # Source:     SQL [?? x 7]
-    # Database:   DuckDB v1.1.3 [hagan@Linux 6.12.10-76061203-generic:R 4.4.3//tmp/RtmpkvGhnP/file372c865e1f58a]
+    # Database:   DuckDB v1.1.3 [hagan@Linux 6.12.10-76061203-generic:R 4.4.3//tmp/Rtmp8zNXOl/file38aa64254a983]
     # Ordered by: date
         year month date       margin missing_date_indicator mtd_margin
        <dbl> <dbl> <date>      <dbl>                  <dbl>      <dbl>
-     1  2021     8 2021-08-01    0                        1         0 
-     2  2021     8 2021-08-02    0                        1         0 
-     3  2021     8 2021-08-03    0                        1         0 
-     4  2021     8 2021-08-04 2091.                       0      2091.
-     5  2021     8 2021-08-05  112.                       0      2203.
-     6  2021     8 2021-08-06   71.2                      0      2274.
-     7  2021     8 2021-08-07 4406.                       0      6681.
-     8  2021     8 2021-08-08    0                        1      6681.
-     9  2021     8 2021-08-09 2044.                       0      8724.
-    10  2021     8 2021-08-10 6847.                       0     15572.
+     1  2021     7 2021-07-29     0                       1     48746.
+     2  2021     7 2021-07-30     0                       1     48746.
+     3  2021     7 2021-07-31  4070.                      0     52816.
+     4  2022     2 2022-02-01  7032.                      0      7032.
+     5  2022     2 2022-02-02  8778.                      0     15810.
+     6  2022     2 2022-02-03 10359.                      0     26169.
+     7  2022     2 2022-02-04  7337.                      0     33506.
+     8  2022     2 2022-02-05  7399.                      0     40905.
+     9  2022     2 2022-02-06     0                       1     40905.
+    10  2022     2 2022-02-07  1051.                      0     41956.
     # ℹ more rows
     # ℹ 1 more variable: days_in_current_period <dbl>
 
 If you using a tibble, under the hood, `fpaR` is converting your data to
 a [duckdb](https://github.com/duckdb/duckdb-r) database.
 
-If your data is a datable, the package will leverage
+If your data is a database, the package will leverage
 [dbplyr](https://dbplyr.tidyverse.org/) to execute all the calculations.
 
 Either case use `dplyr::collect()` to return your results to a local
@@ -209,16 +209,16 @@ sales |>
     # A tibble: 10 × 7
         year month date       margin missing_date_indicator mtd_margin
        <dbl> <dbl> <date>      <dbl>                  <dbl>      <dbl>
-     1  2021     8 2021-08-01    0                        1         0 
-     2  2021     8 2021-08-02    0                        1         0 
-     3  2021     8 2021-08-03    0                        1         0 
-     4  2021     8 2021-08-04 2091.                       0      2091.
-     5  2021     8 2021-08-05  112.                       0      2203.
-     6  2021     8 2021-08-06   71.2                      0      2274.
-     7  2021     8 2021-08-07 4406.                       0      6681.
-     8  2021     8 2021-08-08    0                        1      6681.
-     9  2021     8 2021-08-09 2044.                       0      8724.
-    10  2021     8 2021-08-10 6847.                       0     15572.
+     1  2022    10 2022-10-25  7707.                      0    126939.
+     2  2022    10 2022-10-26  6383.                      0    133322.
+     3  2022    10 2022-10-27 19112.                      0    152434.
+     4  2022    10 2022-10-28  2589.                      0    155024.
+     5  2022    10 2022-10-29  9274.                      0    164297.
+     6  2022    10 2022-10-30     0                       1    164297.
+     7  2022    10 2022-10-31  4578.                      0    168875.
+     8  2023     5 2023-05-01   332.                      0       332.
+     9  2023     5 2023-05-02  2167.                      0      2500.
+    10  2023     5 2023-05-03  2774.                      0      5274.
     # ℹ 1 more variable: days_in_current_period <dbl>
 
 ### what if you need the analysis at the group level?
@@ -238,11 +238,6 @@ sales |>
     • Calendar ranges from 2021-05-18 to 2024-04-20
     • 222 days were missing and replaced with 0
     • New date column date and year was created from order_date
-
-1.  Take your dataset
-2.  Select the groups you want with `group_by()`
-3.  Prints the sumamrized instructions the actions the functions
-    performs to calculate the year over year analysis
 
 ## Why do we need this package when we have lubridate?
 
