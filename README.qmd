@@ -29,12 +29,13 @@ frequently performed business analyses into a fast, efficient, and
 reusable framework.
 
 In particular, the time intelligence functions are heavily inspired by
-[PowerBI DAX](https://www.sqlbi.com/) functions
+[PowerBI DAX](https://www.sqlbi.com/) functions.
 
 Under the hood, these functions are built upon the great foundations of:
--  [dbplyr](https://dbplyr.tidyverse.org/),
--  [duckdb](https://github.com/duckdb/duckdb-r)
--  [lubridate](https://lubridate.tidyverse.org/)
+
+      -  [dbplyr](https://dbplyr.tidyverse.org/)   
+      -  [duckdb](https://github.com/duckdb/duckdb-r)
+      -  [lubridate](https://lubridate.tidyverse.org/)
 
 `fpaR` is designed to seamlessly work with either tibbles or modern database
 (DuckDB, Snowflake, SQLite, etc) with a common syntax.
