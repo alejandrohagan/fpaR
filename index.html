@@ -56,10 +56,17 @@
 </h2>
 <p><code>fpaR</code> is a collection of business intelligence tools designed to simplify common <strong>financial planning and analysis (FP&amp;A)</strong> tasks such as time intelligence calculations, customer, vendor or product segmentation, and factor/variance analysis.</p>
 <p>The package is inspired by best practices from a collection of blogs, books, industry research, and hands-on work experience, consolidating frequently performed business analyses into a fast, efficient, and reusable framework.</p>
-<p>In particular, the time intelligence functions are heavily inspired by <a href="https://www.sqlbi.com/" class="external-link">PowerBI DAX</a> functions</p>
-<p>Under the hood, these functions are built upon the great foundations of: - <a href="https://dbplyr.tidyverse.org/" class="external-link">dbplyr</a>, - <a href="https://github.com/duckdb/duckdb-r" class="external-link">duckdb</a> - <a href="https://lubridate.tidyverse.org/" class="external-link">lubridate</a></p>
-<p><code>fpaR</code> is designed to seamlessly work with either tibbles or modern database (DuckDB, Snowflake, SQLite, etc) with a common syntax.</p>
-<p>Even if you are working with tibbles, most functions are optimized to leverage <a href="https://github.com/duckdb/duckdb-r" class="external-link">DuckDB</a> for superior speed and performance.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;I plan use &lt;a href="https://duckplyr.tidyverse.org/index.html" class="external-link"&gt;duckplyr&lt;/a&gt; once it expands support for lubridate functions&lt;/p&gt;'><sup>1</sup></a></p>
+<p>In particular, the time intelligence functions are heavily inspired by <a href="https://www.sqlbi.com/" class="external-link">PowerBI DAX</a> functions.</p>
+<p>Under the hood, these functions are built upon the great foundations of:</p>
+<ul>
+<li>
+<a href="https://dbplyr.tidyverse.org/" class="external-link">dbplyr</a><br>
+</li>
+<li><a href="https://github.com/duckdb/duckdb-r" class="external-link">duckdb</a></li>
+<li><a href="https://lubridate.tidyverse.org/" class="external-link">lubridate</a></li>
+</ul>
+<p><code>fpaR</code> is designed to seamlessly work with either tibbles or modern databases (DuckDB, Snowflake, SQLite, etc) with a unified syntax.</p>
+<p>Even if you are working with tibbles, most functions are optimized to leverage <a href="https://github.com/duckdb/duckdb-r" class="external-link">DuckDB</a> for superior speed and performance.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;I plan use &lt;a href="https://duckplyr.tidyverse.org/index.html" class="external-link"&gt;duckplyr&lt;/a&gt; once it expands support for lubricate functions&lt;/p&gt;'><sup>1</sup></a></p>
 <p>By default most <code>fpaR</code> function returns a lazy DBI object which you can return as a tibble with <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">dplyr::collect()</a></code></p>
 </div>
 <div class="section level2">
@@ -67,11 +74,11 @@
 </h2>
 <ul>
 <li>
-<strong>Flexible support</strong> common syntax for both local tibbles and databases</li>
+<strong>Unified syntax</strong> regardless if your data is in a tibble or a database</li>
 <li>
-<strong>Optimized for speed and scale</strong> tibbles rewritten to take advantage of <a href="">duckdb</a> database</li>
+<strong>Optimized for speed and scale</strong> your data is converted to a local <a href="https://github.com/duckdb/duckdb-r" class="external-link">duckdb</a> database to scale your calculations</li>
 <li>
-<strong>Every transformation step is explained and summarized</strong> instant clarity to what the underlying functions transformations are doing so you can validate and understand your outputs</li>
+<strong>Instant clarity</strong> as every function summarizes its transformation actions so that you can understand and validate the functions results</li>
 </ul>
 </div>
 <div class="section level2">
@@ -86,12 +93,15 @@
 <div class="section level2">
 <h2 id="what-is-in-fpar">What is in fpaR?<a class="anchor" aria-label="anchor" href="#what-is-in-fpar"></a>
 </h2>
-<p><strong>Time intelligence</strong></p>
-<p><code>fpaR</code> provides readily available functions for most time intelligence analysis such as <strong>Year-over-Year (YoY)</strong>, <strong>Month-to-Date (MTD)</strong>, and <strong>Current Year-to-Date over Previous Year-to-Date (YoYTD)</strong>.</p>
+<p>There are 3 main categories of functions: - Time intelligence (Ready for testing and feedback) - Segmentation strategies (work in progress) - Factor Analysis (work in progress)</p>
+<div class="section level3">
+<h3 id="time-intelligence">Time intelligence<a class="anchor" aria-label="anchor" href="#time-intelligence"></a>
+</h3>
+<p><code>fpaR</code> provides readily available functions for most time intelligence analysis such as <strong>Year-over-Year (YoY)</strong>, <strong>Month-to-Date (MTD)</strong>, and <strong>Current Year-to-Date over Previous Year-to-Date (YoYTD)</strong> analysis.</p>
 <p>These functions are designed to quickly answer most common time intelligence related analysis in a consistent, fast and transparent way.</p>
-<p><strong>These features offer key benefits: </strong></p>
+<p><strong>Key benefits:</strong></p>
 <ul>
-<li><p><strong>Auto-fill missing dates</strong>: Ensures no missing periods in your calculations to ensure there are no missing dates or periods</p></li>
+<li><p><strong>Auto-fill missing dates</strong>: Ensures no missing periods in your datasets so that right period comparisons are performed</p></li>
 <li><p><strong>Flexible calendar options</strong>: Handle comparisons based on a <strong>standard</strong> or <strong>5-5-4</strong> fiscal calendar to accommodate different reporting frameworks</p></li>
 <li><p><strong>Period imbalance indicator</strong>: When comparing periods with dates imbalance, the time intelligence functions will alert you to the type and number of period imbalances to ensure you are aware of misleading likewise comparisons</p></li>
 </ul>
@@ -262,146 +272,207 @@
 </tbody>
 </table>
 </div>
+</div>
 <div class="section level2">
 <h2 id="how-to-use-fpar">How to use fpaR?<a class="anchor" aria-label="anchor" href="#how-to-use-fpar"></a>
 </h2>
 <div class="section level3">
-<h3 id="time-intelligence">Time Intelligence<a class="anchor" aria-label="anchor" href="#time-intelligence"></a>
+<h3 id="time-intelligence-1">Time Intelligence<a class="anchor" aria-label="anchor" href="#time-intelligence-1"></a>
 </h3>
 <p>When you execute a time intelligence function, it will return a <code>ti</code> class object with a custom print method that explains what the function is doing and a summary of transformation steps and the calendar attributes</p>
-<p>You will see a print method that explains the function’s actions, details the calendar’s attributes, summarizes the main transformation steps and lists out possible next actions</p>
-<p>To return a tibble of results, pass the ti object through to <code><a href="reference/calculate.html">calculate()</a></code></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sales</span> <span class="op">|&gt;</span> </span>
-<span>   <span class="fu"><a href="reference/mtd.html">mtd</a></span><span class="op">(</span>.date<span class="op">=</span><span class="va">order_date</span>,.value <span class="op">=</span> <span class="va">margin</span>,calendar_type <span class="op">=</span> <span class="st">"standard"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>   <span class="fu"><a href="reference/calculate.html">calculate</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Source:     SQL [?? x 5]</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co"># Database:   DuckDB v1.1.3 [hagan@Linux 6.9.3-76060903-generic:R 4.4.2//tmp/Rtmp5z4vIG/file1c6961d6cdb0e]</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co"># Ordered by: date</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>    year month date       margin mtd_margin</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>   <span class="sc">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>date<span class="sc">&gt;</span>      <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>      <span class="er">&lt;</span>dbl<span class="sc">&gt;</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a> <span class="dv">1</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-01</span>    <span class="dv">0</span>           <span class="dv">0</span> </span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a> <span class="dv">2</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-02</span>    <span class="dv">0</span>           <span class="dv">0</span> </span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a> <span class="dv">3</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-03</span>    <span class="dv">0</span>           <span class="dv">0</span> </span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a> <span class="dv">4</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-04</span> <span class="fl">2091.</span>       <span class="fl">2091.</span></span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a> <span class="dv">5</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-05</span>  <span class="fl">112.</span>       <span class="fl">2203.</span></span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a> <span class="dv">6</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-06</span>   <span class="fl">71.2</span>      <span class="fl">2274.</span></span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a> <span class="dv">7</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-07</span> <span class="fl">4406.</span>       <span class="fl">6681.</span></span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a> <span class="dv">8</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-08</span>    <span class="dv">0</span>        <span class="fl">6681.</span></span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a> <span class="dv">9</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-09</span> <span class="fl">2044.</span>       <span class="fl">8724.</span></span>
-<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="dv">10</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-10</span> <span class="fl">6847.</span>      <span class="fl">15572.</span></span>
-<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co"># ℹ more rows</span></span></code></pre></div>
-<p>If you using a tibble data, under the hood, <code>fpaR</code> is converting that tibble to a <a href="">duckdb</a> database and using <a href="">dbplyr</a> to execute all the calculations. Use <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">dplyr::collect()</a></code> to return it as a regular tibble</p>
+<span>   <span class="fu"><a href="reference/mtd.html">mtd</a></span><span class="op">(</span>.date<span class="op">=</span><span class="va">order_date</span>,.value <span class="op">=</span> <span class="va">margin</span>,calendar_type <span class="op">=</span> <span class="st">"standard"</span><span class="op">)</span> </span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>── Month<span class="sc">-</span>to<span class="sc">-</span>date ───────────────────────────────────────────────────────────────</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>Function<span class="sc">:</span> <span class="st">`</span><span class="at">mtd</span><span class="st">`</span> was executed</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>── Description<span class="sc">:</span> ──</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>This creates a daily <span class="st">`</span><span class="at">cumsum()</span><span class="st">`</span> of the current month margin from the start of</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>the standard calendar month to the end of the month</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>── Calendar<span class="sc">:</span> ──</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>• The calendar aggregated order_date to the day time unit</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>• A standard calendar is created with <span class="dv">0</span> groups</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>• Calendar ranges from <span class="dv">2021-05-18</span> to <span class="dv">2024-04-20</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>• <span class="dv">222</span> days were missing and replaced with <span class="dv">0</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>• New date column date, year and month was created from order_date</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>── Actions<span class="sc">:</span> ──</span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>✔Aggregate</span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>✖Shift</span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>✖Compare</span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>✖Proportion Of Total</span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a>✖Count Distinct</span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a>── Next Steps<span class="sc">:</span> ──</span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a>• Use <span class="st">`</span><span class="at">calculate()</span><span class="st">`</span> to return the results</span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a>────────────────────────────────────────────────────────────────────────────────</span></code></pre></div>
+<p>You will see a print method that explains the function’s actions, details the calendar’s attributes, summarizes the main transformation steps and lists out possible next actions</p>
+<p>To return a tibble of results, pass the ti object through to <code><a href="reference/calculate.html">calculate()</a></code></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sales</span> <span class="op">|&gt;</span> </span>
-<span>   <span class="fu"><a href="reference/mtd.html">mtd</a></span><span class="op">(</span>.date<span class="op">=</span><span class="va">order_date</span>,.value <span class="op">=</span> <span class="va">margin</span>,calendar_type <span class="op">=</span> <span class="st">"standard"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>   <span class="fu"><a href="reference/calculate.html">calculate</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">date</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># A tibble: 10 × 5</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>    year month date        margin mtd_margin</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>   <span class="sc">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>date<span class="sc">&gt;</span>       <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>      <span class="er">&lt;</span>dbl<span class="sc">&gt;</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a> <span class="dv">1</span>  <span class="dv">2021</span>     <span class="dv">5</span> <span class="dv">2021-05-18</span>   <span class="fl">407.</span>        <span class="fl">407.</span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a> <span class="dv">2</span>  <span class="dv">2021</span>     <span class="dv">5</span> <span class="dv">2021-05-19</span>   <span class="fl">711.</span>       <span class="fl">1118.</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a> <span class="dv">3</span>  <span class="dv">2021</span>     <span class="dv">5</span> <span class="dv">2021-05-20</span>  <span class="fl">1424.</span>       <span class="fl">2542.</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a> <span class="dv">4</span>  <span class="dv">2021</span>     <span class="dv">5</span> <span class="dv">2021-05-21</span> <span class="fl">11339.</span>      <span class="fl">13881.</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a> <span class="dv">5</span>  <span class="dv">2021</span>     <span class="dv">5</span> <span class="dv">2021-05-22</span>  <span class="fl">5359.</span>      <span class="fl">19240.</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a> <span class="dv">6</span>  <span class="dv">2021</span>     <span class="dv">5</span> <span class="dv">2021-05-23</span>     <span class="dv">0</span>       <span class="fl">19240.</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a> <span class="dv">7</span>  <span class="dv">2021</span>     <span class="dv">5</span> <span class="dv">2021-05-24</span>     <span class="dv">0</span>       <span class="fl">19240.</span></span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a> <span class="dv">8</span>  <span class="dv">2021</span>     <span class="dv">5</span> <span class="dv">2021-05-25</span>   <span class="fl">793.</span>      <span class="fl">20033.</span></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a> <span class="dv">9</span>  <span class="dv">2021</span>     <span class="dv">5</span> <span class="dv">2021-05-26</span>    <span class="fl">74.6</span>     <span class="fl">20107.</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="dv">10</span>  <span class="dv">2021</span>     <span class="dv">5</span> <span class="dv">2021-05-27</span>  <span class="fl">1433.</span>      <span class="fl">21540.</span></span></code></pre></div>
-<p>what if you need the analysis at the group level?</p>
-<p>Simply pass through the groups that you want with <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code> and time intelligence function will create a custom calendar for each group level.</p>
+<code class="sourceCode R"><span><span class="va">sales</span> <span class="op">|&gt;</span>                                                                </span>
+<span>   <span class="fu"><a href="reference/mtd.html">mtd</a></span><span class="op">(</span>.date<span class="op">=</span><span class="va">order_date</span>,.value <span class="op">=</span> <span class="va">margin</span>,calendar_type <span class="op">=</span> <span class="st">"standard"</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
+<span>   <span class="fu"><a href="reference/calculate.html">calculate</a></span><span class="op">(</span><span class="op">)</span>                                                          </span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Source:     SQL [?? x 7]</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co"># Database:   DuckDB v1.1.3 [hagan@Linux 6.12.10-76061203-generic:R 4.4.3//tmp/RtmpkvGhnP/file372c865e1f58a]</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co"># Ordered by: date</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>    year month date       margin missing_date_indicator mtd_margin</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>   <span class="sc">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>date<span class="sc">&gt;</span>      <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>                  <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>      <span class="er">&lt;</span>dbl<span class="sc">&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a> <span class="dv">1</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-01</span>    <span class="dv">0</span>                        <span class="dv">1</span>         <span class="dv">0</span> </span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a> <span class="dv">2</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-02</span>    <span class="dv">0</span>                        <span class="dv">1</span>         <span class="dv">0</span> </span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a> <span class="dv">3</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-03</span>    <span class="dv">0</span>                        <span class="dv">1</span>         <span class="dv">0</span> </span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a> <span class="dv">4</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-04</span> <span class="fl">2091.</span>                       <span class="dv">0</span>      <span class="fl">2091.</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a> <span class="dv">5</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-05</span>  <span class="fl">112.</span>                       <span class="dv">0</span>      <span class="fl">2203.</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a> <span class="dv">6</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-06</span>   <span class="fl">71.2</span>                      <span class="dv">0</span>      <span class="fl">2274.</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a> <span class="dv">7</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-07</span> <span class="fl">4406.</span>                       <span class="dv">0</span>      <span class="fl">6681.</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a> <span class="dv">8</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-08</span>    <span class="dv">0</span>                        <span class="dv">1</span>      <span class="fl">6681.</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a> <span class="dv">9</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-09</span> <span class="fl">2044.</span>                       <span class="dv">0</span>      <span class="fl">8724.</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="dv">10</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-10</span> <span class="fl">6847.</span>                       <span class="dv">0</span>     <span class="fl">15572.</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co"># ℹ more rows</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co"># ℹ 1 more variable: days_in_current_period &lt;dbl&gt;</span></span></code></pre></div>
+<p>If you using a tibble, under the hood, <code>fpaR</code> is converting your data to a <a href="https://github.com/duckdb/duckdb-r" class="external-link">duckdb</a> database.</p>
+<p>If your data is a datable, the package will leverage <a href="https://dbplyr.tidyverse.org/" class="external-link">dbplyr</a> to execute all the calculations.</p>
+<p>Either case use <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">dplyr::collect()</a></code> to return your results to a local tibble.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sales</span> <span class="op">|&gt;</span> </span>
-<span>   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">customer_key</span>,<span class="va">store_key</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>   <span class="fu"><a href="reference/yoy.html">yoy</a></span><span class="op">(</span>.date<span class="op">=</span><span class="va">order_date</span>,.value <span class="op">=</span> <span class="va">margin</span>,calendar_type <span class="op">=</span> <span class="st">"standard"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>• The calendar was aggregated to the year time unit</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>• A standard calendar is created with <span class="dv">2</span> groups</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>• Calendar ranges from <span class="dv">2021-05-18</span> to <span class="dv">2024-04-20</span></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>• <span class="dv">222</span> days were missing and replaced with <span class="dv">0</span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>• New date column date and year was created</span></code></pre></div>
-<hr>
+<code class="sourceCode R"><span><span class="va">sales</span> <span class="op">|&gt;</span>                                                                </span>
+<span>   <span class="fu"><a href="reference/mtd.html">mtd</a></span><span class="op">(</span>.date<span class="op">=</span><span class="va">order_date</span>,.value <span class="op">=</span> <span class="va">margin</span>,calendar_type <span class="op">=</span> <span class="st">"standard"</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
+<span>   <span class="fu"><a href="reference/calculate.html">calculate</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span>                                                       </span>
+<span>   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span>                                               </span>
+<span>   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># A tibble: 10 × 7</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>    year month date       margin missing_date_indicator mtd_margin</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>   <span class="sc">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>date<span class="sc">&gt;</span>      <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>                  <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>      <span class="er">&lt;</span>dbl<span class="sc">&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a> <span class="dv">1</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-01</span>    <span class="dv">0</span>                        <span class="dv">1</span>         <span class="dv">0</span> </span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a> <span class="dv">2</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-02</span>    <span class="dv">0</span>                        <span class="dv">1</span>         <span class="dv">0</span> </span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a> <span class="dv">3</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-03</span>    <span class="dv">0</span>                        <span class="dv">1</span>         <span class="dv">0</span> </span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a> <span class="dv">4</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-04</span> <span class="fl">2091.</span>                       <span class="dv">0</span>      <span class="fl">2091.</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a> <span class="dv">5</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-05</span>  <span class="fl">112.</span>                       <span class="dv">0</span>      <span class="fl">2203.</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a> <span class="dv">6</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-06</span>   <span class="fl">71.2</span>                      <span class="dv">0</span>      <span class="fl">2274.</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a> <span class="dv">7</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-07</span> <span class="fl">4406.</span>                       <span class="dv">0</span>      <span class="fl">6681.</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a> <span class="dv">8</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-08</span>    <span class="dv">0</span>                        <span class="dv">1</span>      <span class="fl">6681.</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a> <span class="dv">9</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-09</span> <span class="fl">2044.</span>                       <span class="dv">0</span>      <span class="fl">8724.</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="dv">10</span>  <span class="dv">2021</span>     <span class="dv">8</span> <span class="dv">2021-08-10</span> <span class="fl">6847.</span>                       <span class="dv">0</span>     <span class="fl">15572.</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co"># ℹ 1 more variable: days_in_current_period &lt;dbl&gt;</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="what-if-you-need-the-analysis-at-the-group-level">what if you need the analysis at the group level?<a class="anchor" aria-label="anchor" href="#what-if-you-need-the-analysis-at-the-group-level"></a>
+</h3>
+<p>Simply pass through the groups that you want with <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code> and time intelligence function will create a custom calendar for each group level.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sales</span> <span class="op">|&gt;</span>   </span>
+<span>   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">customer_key</span>,<span class="va">store_key</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
+<span>   <span class="fu"><a href="reference/yoy.html">yoy</a></span><span class="op">(</span>.date<span class="op">=</span><span class="va">order_date</span>,.value <span class="op">=</span> <span class="va">margin</span>,calendar_type <span class="op">=</span> <span class="st">"standard"</span><span class="op">)</span> </span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>• The calendar aggregated order_date to the year time unit</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>• A standard calendar is created with <span class="dv">2</span> groups</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>• Calendar ranges from <span class="dv">2021-05-18</span> to <span class="dv">2024-04-20</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>• <span class="dv">222</span> days were missing and replaced with <span class="dv">0</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>• New date column date and year was created from order_date</span></code></pre></div>
+<ol style="list-style-type: decimal">
+<li>Take your dataset</li>
+<li>Select the groups you want with <code>group_by()</code>
+</li>
+<li>Prints the sumamrized instructions the actions the functions performs to calculate the year over year analysis</li>
+</ol>
 </div>
 </div>
 <div class="section level2">
 <h2 id="why-do-we-need-this-package-when-we-have-lubridate">Why do we need this package when we have lubridate?<a class="anchor" aria-label="anchor" href="#why-do-we-need-this-package-when-we-have-lubridate"></a>
 </h2>
+<p><a href="https://lubridate.tidyverse.org/" class="external-link">Lubridate</a> is an excellent package and is heavily used by the package. The issue isn’t lubridate but rather issues you may not be aware of in your package.</p>
 <p>Time-based comparisons, such as Year-over-Year (YoY), Quarter-over-Quarter (QoQ), and Month-to-Date (MTD), are common for tracking business performance. However, they come with challenges:</p>
 <ul>
 <li><p>Many datasets <strong>do not have continuous dates</strong>, especially if data is recorded only on business days or for active transactions</p></li>
 <li><p>Period imbalances between periods (Eg. the different number of days between February vs. January) can create misleading analysis or trends</p></li>
-<li><p>Your organization may use a non-standard calendar such as a 5-5-4, 4-4-5, or 13 month calendar and you need the ability to do time intelligence functions</p></li>
+<li><p>Your analysis may need to reference a non-standard calendar such as a 5-5-4, 4-4-5, or 13 month calendar</p></li>
 <li><p>Your data may be in excel sheets, csv or databases and you need to inter-operable framework to switch between all your data types</p></li>
 </ul>
+<div class="section level3">
+<h3 id="continuous-dates">Continuous Dates<a class="anchor" aria-label="anchor" href="#continuous-dates"></a>
+</h3>
 <table class="table">
 <thead><tr class="header">
-<th>Date</th>
-<th>Revenue</th>
+<th>order_date</th>
+<th>margin</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td>2024-01-01</td>
-<td>1,200</td>
+<td>1200</td>
 </tr>
 <tr class="even">
 <td>2024-01-03</td>
-<td>1,100</td>
+<td>1100</td>
 </tr>
 <tr class="odd">
 <td>2024-01-06</td>
-<td>1,300</td>
+<td>1300</td>
+</tr>
+<tr class="even">
+<td>2024-01-07</td>
+<td>900</td>
+</tr>
+<tr class="odd">
+<td>2024-01-08</td>
+<td>1200</td>
+</tr>
+<tr class="even">
+<td>2024-01-09</td>
+<td>850</td>
+</tr>
+<tr class="odd">
+<td>2024-01-11</td>
+<td>1450</td>
 </tr>
 </tbody>
 </table>
-<p>If we use <code><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">dplyr::lag()</a></code> to compare <strong>Day-over-Day (DoD)</strong> revenue, we would be missing <code>2024-01-02</code> and <code>2024-01-04</code> which will lead to incorrect answers or trends</p>
-<p>To correct this, <code>fpaR</code> automatically <strong>fills in missing dates</strong> for each group of your data to ensure there are no missing periods when comparing periods</p>
+<p>If we use <code><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">dplyr::lag()</a></code> to compare <strong>Day-over-Day (DoD)</strong> revenue, we would be missing <code>2024-01-02</code>, <code>2024-01-04</code>, and <code>2024-01-05</code> which will lead to incorrect answers or trends.</p>
+<p>To correct this, <code>fpaR</code> will complete your calendar for each group for the missing periods to ensure there are no missing periods when calculating trends.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="issue-2">Issue 2<a class="anchor" aria-label="anchor" href="#issue-2"></a>
 </h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># A tibble: 10 × 6</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>   date        year month pmtd_margin previous_period_short previous_period_long</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>   <span class="sc">&lt;</span>date<span class="sc">&gt;</span>     <span class="er">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>       <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>                 <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>                <span class="er">&lt;</span>dbl<span class="sc">&gt;</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a> <span class="dv">1</span> <span class="dv">2022-02-28</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">142668.</span>                     <span class="dv">0</span>                    <span class="dv">4</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a> <span class="dv">2</span> <span class="dv">2022-02-27</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">132202.</span>                     <span class="dv">0</span>                    <span class="dv">0</span></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a> <span class="dv">3</span> <span class="dv">2022-02-26</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">129436.</span>                     <span class="dv">0</span>                    <span class="dv">0</span></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a> <span class="dv">4</span> <span class="dv">2022-02-25</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">123449.</span>                     <span class="dv">0</span>                    <span class="dv">0</span></span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a> <span class="dv">5</span> <span class="dv">2022-02-24</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">112772.</span>                     <span class="dv">0</span>                    <span class="dv">0</span></span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a> <span class="dv">6</span> <span class="dv">2022-02-23</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">112085.</span>                     <span class="dv">0</span>                    <span class="dv">0</span></span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a> <span class="dv">7</span> <span class="dv">2022-02-22</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">112085.</span>                     <span class="dv">0</span>                    <span class="dv">0</span></span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a> <span class="dv">8</span> <span class="dv">2022-02-21</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">101241.</span>                     <span class="dv">0</span>                    <span class="dv">0</span></span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a> <span class="dv">9</span> <span class="dv">2022-02-20</span>  <span class="dv">2022</span>     <span class="dv">2</span>      <span class="fl">97958.</span>                     <span class="dv">0</span>                    <span class="dv">0</span></span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="dv">10</span> <span class="dv">2022-02-19</span>  <span class="dv">2022</span>     <span class="dv">2</span>      <span class="fl">95431.</span>                     <span class="dv">0</span>                    <span class="dv">0</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># A tibble: 10 × 5</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>   date        year month pmtd_margin days_in_comparison_period</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>   <span class="sc">&lt;</span>date<span class="sc">&gt;</span>     <span class="er">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>       <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>                     <span class="er">&lt;</span>dbl<span class="sc">&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a> <span class="dv">1</span> <span class="dv">2022-02-28</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">142668.</span>                        <span class="dv">31</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a> <span class="dv">2</span> <span class="dv">2022-02-27</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">132202.</span>                        <span class="dv">27</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a> <span class="dv">3</span> <span class="dv">2022-02-26</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">129436.</span>                        <span class="dv">26</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a> <span class="dv">4</span> <span class="dv">2022-02-25</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">123449.</span>                        <span class="dv">25</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a> <span class="dv">5</span> <span class="dv">2022-02-24</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">112772.</span>                        <span class="dv">24</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a> <span class="dv">6</span> <span class="dv">2022-02-23</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">112085.</span>                        <span class="dv">23</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a> <span class="dv">7</span> <span class="dv">2022-02-22</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">112085.</span>                        <span class="dv">22</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a> <span class="dv">8</span> <span class="dv">2022-02-21</span>  <span class="dv">2022</span>     <span class="dv">2</span>     <span class="fl">101241.</span>                        <span class="dv">21</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a> <span class="dv">9</span> <span class="dv">2022-02-20</span>  <span class="dv">2022</span>     <span class="dv">2</span>      <span class="fl">97958.</span>                        <span class="dv">20</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="dv">10</span> <span class="dv">2022-02-19</span>  <span class="dv">2022</span>     <span class="dv">2</span>      <span class="fl">95431.</span>                        <span class="dv">19</span></span></code></pre></div>
+<ul>
+<li>TBD</li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="issue-3">Issue 3<a class="anchor" aria-label="anchor" href="#issue-3"></a>
 </h2>
-<p><strong>Practice Datasets</strong></p>
 <ul>
-<li>This package leverages the <code>contoso</code> package for its analysis. The contoso datasets are fictional datasets of sales transaction which are helpful for business intelligence related analysis (or general database management practices)</li>
+<li>TBD</li>
 </ul>
-<div class="float">
-<img src="fig/contoso_schema.svg" alt="Contoso"><div class="figcaption">Contoso</div>
-</div>
-<p>This is an <strong>active work-in-progress</strong>, and feedback, testing, and contributions are welcome!</p>
-<hr>
 </div>
 <div class="section level2">
-<h2 id="core-functionalities">
-<strong>Core Functionalities</strong><a class="anchor" aria-label="anchor" href="#core-functionalities"></a>
+<h2 id="datasets">Datasets<a class="anchor" aria-label="anchor" href="#datasets"></a>
 </h2>
-<p>The package is centered around <strong>three main areas of analysis</strong>:</p>
-<div class="section level3">
-<h3 id="time-intelligence-functions">
-<strong>Time Intelligence Functions</strong><a class="anchor" aria-label="anchor" href="#time-intelligence-functions"></a>
-</h3>
-<p>A comprehensive set of time-based functions to track trends over different periods.</p>
-<p><em>Support for non-standard calendars (e.g., 5-5-4 fiscal calendar) is under development.</em></p>
-<hr>
-</div>
+<ul>
+<li>This package leverages the <a href="https://github.com/alejandrohagan/contoso" class="external-link">Contoso</a> package for its analysis. The contoso datasets are fictional business transaction of Contoso toy company which are helpful for business intelligence related analysis</li>
+</ul>
+<p>This is an <strong>active work-in-progress</strong>, and feedback, testing, and contributions are welcome!</p>
 </div>
 <div class="section level2">
 <h2 id="future-capabilities">Future capabilities<a class="anchor" aria-label="anchor" href="#future-capabilities"></a>
@@ -417,16 +488,15 @@
 </h4>
 <ul>
 <li>
-<strong>ABC Classification</strong> – Categorizing products/customers based on revenue contribution.<br>
-</li>
+<strong>ABC Classification</strong> – Categorizing products/customers based on revenue contribution</li>
 <li>
-<strong>New vs. Returning</strong> – Distinguishing first-time buyers from repeat customers.<br>
-</li>
+<strong>Cohort Analysis</strong> - Categorize your data by a shared time based attribute to track over time</li>
 <li>
-<strong>K-means Clustering</strong> – Grouping data points based on patterns.<br>
-</li>
+<strong>New vs. Returning</strong> – Distinguishing first-time buyers from repeat customers</li>
 <li>
-<strong>UMAP (Uniform Manifold Approximation and Projection)</strong> – Dimensionality reduction for clustering.</li>
+<strong>K-means Clustering</strong> – Grouping data points based on patterns</li>
+<li>
+<strong>UMAP (Uniform Manifold Approximation and Projection)</strong> – Dimensionaltiy reduction for clustering</li>
 </ul>
 <hr>
 </div>
@@ -441,13 +511,20 @@
 <strong>Use Cases:</strong><a class="anchor" aria-label="anchor" href="#use-cases"></a>
 </h4>
 <ul>
-<li>Analyzing revenue growth <strong>due to price increases vs. increased sales volume</strong>.<br>
+<li>Analyzing revenue growth <strong>due to price increases vs. increased sales volume</strong>
 </li>
 <li>Measuring the impact of <strong>product mix changes on profitability</strong>.</li>
 </ul>
 <hr>
 </div>
 </div>
+</div>
+<div class="section level2">
+<h2 id="additional-references-and-inspirations">Additional references and inspirations<a class="anchor" aria-label="anchor" href="#additional-references-and-inspirations"></a>
+</h2>
+<ul>
+<li><a href="https://github.com/PeerChristensen/cohorts" class="external-link">PeerChristensen’s Cohort Package</a></li>
+</ul>
 </div>
 </div>
 
