@@ -77,7 +77,6 @@ return(x)
 #' thresholds
 #'
 #' @return a dbi objection
-#' @export
 #'
 abc_fn <- function(x){
 

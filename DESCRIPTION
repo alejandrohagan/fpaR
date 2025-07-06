@@ -1,5 +1,5 @@
 Package: fpaR
-Title: Common Business Intelligence Functions for F&PA work
+Title: Common Business Intelligence Functions for FP&A work
 Description: Tools for financial planning analysis. This package provides functions for calculating financial metrics, analyzing time series data, and generating reports.
 Version: 0.0.0.9000
 Authors@R: 

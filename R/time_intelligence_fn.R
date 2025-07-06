@@ -200,7 +200,6 @@ yoy_fn <- function(x){
 #' This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
 #' by [calculate]
 #' This will return a dbi object that can converted to a tibble object with[dplyr::collect()]
-#' @export
 #' @returns dbi object
 #'
 ytdopy_fn <- function(x){
