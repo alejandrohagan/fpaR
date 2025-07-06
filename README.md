@@ -38,11 +38,10 @@ return as a tibble with `dplyr::collect()`
 
 - **Unified syntax** regardless if your data is in a tibble or a
   database
-- **Optimized for speed and scale** your data is converted to a local
-  [duckdb](https://github.com/duckdb/duckdb-r) database to scale your
-  calculations
+- **Scale** your data with [duckdb](https://github.com/duckdb/duckdb-r)
+  to optimize your calculations
 - **Instant clarity** as every function summarizes its transformation
-  actions so that you can understand and validate the functions results
+  actions so that you can understand and validate the results
 
 ## Installation
 
@@ -56,9 +55,11 @@ pak::pak("alejandrohagan/fpaR")
 
 ## What is in fpaR?
 
-There are 3 main categories of functions: - Time intelligence (Ready for
-testing and feedback) - Segmentation strategies (work in progress) -
-Factor Analysis (work in progress)
+There are 3 main categories of functions:
+
+- Time intelligence (Ready for testing and feedback)
+- Segmentation strategies (work in progress)
+- Factor Analysis (work in progress)
 
 ### Time intelligence
 
@@ -172,20 +173,20 @@ sales |>
 ```
 
     # Source:     SQL [?? x 7]
-    # Database:   DuckDB v1.1.3 [hagan@Linux 6.12.10-76061203-generic:R 4.4.3//tmp/Rtmp8zNXOl/file38aa64254a983]
+    # Database:   DuckDB v1.1.3 [hagan@Linux 6.12.10-76061203-generic:R 4.4.3//tmp/RtmpRlpFwn/file3ab461cdd9a15]
     # Ordered by: date
         year month date       margin missing_date_indicator mtd_margin
        <dbl> <dbl> <date>      <dbl>                  <dbl>      <dbl>
-     1  2021     7 2021-07-29     0                       1     48746.
-     2  2021     7 2021-07-30     0                       1     48746.
-     3  2021     7 2021-07-31  4070.                      0     52816.
-     4  2022     2 2022-02-01  7032.                      0      7032.
-     5  2022     2 2022-02-02  8778.                      0     15810.
-     6  2022     2 2022-02-03 10359.                      0     26169.
-     7  2022     2 2022-02-04  7337.                      0     33506.
-     8  2022     2 2022-02-05  7399.                      0     40905.
-     9  2022     2 2022-02-06     0                       1     40905.
-    10  2022     2 2022-02-07  1051.                      0     41956.
+     1  2023     5 2023-05-27  9227.                      0     89422.
+     2  2023     5 2023-05-28     0                       1     89422.
+     3  2023     5 2023-05-29  2349.                      0     91771.
+     4  2023     5 2023-05-30  6359.                      0     98129.
+     5  2023     5 2023-05-31  2986.                      0    101115.
+     6  2023     9 2023-09-01  5553.                      0      5553.
+     7  2023     9 2023-09-02  1833.                      0      7386.
+     8  2023     9 2023-09-03     0                       1      7386.
+     9  2023     9 2023-09-04  1365.                      0      8751.
+    10  2023     9 2023-09-05  2405.                      0     11157.
     # ℹ more rows
     # ℹ 1 more variable: days_in_current_period <dbl>
 
@@ -209,16 +210,16 @@ sales |>
     # A tibble: 10 × 7
         year month date       margin missing_date_indicator mtd_margin
        <dbl> <dbl> <date>      <dbl>                  <dbl>      <dbl>
-     1  2022    10 2022-10-25  7707.                      0    126939.
-     2  2022    10 2022-10-26  6383.                      0    133322.
-     3  2022    10 2022-10-27 19112.                      0    152434.
-     4  2022    10 2022-10-28  2589.                      0    155024.
-     5  2022    10 2022-10-29  9274.                      0    164297.
-     6  2022    10 2022-10-30     0                       1    164297.
-     7  2022    10 2022-10-31  4578.                      0    168875.
-     8  2023     5 2023-05-01   332.                      0       332.
-     9  2023     5 2023-05-02  2167.                      0      2500.
-    10  2023     5 2023-05-03  2774.                      0      5274.
+     1  2023     6 2023-06-13  3083.                      0     59567.
+     2  2023     6 2023-06-14   969.                      0     60536.
+     3  2023     6 2023-06-15  3756.                      0     64292.
+     4  2023     6 2023-06-16  1580.                      0     65872.
+     5  2023     6 2023-06-17  7492.                      0     73364.
+     6  2023     6 2023-06-18     0                       1     73364.
+     7  2023     6 2023-06-19   438.                      0     73802.
+     8  2023     6 2023-06-20  1748.                      0     75550.
+     9  2023     6 2023-06-21  3839.                      0     79389.
+    10  2023     6 2023-06-22 14923.                      0     94312.
     # ℹ 1 more variable: days_in_current_period <dbl>
 
 ### what if you need the analysis at the group level?
