@@ -3,12 +3,19 @@
 \name{complete_calendar}
 \alias{complete_calendar}
 \title{complete_calendar}
+\usage{
+complete_calendar(x)
+}
 \arguments{
-\item{x}{ti object}
+\item{x}{dataframe}
 }
 \value{
 dbi object
+
+dbi object
 }
 \description{
+complete_calendar
+
 complete_calendar
 }

@@ -2,7 +2,7 @@
 
 test_that("ABC: Returns segment class", {
 
-  out <- abc(sales |> group_by(customer_key),category_values = c(.1,.4,.6,1))
+  out <- abc(sales |> dplyr::group_by(customer_key),category_values = c(.1,.4,.6,1))
 
   testthat::expect_s7_class(out,segment)
 

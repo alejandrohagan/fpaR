@@ -159,9 +159,9 @@ sales |>
 
     ────────────────────────────────────────────────────────────────────────────────
 
-You will see a print method that explains the function’s actions,
-details the calendar’s attributes, summarizes the main transformation
-steps and lists out possible next actions.
+This prints a summary of the function’s actions,details the calendar’s
+attributes, summarizes the main transformation steps and lists out
+possible next actions.
 
 To return a tibble of results, pass the ti object through to
 `calculate()`.
@@ -173,27 +173,27 @@ sales |>
 ```
 
     # Source:     SQL [?? x 7]
-    # Database:   DuckDB v1.1.3 [hagan@Linux 6.12.10-76061203-generic:R 4.4.3//tmp/RtmpRlpFwn/file3ab461cdd9a15]
+    # Database:   DuckDB v1.1.3 [hagan@Linux 6.12.10-76061203-generic:R 4.4.3//tmp/RtmpLBktPR/file4b8fe61bc9464]
     # Ordered by: date
         year month date       margin missing_date_indicator mtd_margin
        <dbl> <dbl> <date>      <dbl>                  <dbl>      <dbl>
-     1  2023     5 2023-05-27  9227.                      0     89422.
-     2  2023     5 2023-05-28     0                       1     89422.
-     3  2023     5 2023-05-29  2349.                      0     91771.
-     4  2023     5 2023-05-30  6359.                      0     98129.
-     5  2023     5 2023-05-31  2986.                      0    101115.
-     6  2023     9 2023-09-01  5553.                      0      5553.
-     7  2023     9 2023-09-02  1833.                      0      7386.
-     8  2023     9 2023-09-03     0                       1      7386.
-     9  2023     9 2023-09-04  1365.                      0      8751.
-    10  2023     9 2023-09-05  2405.                      0     11157.
+     1  2022     2 2022-02-26 17891.                      0    219599.
+     2  2022     2 2022-02-27     0                       1    219599.
+     3  2022     2 2022-02-28  7647.                      0    227246.
+     4  2021     7 2021-07-29     0                       1     48746.
+     5  2021     7 2021-07-30     0                       1     48746.
+     6  2021     7 2021-07-31  4070.                      0     52816.
+     7  2022     2 2022-02-01  7032.                      0      7032.
+     8  2022     2 2022-02-02  8778.                      0     15810.
+     9  2022     2 2022-02-03 10359.                      0     26169.
+    10  2022     2 2022-02-04  7337.                      0     33506.
     # ℹ more rows
     # ℹ 1 more variable: days_in_current_period <dbl>
 
 If you using a tibble, under the hood, `fpaR` is converting your data to
 a [duckdb](https://github.com/duckdb/duckdb-r) database.
 
-If your data is a database, the package will leverage
+If your data is in a database, the package will leverage
 [dbplyr](https://dbplyr.tidyverse.org/) to execute all the calculations.
 
 Either case use `dplyr::collect()` to return your results to a local
@@ -210,23 +210,26 @@ sales |>
     # A tibble: 10 × 7
         year month date       margin missing_date_indicator mtd_margin
        <dbl> <dbl> <date>      <dbl>                  <dbl>      <dbl>
-     1  2023     6 2023-06-13  3083.                      0     59567.
-     2  2023     6 2023-06-14   969.                      0     60536.
-     3  2023     6 2023-06-15  3756.                      0     64292.
-     4  2023     6 2023-06-16  1580.                      0     65872.
-     5  2023     6 2023-06-17  7492.                      0     73364.
-     6  2023     6 2023-06-18     0                       1     73364.
-     7  2023     6 2023-06-19   438.                      0     73802.
-     8  2023     6 2023-06-20  1748.                      0     75550.
-     9  2023     6 2023-06-21  3839.                      0     79389.
-    10  2023     6 2023-06-22 14923.                      0     94312.
+     1  2023     7 2023-07-23     0                       1     69606.
+     2  2023     7 2023-07-24   107.                      0     69713.
+     3  2023     7 2023-07-25   566.                      0     70279.
+     4  2023     7 2023-07-26  1331.                      0     71610.
+     5  2023     7 2023-07-27  4201.                      0     75811.
+     6  2023     7 2023-07-28  4508.                      0     80319.
+     7  2023     7 2023-07-29  6999.                      0     87319.
+     8  2023     7 2023-07-30     0                       1     87319.
+     9  2023     7 2023-07-31     0                       1     87319.
+    10  2023    12 2023-12-01  2158.                      0      2158.
     # ℹ 1 more variable: days_in_current_period <dbl>
 
-### what if you need the analysis at the group level?
+### What if you need the analysis at the group level?
 
 Simply pass through the groups that you want with `dplyr::group_by()`
 and time intelligence function will create a custom calendar for each
 group level.
+
+This will calculate a complete calendar ensuring each group has a
+complete calendar with no missing dates.
 
 ``` r
 sales |>   
@@ -234,11 +237,46 @@ sales |>
    yoy(.date=order_date,.value = margin,calendar_type = "standard") 
 ```
 
+    ── Year over year ──────────────────────────────────────────────────────────────
+
+    Function: `yoy` was executed
+
+    ── Description: ──
+
+    This creates a full year `sum()` of the previous year margin and compares it
+    with the full year `sum()` current year margin from the start of the standard
+    calendar year to the end of the year
+
+    ── Calendar: ──
+
     • The calendar aggregated order_date to the year time unit
     • A standard calendar is created with 2 groups
     • Calendar ranges from 2021-05-18 to 2024-04-20
     • 222 days were missing and replaced with 0
     • New date column date and year was created from order_date
+
+    ── Actions: ──
+
+    ✔Aggregate
+
+    ✔Shift 1 year
+
+    ✔Compare previous year
+
+    ✖Proportion Of Total
+
+    ✖Count Distinct
+
+    customer_key and store_key groups are in the table
+
+    ── Next Steps: ──
+
+    • Use `calculate()` to return the results
+
+    ────────────────────────────────────────────────────────────────────────────────
+
+The functions will work with your database even if you don’t have write
+permission by creatively leveraging CTEs to create interim tables.
 
 ## Why do we need this package when we have lubridate?
 
@@ -262,7 +300,12 @@ tracking business performance. However, they come with challenges:
 - Your data may be in excel sheets, csv or databases and you need to
   inter-operable framework to switch between all your data types
 
-### Continuous Dates
+### Issue 1: Continuous Dates
+
+Referencing the table below, if we use `dplyr::lag()` to compare
+**Day-over-Day (DoD)** revenue, we would be missing `2024-01-02`,
+`2024-01-04`, and `2024-01-05` which will lead to incorrect answers or
+trends.
 
 | order_date | margin |
 |------------|--------|
@@ -274,29 +317,11 @@ tracking business performance. However, they come with challenges:
 | 2024-01-09 | 850    |
 | 2024-01-11 | 1450   |
 
-If we use `dplyr::lag()` to compare **Day-over-Day (DoD)** revenue, we
-would be missing `2024-01-02`, `2024-01-04`, and `2024-01-05` which will
-lead to incorrect answers or trends.
-
-To correct this, `fpaR` will complete your calendar for each group for
-the missing periods to ensure there are no missing periods when
-calculating trends.
+To correct this, `fpaR` will automatically complete your calendar for
+each group for the missing periods to ensure there are no missing
+periods when calculating trends.
 
 ## Issue 2
-
-    # A tibble: 10 × 5
-       date        year month pmtd_margin days_in_comparison_period
-       <date>     <dbl> <dbl>       <dbl>                     <dbl>
-     1 2022-02-28  2022     2     142668.                        31
-     2 2022-02-27  2022     2     132202.                        27
-     3 2022-02-26  2022     2     129436.                        26
-     4 2022-02-25  2022     2     123449.                        25
-     5 2022-02-24  2022     2     112772.                        24
-     6 2022-02-23  2022     2     112085.                        23
-     7 2022-02-22  2022     2     112085.                        22
-     8 2022-02-21  2022     2     101241.                        21
-     9 2022-02-20  2022     2      97958.                        20
-    10 2022-02-19  2022     2      95431.                        19
 
 - TBD
 
