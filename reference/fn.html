@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
-
+<meta name="generator" content="quarto-1.9.38">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-
-<title>Function reference – ti</title>
+<title>Function class — fn – ti</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -20,31 +21,51 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-5acddea9ec7addd5e9532e878e20728d.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-e3345c6ef29c45a7958e8df45469d16f.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-5acddea9ec7addd5e9532e878e20728d.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-c85bf800f77521da5fb58a3d41a41409.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-95b7c47c30a34e4c5c1b5ad6043067cf.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-c85bf800f77521da5fb58a3d41a41409.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script><script src="../site_libs/quarto-nav/headroom.min.js"></script><script src="../site_libs/clipboard/clipboard.min.js"></script><script src="../site_libs/quarto-search/autocomplete.umd.js"></script><script src="../site_libs/quarto-search/fuse.min.js"></script><script src="../site_libs/quarto-search/quarto-search.js"></script><meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script><script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script><script src="../site_libs/quarto-html/popper.min.js"></script><script src="../site_libs/quarto-html/tippy.umd.min.js"></script><script src="../site_libs/quarto-html/anchor.min.js"></script><link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-6a50bd621f08fdc5c26e43d254df0a90.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-9bfc61b20ce54e18ae6b25bf56d136e1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-6a50bd621f08fdc5c26e43d254df0a90.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script><link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-255aa4841e964d86d0010a80af499a89.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-75c0ff1f41ea84be33926fce437fb47c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-255aa4841e964d86d0010a80af499a89.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -71,12 +92,10 @@ ul.task-list li input[type="checkbox"] {
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
-}</script>
-
-
+}</script><link rel="stylesheet" href="../_qrtdown-styles.css">
 </head>
-
-<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+<body class="nav-fixed quarto-light">
+<script id="quarto-html-before-body" type="application/javascript">
     const toggleBodyColorMode = (bsSheetEl) => {
       const mode = bsSheetEl.getAttribute("data-mode");
       const bodyEl = window.document.querySelector("body");
@@ -238,17 +257,11 @@ ul.task-list li input[type="checkbox"] {
     } else {
       toggleColorMode(false);
     }
-  </script>
-
-<div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
+  </script><div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    </a>
-    <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">ti 4.0.0</span>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">ti 4.2.1</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -257,72 +270,65 @@ ul.task-list li input[type="checkbox"] {
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="./vignettes/articles/ti.html"> 
+<li class="nav-item">
+    <a class="nav-link" href="../articles/ti.html"> 
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-articles" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Articles</span>
     </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-articles">    
-        <li>
-    <a class="dropdown-item" href="./vignettes/articles/abc.html">
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-articles">
+<li>
+    <a class="dropdown-item" href="../articles/abc.html">
  <span class="dropdown-text">ABC Classification</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./vignettes/articles/calendar_types.html">
- <span class="dropdown-text">Standard vs.&nbsp;Non-Standard Calendars</span></a>
+    <a class="dropdown-item" href="../articles/calendar_types.html">
+ <span class="dropdown-text">Standard vs. Non-Standard Calendars</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./vignettes/articles/cohort.html">
+    <a class="dropdown-item" href="../articles/cohort.html">
  <span class="dropdown-text">Cohort</span></a>
   </li>  
     </ul>
-  </li>
+</li>
   <li class="nav-item">
-    <a class="nav-link active" href="./reference.html" aria-current="page"> 
+    <a class="nav-link" href="../reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./NEWS.html"> 
+    <a class="nav-link" href="../NEWS.html"> 
 <span class="menu-text">Changelog</span></a>
   </li>  
 </ul>
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item compact">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item compact">
     <a class="nav-link" href="https://codeberg.org/usrbinr/ti"> <i class="bi bi-code-square" role="img" aria-label="Source code">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
 </ul>
-          </div> <!-- /navcollapse -->
+</div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
       </div> <!-- /container-fluid -->
-    </nav>
-</header>
-<!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+    </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#functions" id="toc-functions" class="nav-link active" data-scroll-target="#functions">Functions</a></li>
-  </ul>
-</nav>
-    </div>
+<li><a href="#usage" id="toc-usage" class="nav-link active" data-scroll-target="#usage">Usage</a></li>
+  <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
+  <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
+  </ul></nav>
+</div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Function reference</h1>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">Function class</h1>
 </div>
 
 
@@ -336,300 +342,99 @@ ul.task-list li input[type="checkbox"] {
   
 
 
-</header>
+</header><div class="qrtdown-source dont-index">
+<p>Source: <a href="https://codeberg.org/usrbinr/ti/src/branch/main/R/classes.R"><code>R/classes.R</code></a></p>
+</div>
+<p>
+<code>fn</code> is the blueprint half of a lazy time-intelligence object. It holds the transformation to run (<a href="../reference/fn.html">fn_exec</a>) plus the metadata that describes it, which is what lets <code><a href="../reference/ytd.html">ytd()</a></code> and friends return an object cheaply and defer the real work to <code><a href="../reference/calculate.html">calculate()</a></code>.
+</p>
+<section id="usage" class="level2"><h2 class="anchored" data-anchor-id="usage">Usage</h2>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fn</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">fn_exec =</span> <span class="cf">function</span>() <span class="cn">NULL</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">fn_name =</span> <span class="cn">NA_character_</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">fn_long_name =</span> <span class="cn">NA_character_</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">shift =</span> <span class="cn">NA_character_</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">compare =</span> <span class="cn">NA_character_</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">label =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">new_date_column_name =</span> <span class="cn">NA_character_</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">lag_n =</span> <span class="dv">0</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+</section><section id="arguments" class="level2"><h2 class="anchored" data-anchor-id="arguments">Arguments</h2>
+<dl class="qrtdown-arguments">
+<dt id="arg-fn-exec">
+<code>fn_exec</code><a class="anchor" aria-label="anchor" href="#arg-fn-exec"></a>
+</dt>
+<dd>
+<p>
+A function taking a <code>ti</code> object and returning the transformed table.
+</p>
+</dd>
+<dt id="arg-fn-name">
+<code>fn_name</code><a class="anchor" aria-label="anchor" href="#arg-fn-name"></a>
+</dt>
+<dd>
+<p>
+Short name of the calculation, e.g. <code>“ytd”</code>.
+</p>
+</dd>
+<dt id="arg-fn-long-name">
+<code>fn_long_name</code><a class="anchor" aria-label="anchor" href="#arg-fn-long-name"></a>
+</dt>
+<dd>
+<p>
+Human-readable name, e.g. <code>“year to date”</code>.
+</p>
+</dd>
+<dt id="arg-shift">
+<code>shift</code><a class="anchor" aria-label="anchor" href="#arg-shift"></a>
+</dt>
+<dd>
+<p>
+The period the calculation shifts by, e.g. <code>“year”</code>.
+</p>
+</dd>
+<dt id="arg-compare">
+<code>compare</code><a class="anchor" aria-label="anchor" href="#arg-compare"></a>
+</dt>
+<dd>
+<p>
+The period the calculation compares against.
+</p>
+</dd>
+<dt id="arg-label">
+<code>label</code><a class="anchor" aria-label="anchor" href="#arg-label"></a>
+</dt>
+<dd>
+<p>
+Whether the calculation adds a period label column.
+</p>
+</dd>
+<dt id="arg-new-date-column-name">
+<code>new_date_column_name</code><a class="anchor" aria-label="anchor" href="#arg-new-date-column-name"></a>
+</dt>
+<dd>
+<p>
+Name of the date column the calculation creates.
+</p>
+</dd>
+<dt id="arg-lag-n">
+<code>lag_n</code><a class="anchor" aria-label="anchor" href="#arg-lag-n"></a>
+</dt>
+<dd>
+<p>
+Number of periods to lag by.
+</p>
+</dd>
+</dl></section><section id="value" class="level2"><h2 class="anchored" data-anchor-id="value">Value</h2>
+<p>
+An <code>fn</code> S7 object.
+</p>
 
 
-<p>All functions and classes exported by ti.</p>
-<section id="functions" class="level2">
-<h2 class="anchored" data-anchor-id="functions">Functions</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Function</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="./reference/abc.html"><code>abc()</code></a></td>
-<td>ABC classification function</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/abc_fn.html"><code>abc_fn()</code></a></td>
-<td>Classify a group by proportion of a variable (A,B,C,…)</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/atd.html"><code>atd()</code></a></td>
-<td>All period-to-date</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/atd_fn.html"><code>atd_fn()</code></a></td>
-<td>All-to-date execution function</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/augment_standard_calendar.html"><code>augment_standard_calendar()</code></a></td>
-<td>Add Comprehensive Date-Based Attributes to a DBI lazy frame or tibble object</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/augment_standard_calendar_dbi.html"><code>augment_standard_calendar_dbi()</code></a></td>
-<td>Add Comprehensive Date-Based Attributes to a DBI lazy frame</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/augment_standard_calendar_tbl.html"><code>augment_standard_calendar_tbl()</code></a></td>
-<td>Add Comprehensive Date-Based Attributes to a Data Frame</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/calculate.html"><code>calculate()</code></a></td>
-<td>Execute time-intelligence or segments class objects to return the underlying tra</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/cohort.html"><code>cohort()</code></a></td>
-<td>Cohort Analysis</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/cohort_fn.html"><code>cohort_fn()</code></a></td>
-<td>Internal function for the cohort segment object</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/complete_standard_calendar.html"><code>complete_standard_calendar()</code></a></td>
-<td>Title</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/create_calendar.html"><code>create_calendar()</code></a></td>
-<td>Create Calendar Table</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/create_full_dbi.html"><code>create_full_dbi()</code></a></td>
-<td>Title</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/detect_sql_dialect.html"><code>detect_sql_dialect()</code></a></td>
-<td>Detect SQL dialect from a DBI connection</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/dod.html"><code>dod()</code></a></td>
-<td>Current period day over previous period day</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/dod_fn.html"><code>dod_fn()</code></a></td>
-<td>Day-over-day execution function</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/generate_cli_action.html"><code>generate_cli_action()</code></a></td>
-<td>Generate CLI actions</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/generate_retail_calendar.html"><code>generate_retail_calendar()</code></a></td>
-<td>Generate a retail (4-4-5, 4-5-4, or 5-4-4) calendar mapping table</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/is_yyyy_mm_dd.html"><code>is_yyyy_mm_dd()</code></a></td>
-<td>Validate an input is YYYY-MM-DD format</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/make_action_cli.html"><code>make_action_cli()</code></a></td>
-<td>Make Action field CLI args</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/make_db_tbl.html"><code>make_db_tbl()</code></a></td>
-<td>Make an in memory database from a table</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/mom.html"><code>mom()</code></a></td>
-<td>Current full period month over previous full period month</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/mom_fn.html"><code>mom_fn()</code></a></td>
-<td>month-over-month execution function</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/momtd.html"><code>momtd()</code></a></td>
-<td>Current period month to date compared to previous period month-to-date</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/momtd_fn.html"><code>momtd_fn()</code></a></td>
-<td>Current year to date over previous year-to-date for tibble objects</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/mtd.html"><code>mtd()</code></a></td>
-<td>Current period month-to-date</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/mtd_fn.html"><code>mtd_fn()</code></a></td>
-<td>Month-to-date execution function</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/mtdopm.html"><code>mtdopm()</code></a></td>
-<td>Current month-to-date over full previous period month</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/mtdopm_fn.html"><code>mtdopm_fn()</code></a></td>
-<td>Month-to-date over full previous month execution function</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/pmtd.html"><code>pmtd()</code></a></td>
-<td>Previous period month-to-date</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/pmtd_fn.html"><code>pmtd_fn()</code></a></td>
-<td>Previous month-to-date execution function</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/pqtd.html"><code>pqtd()</code></a></td>
-<td>Prior period quarter-to-date</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/pqtd_fn.html"><code>pqtd_fn()</code></a></td>
-<td>Previous quarter-to-date for tibble objects</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/print.html"><code>print()</code></a></td>
-<td>Print ti objects</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/print_actions_steps.html"><code>print_actions_steps()</code></a></td>
-<td>Print action steps</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/print_calendar_info.html"><code>print_calendar_info()</code></a></td>
-<td>Print calendar information block</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/print_fn_info.html"><code>print_fn_info()</code></a></td>
-<td>Prints function header info</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/print_next_steps.html"><code>print_next_steps()</code></a></td>
-<td>Prints functions next steps</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/pwtd.html"><code>pwtd()</code></a></td>
-<td>Previous period week-to-date</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/pwtd_fn.html"><code>pwtd_fn()</code></a></td>
-<td>Previous week-to-date execution function</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/pytd.html"><code>pytd()</code></a></td>
-<td>Previous period year-to-date</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/pytd_fn.html"><code>pytd_fn()</code></a></td>
-<td>Previous year-to-date execution function</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/qoq.html"><code>qoq()</code></a></td>
-<td>Current full period quarter over previous full period quarter</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/qoq_fn.html"><code>qoq_fn()</code></a></td>
-<td>Quarter-over-quarter execution function</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/qoqtd.html"><code>qoqtd()</code></a></td>
-<td>Current period quarter-to-date compared to previous period quarter-to-date</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/qoqtd_fn.html"><code>qoqtd_fn()</code></a></td>
-<td>Current quarter to date over previous quarter-to-date for tibble objects</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/qtd.html"><code>qtd()</code></a></td>
-<td>Current period quarter-to-date</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/qtd_fn.html"><code>qtd_fn()</code></a></td>
-<td>Quarter-to-date execution function</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/qtdopq.html"><code>qtdopq()</code></a></td>
-<td>Current period quarter-to-date over previous period quarter</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/qtdopq_fn.html"><code>qtdopq_fn()</code></a></td>
-<td>quarter-to-date over previous quarter execution function</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/seq_date_sql.html"><code>seq_date_sql()</code></a></td>
-<td>Generate a Cross-Dialect SQL Date Series</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/sql_date_add.html"><code>sql_date_add()</code></a></td>
-<td>Generate dialect-appropriate date addition SQL</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/wow.html"><code>wow()</code></a></td>
-<td>Current full period week over full previous period week</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/wow_fn.html"><code>wow_fn()</code></a></td>
-<td>Week-over-week execution function</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/wowtd.html"><code>wowtd()</code></a></td>
-<td>Current period Week-to-date over previous period week-to-date</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/wowtd_fn.html"><code>wowtd_fn()</code></a></td>
-<td>Week-to-date over previous week-to-date execution function</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/wtd.html"><code>wtd()</code></a></td>
-<td>Current period week-to-date</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/wtd_fn.html"><code>wtd_fn()</code></a></td>
-<td>Week-to-date execution function</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/wtdopw.html"><code>wtdopw()</code></a></td>
-<td>Current period week-to-date over full previous period week</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/wtdopw_fn.html"><code>wtdopw_fn()</code></a></td>
-<td>Week-to-date over full previous week execution function</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/yoy.html"><code>yoy()</code></a></td>
-<td>Current full period year over previous full period year</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/yoy_fn.html"><code>yoy_fn()</code></a></td>
-<td>Current year-to-date over previous period year-to-date execution function</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/yoytd.html"><code>yoytd()</code></a></td>
-<td>Current period year-to-date compared to previous period year-to-date</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/yoytd_fn.html"><code>yoytd_fn()</code></a></td>
-<td>Current year to date over previous year-to-date execution function</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/ytd.html"><code>ytd()</code></a></td>
-<td>Current period year-to-date</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/ytd_fn.html"><code>ytd_fn()</code></a></td>
-<td>Year-to-date execution function</td>
-</tr>
-<tr class="odd">
-<td><a href="./reference/ytdopy.html"><code>ytdopy()</code></a></td>
-<td>Current period year-to-date compared to full previous period</td>
-</tr>
-<tr class="even">
-<td><a href="./reference/ytdopy_fn.html"><code>ytdopy_fn()</code></a></td>
-<td>Year-to-date over full prior period year</td>
-</tr>
-</tbody>
-</table>
-
-
-</section>
-
-</main> <!-- /main -->
-<script id="quarto-html-after-body" type="application/javascript">
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
     if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
@@ -1043,21 +848,17 @@ ul.task-list li input[type="checkbox"] {
   });
   </script>
 </div> <!-- /content -->
-<footer class="footer">
-  <div class="nav-footer">
+<footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
-<p>Built with <a href="https://quarto.org/">Quarto</a> and <a href="https://codeberg.org/usrbinr/qrtdown">qrtdown</a></p>
+<p>Built with <a href="https://quarto.org/" class="external-link">Quarto</a> and <a href="https://codeberg.org/usrbinr/qrtdown" class="external-link">qrtdown</a></p>
 </div>   
     <div class="nav-footer-center">
-      &nbsp;
+       
     </div>
     <div class="nav-footer-right">
-<p>ti 4.0.0</p>
+<p>ti 4.2.1</p>
 </div>
   </div>
 </footer>
-
-
-
-
-</body></html>
+</body>
+</html>
