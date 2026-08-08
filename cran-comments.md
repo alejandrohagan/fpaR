@@ -1,42 +1,60 @@
+## Resubmission of an archived package
+
+'ti' was archived on 2026-04-06 because the check ERRORs reported for version
+4.0.0 were not corrected in time. This submission fixes them.
+
+### Why 4.0.0 failed
+
+All failures came from a single cause. 'ti' uses the 'contoso' package (Suggests)
+for sample data in its tests and examples. 'contoso' 2.1.0 renamed the `margin`
+column of its `sales` dataset to `gross_margin`, so every test that measured that
+column failed with `Object 'margin' not found` (55 failures across
+`test-retail-calendar.R` and `test-ti_fn.R`).
+
+This is also why only some flavours reported ERROR: the macOS flavours, where
+'contoso' was not installed, skipped the affected tests and returned OK.
+
+### Fixes in this version
+
+* All tests and examples now use `gross_margin`, matching 'contoso' >= 2.1.0.
+  'contoso' is pinned to `(>= 2.1.0)` in Suggests so the mismatch cannot recur.
+* Restored `calculate()` and `create_calendar()` to NAMESPACE. roxygen2 8.0.0
+  added S7 support and no longer emits an export from `@export` on an
+  `S7::method()<-` block, so both generics were silently dropped and every call
+  failed with "'calculate' is not an exported object from 'namespace:ti'". The
+  generics are now documented and exported on their `S7::new_generic()`
+  definitions, following `vignette("rd-S7", package = "roxygen2")`.
+* Removed the incorrect `export(print)` directive. S7 registers the `print()`
+  methods at load time via `S7::methods_register()`, so re-exporting `base::print`
+  was never needed.
+* Documented all S7 classes, using `@prop` for read-only computed properties.
+* Merged two roxygen blocks in `R/utils-misc.R` that had run together, which
+  produced a malformed `@keywords` entry.
+
+Version 4.2.0 was prepared with the first of these fixes but was never published;
+4.2.1 is the version being submitted. See NEWS.md for the full list of changes
+since 4.0.0.
+
 ## R CMD check results
 
 0 errors | 0 warnings | 1 note
 
-* The NOTE about "unable to verify current time" is a local system issue
-  and not related to the package.
+The NOTE is expected for this submission:
 
-## Changes in this version (4.2.0)
-
-### Bug Fixes
-- Fixed test compatibility with contoso >= 2.1.0 (column renamed)
-- Fixed ABC temp table naming to prevent collisions in parallel usage
-- Fixed example in `abc()` documentation
-
-### Improvements
-- Added input validation for date/value column types with helpful error messages
-- Added comprehensive error handling tests (16 new tests, 102 total)
-- Replaced `assertthat` dependency with `cli::cli_abort` for consistent error handling
-- Removed `scales` dependency (inlined percent formatting)
-- Documented NA handling behavior in function documentation
-
-### Dependencies Reduced
-- Removed: `assertthat`, `scales`
-- Current Imports: cli, DBI, dbplyr, dplyr, duckdb, glue, janitor, lubridate, rlang, S7, tidyr
+* "New submission" and "Package was archived on CRAN" — this resubmission is
+  addressed above.
+* "Possibly misspelled words in DESCRIPTION: MTD, QTD, YTD, backends" — these
+  are correct. MTD, QTD and YTD are the standard financial abbreviations for
+  month-, quarter- and year-to-date, and "backends" is the usual spelling for
+  database backends.
 
 ## Test environments
 
-* local: Pop!_OS 22.04 LTS, R 4.5.2
-* GitHub Actions: ubuntu-latest, R release
-* R-hub: Windows, macOS, Linux
+* local: Pop!_OS 24.04 LTS, R 4.6.1
 
-## Previous CRAN feedback addressed
+Checked with `devtools::check(remote = TRUE, manual = TRUE)`. Tests were run
+against 'contoso' 2.1.0, the version currently on CRAN, as well as 2.2.0.
 
-1. **Package names in single quotes**: DESCRIPTION uses 'ti' and 'dbplyr' in single quotes.
+## Downstream dependencies
 
-2. **Removed "Tools for" from description**: Description begins with the package's purpose directly.
-
-3. **References**: This package implements standard time intelligence calculations
-   commonly used in financial planning tools (YTD, MTD, QTD, YoY, etc.).
-
-4. **Examples**: All examples use `\donttest{}` as they depend on the suggested
-   package 'contoso' for sample data.
+There are no reverse dependencies.

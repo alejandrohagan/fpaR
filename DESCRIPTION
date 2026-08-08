@@ -6,13 +6,12 @@ Description: Calculate time intelligence metrics for financial planning and
     QTD), and customer segmentation (ABC analysis, cohorts). Supports standard
     and retail calendars (4-4-5, 4-5-4, 5-4-4) with both in-memory and database
     backends via 'dbplyr'.
-Version: 4.2.0
+Version: 4.2.1
 Authors@R: 
     person(given="Alejandro",family= "Hagan", email="alejandro.hagan@outlook.com", role = c("aut", "cre"))
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Imports:
     cli,
     DBI,
@@ -41,3 +40,4 @@ Depends:
     R (>= 4.2.0)
 URL: https://codeberg.org/usrbinr/ti
 Repository: codeberg
+Config/roxygen2/version: 8.0.0

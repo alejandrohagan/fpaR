@@ -8,3 +8,13 @@
 
 # qrtdown
 _quarto.yml
+
+# qrtdown
+/_quarto.yml
+/_qrtdown-styles.css
+/_qrtdown/
+/index.qmd
+/reference/
+/articles/
+/citation.qmd
+/_freeze/

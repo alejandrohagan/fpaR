@@ -1,0 +1,33 @@
+---
+title: "Time unit class"
+pagetitle: "Time unit class — time_unit"
+---
+
+::: {.qrtdown-source .dont-index}
+Source: [`R/classes.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/classes.R)
+:::
+
+<p><code>time_unit</code> records the calendar granularity that a date column is floored to
+before a time-intelligence calculation is run. The value is lower-cased on
+assignment and must be one of <code>"day"</code>, <code>"week"</code>, <code>"month"</code>, <code>"quarter"</code> or
+<code>"year"</code>.
+</p>
+
+## Usage
+
+```r
+time_unit(value = "day")
+```
+
+## Arguments
+
+<dl class="qrtdown-arguments">
+<dt id="arg-value"><code>value</code><a class="anchor" aria-label="anchor" href="#arg-value"></a></dt>
+<dd><p>A single string giving the time unit.</p></dd>
+</dl>
+
+## Value
+
+<p>A <code>time_unit</code> S7 object.
+</p>
+

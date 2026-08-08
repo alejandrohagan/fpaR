@@ -1,12 +1,20 @@
 ---
-title: "augment_standard_calendar_dbi"
+title: "Add Comprehensive Date-Based Attributes to a DBI lazy frame"
+pagetitle: "Add Comprehensive Date-Based Attributes to a DBI lazy frame — augment_standard_calendar_dbi"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R#L319)
+::: {.qrtdown-source .dont-index}
+Source: [`R/utils-misc.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R)
+:::
 
-# `augment_standard_calendar_dbi()`
-
-Add Comprehensive Date-Based Attributes to a DBI lazy frame
+<p>This function takes a data frame and a date column and generates a wide set of
+derived date attributes. These include start/end dates for year, quarter,
+month, and week; day-of-week indicators; completed and remaining days in each
+time unit; and additional convenience variables such as weekend indicators.
+</p>
+<p>It is designed for time-based feature engineering and is useful in reporting,
+forecasting, time-series modeling, and data enrichment workflows.
+</p>
 
 ## Usage
 
@@ -16,67 +24,89 @@ augment_standard_calendar_dbi(.data, .date)
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `.data` | A data frame or tibble containing at least one date column. |
-| `.date` | A column containing `Date` values, passed using tidy-eval (e.g., `{{ date_col `). |
+<dl class="qrtdown-arguments">
+<dt id="arg-data"><code>.data</code><a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
+<dd><p>A data frame or tibble containing at least one date column.</p></dd>
+<dt id="arg-date"><code>.date</code><a class="anchor" aria-label="anchor" href="#arg-date"></a></dt>
+<dd><p>A column containing <code>Date</code> values, passed using tidy-eval
+(e.g., <code>{{ date_col }}</code>).</p></dd>
+</dl>
 
 ## Value
 
-A dbi containing the original data along with all generated
+<p>A dbi containing the original data along with all generated
 date-based attributes.
-
-## Description
-
-This function takes a data frame and a date column and generates a wide set of
-derived date attributes. These include start/end dates for year, quarter,
-month, and week; day-of-week indicators; completed and remaining days in each
-time unit; and additional convenience variables such as weekend indicators.
-
-It is designed for time-based feature engineering and is useful in reporting,
-forecasting, time-series modeling, and data enrichment workflows.
+</p>
 
 ## Details
 
-The function creates the following groups of attributes:
+<p>The function creates the following groups of attributes:
+</p>
+<p><strong>1. Start and end dates</strong>
+</p>
+<ul>
+<li> <p><code>year_start_date</code>, <code>year_end_date</code>
+</p>
+</li>
+<li> <p><code>quarter_start_date</code>, <code>quarter_end_date</code>
+</p>
+</li>
+<li> <p><code>month_start_date</code>, <code>month_end_date</code>
+</p>
+</li>
+<li> <p><code>week_start_date</code>, <code>week_end_date</code>
+</p>
+</li>
+</ul>
 
-**1. Start and end dates**
+<p><strong>2. Day-of-week fields</strong>
+</p>
+<ul>
+<li> <p><code>day_of_week</code> – numeric day of the week (1–7)
+</p>
+</li>
+<li> <p><code>day_of_week_label</code> – ordered factor label (e.g., Mon, Tue, …)
+</p>
+</li>
+</ul>
 
-- `year_start_date`, `year_end_date`
+<p><strong>3. Duration fields</strong>
+</p>
+<ul>
+<li> <p><code>days_in_year</code> – total days in the year interval
+</p>
+</li>
+<li> <p><code>days_in_quarter</code> – total days in the quarter interval
+</p>
+</li>
+<li> <p><code>days_in_month</code> – total days in the month
+</p>
+</li>
+</ul>
 
-- `quarter_start_date`, `quarter_end_date`
+<p><strong>4. Completed/remaining days</strong>
+</p>
+<ul>
+<li> <p><code>days_complete_in_week</code>, <code>days_remaining_in_week</code>
+</p>
+</li>
+<li> <p><code>days_complete_in_month</code>, <code>days_remaining_in_month</code>
+</p>
+</li>
+<li> <p><code>days_complete_in_quarter</code>, <code>days_remaining_in_quarter</code>
+</p>
+</li>
+<li> <p><code>days_complete_in_year</code>, <code>days_remaining_in_year</code>
+</p>
+</li>
+</ul>
 
-- `month_start_date`, `month_end_date`
+<p><strong>5. Miscellaneous</strong>
+</p>
+<ul><li> <p><code>weekend_indicator</code> – equals 1 if Saturday or Sunday; otherwise 0
+</p>
+</li></ul>
 
-- `week_start_date`, `week_end_date`
-
-**2. Day-of-week fields**
-
-- `day_of_week` – numeric day of the week (1–7)
-
-- `day_of_week_label` – ordered factor label (e.g., Mon, Tue, …)
-
-**3. Duration fields**
-
-- `days_in_year` – total days in the year interval
-
-- `days_in_quarter` – total days in the quarter interval
-
-- `days_in_month` – total days in the month
-
-**4. Completed/remaining days**
-
-- `days_complete_in_week`, `days_remaining_in_week`
-
-- `days_complete_in_month`, `days_remaining_in_month`
-
-- `days_complete_in_quarter`, `days_remaining_in_quarter`
-
-- `days_complete_in_year`, `days_remaining_in_year`
-
-**5. Miscellaneous**
-
-- `weekend_indicator` – equals 1 if Saturday or Sunday; otherwise 0
-
-All date-derived fields ending in _date are coerced to class `Date`.
+<p>All date-derived fields ending in <code style="white-space: pre;">⁠_date⁠</code> are coerced to class <code>Date</code>.
+</p>
 

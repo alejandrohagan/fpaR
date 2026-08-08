@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils-misc.R
 \name{make_db_tbl}
 \alias{make_db_tbl}
-\title{Make an in memory database from a table}
+\title{Coerce data into a DuckDB-backed lazy table}
 \usage{
 make_db_tbl(x)
 }
@@ -10,8 +10,6 @@ make_db_tbl(x)
 \item{x}{A tibble, data.frame, or tbl_dbi object.}
 }
 \value{
-dbi object
-
 A \code{tbl_dbi} object backed by DuckDB.
 }
 \description{
@@ -24,11 +22,4 @@ When converting a data.frame, this function preserves existing \code{dplyr}
 groups. It uses DuckDB's \code{duckdb_register}, which is a virtual registration
 and does not perform a physical copy of the data, making it extremely fast.
 }
-\keyword{Coerce}
-\keyword{DuckDB-backed}
-\keyword{a}
-\keyword{data}
 \keyword{internal}
-\keyword{into}
-\keyword{lazy}
-\keyword{table}

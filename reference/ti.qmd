@@ -1,0 +1,50 @@
+---
+title: "Time-intelligence class"
+pagetitle: "Time-intelligence class — ti"
+---
+
+::: {.qrtdown-source .dont-index}
+Source: [`R/classes.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/classes.R)
+:::
+
+<p><code>ti</code> is the object returned by every time-intelligence function (<code><a href="ytd.qmd">ytd()</a></code>,
+<code><a href="yoy.qmd">yoy()</a></code>, <code><a href="mtd.qmd">mtd()</a></code> and so on). It composes the data (<a href="datum.qmd">datum</a>), the
+granularity (<a href="time_unit.qmd">time_unit</a>), the measure (<a href="value.qmd">value</a>), the
+calculation blueprint (<a href="fn.qmd">fn</a>) and the print narrative (<a href="action.qmd">action</a>)
+into a single lazy object. Nothing is computed until it is passed to
+<code><a href="calculate.qmd">calculate()</a></code>.
+</p>
+
+## Usage
+
+```r
+ti(
+  datum = datum(),
+  time_unit = time_unit(),
+  value = value(),
+  fn = fn(),
+  action = action()
+)
+```
+
+## Arguments
+
+<dl class="qrtdown-arguments">
+<dt id="arg-datum"><code>datum</code><a class="anchor" aria-label="anchor" href="#arg-datum"></a></dt>
+<dd><p>A <a href="datum.qmd">datum</a> object holding the table and its date metadata.</p></dd>
+<dt id="arg-time-unit"><code>time_unit</code><a class="anchor" aria-label="anchor" href="#arg-time-unit"></a></dt>
+<dd><p>A <a href="time_unit.qmd">time_unit</a> object giving the granularity.</p></dd>
+<dt id="arg-value"><code>value</code><a class="anchor" aria-label="anchor" href="#arg-value"></a></dt>
+<dd><p>A <a href="value.qmd">value</a> object naming the measure and output column.</p></dd>
+<dt id="arg-fn"><code>fn</code><a class="anchor" aria-label="anchor" href="#arg-fn"></a></dt>
+<dd><p>An <a href="fn.qmd">fn</a> object holding the transformation to execute.</p></dd>
+<dt id="arg-action"><code>action</code><a class="anchor" aria-label="anchor" href="#arg-action"></a></dt>
+<dd><p>An <a href="action.qmd">action</a> object describing the calculation for
+printing.</p></dd>
+</dl>
+
+## Value
+
+<p>A <code>ti</code> S7 object.
+</p>
+

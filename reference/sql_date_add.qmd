@@ -1,12 +1,14 @@
 ---
-title: "sql_date_add"
+title: "Generate dialect-appropriate date addition SQL"
+pagetitle: "Generate dialect-appropriate date addition SQL — sql_date_add"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R#L892)
+::: {.qrtdown-source .dont-index}
+Source: [`R/utils-misc.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R)
+:::
 
-# `sql_date_add()`
-
-Generate dialect-appropriate date addition SQL
+<p>Generate dialect-appropriate date addition SQL
+</p>
 
 ## Usage
 
@@ -16,14 +18,19 @@ sql_date_add(.con, unit, n_expr, date_col = "date")
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `.con` | A DBI connection object |
-| `unit` | A character string: "month", "week", etc. |
-| `n_expr` | An expression string for the number of units |
-| `date_col` | A character string for the date column name |
+<dl class="qrtdown-arguments">
+<dt id="arg-con"><code>.con</code><a class="anchor" aria-label="anchor" href="#arg-con"></a></dt>
+<dd><p>A DBI connection object</p></dd>
+<dt id="arg-unit"><code>unit</code><a class="anchor" aria-label="anchor" href="#arg-unit"></a></dt>
+<dd><p>A character string: "month", "week", etc.</p></dd>
+<dt id="arg-n-expr"><code>n_expr</code><a class="anchor" aria-label="anchor" href="#arg-n-expr"></a></dt>
+<dd><p>An expression string for the number of units</p></dd>
+<dt id="arg-date-col"><code>date_col</code><a class="anchor" aria-label="anchor" href="#arg-date-col"></a></dt>
+<dd><p>A character string for the date column name</p></dd>
+</dl>
 
 ## Value
 
-A `dplyr::sql` object
+<p>A <code>dplyr::sql</code> object
+</p>
 

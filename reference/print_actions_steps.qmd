@@ -1,12 +1,14 @@
 ---
-title: "print_actions_steps"
+title: "Print action steps"
+pagetitle: "Print action steps — print_actions_steps"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R#L123)
+::: {.qrtdown-source .dont-index}
+Source: [`R/utils-misc.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R)
+:::
 
-# `print_actions_steps()`
-
-Print action steps
+<p>Print action steps
+</p>
 
 ## Usage
 
@@ -16,11 +18,13 @@ print_actions_steps(x)
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `x` | an S7 class |
+<dl class="qrtdown-arguments">
+<dt id="arg-x"><code>x</code><a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>an S7 class</p></dd>
+</dl>
 
 ## Value
 
-cli messages
+<p>cli messages
+</p>
 

@@ -1,33 +1,45 @@
 ---
-title: "create_calendar"
+title: "Create Calendar Table"
+pagetitle: "Create Calendar Table — create_calendar"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/methods.R#L12)
+::: {.qrtdown-source .dont-index}
+Source: [`R/methods.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/methods.R)
+:::
 
-# `create_calendar()`
+<p><code><a href="create_calendar.qmd">create_calendar()</a></code> summarizes a tibble to target time unit and completes the calendar to ensure
+no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
+for each combination of the group
+</p>
 
-Create Calendar Table
+## Usage
+
+```r
+create_calendar(x, ...)
+
+## S7 method for class <ti::ti>
+create_calendar(x, ...)
+```
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `x` | ti object |
+<dl class="qrtdown-arguments">
+<dt id="arg-x"><code>x</code><a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>ti object</p></dd>
+<dt id="arg-"><code>...</code><a class="anchor" aria-label="anchor" href="#arg-"></a></dt>
+<dd><p>Not used.</p></dd>
+</dl>
 
 ## Value
 
-dbi object
-
-## Description
-
-`create_calendar()` summarizes a tibble to target time unit and completes the calendar to ensure
-no missing days, month, quarter or years. If a grouped tibble is passed through it will complete the calendar
-for each combination of the group
+<p>dbi object
+</p>
 
 ## Details
 
-This is in internal function to make it easier to ensure data has no missing dates to
+<p>This is in internal function to make it easier to ensure data has no missing dates to
 simplify the use of time intelligence functions downstream of the application.
-If you want to summarize to a particular group, simply pass the tibble through to the `dplyr::group_by()` argument
+If you want to summarize to a particular group, simply pass the tibble through to the <code><a href="https://dplyr.tidyverse.org/reference/group_by.html">dplyr::group_by()</a></code> argument
 prior to function and the function will make summarize and make a complete calendar for each group item.
+</p>
 

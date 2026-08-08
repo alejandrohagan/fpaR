@@ -1,0 +1,48 @@
+---
+title: "Cohort segmentation class"
+pagetitle: "Cohort segmentation class — segment_cohort"
+---
+
+::: {.qrtdown-source .dont-index}
+Source: [`R/classes.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/classes.R)
+:::
+
+<p><code>segment_cohort</code> is the lazy object returned by <code><a href="cohort.qmd">cohort()</a></code>. It groups records
+by the period in which each group member first appears, then measures each
+cohort forward through time. Pass it to <code><a href="calculate.qmd">calculate()</a></code> to run the
+segmentation.
+</p>
+
+## Usage
+
+```r
+segment_cohort(
+  datum = datum(),
+  time_unit = time_unit(),
+  fn = fn(),
+  action = action(),
+  value = value()
+)
+```
+
+## Arguments
+
+<dl class="qrtdown-arguments">
+<dt id="arg-datum"><code>datum</code><a class="anchor" aria-label="anchor" href="#arg-datum"></a></dt>
+<dd><p>A <a href="datum.qmd">datum</a> object holding the table and its date metadata.</p></dd>
+<dt id="arg-time-unit"><code>time_unit</code><a class="anchor" aria-label="anchor" href="#arg-time-unit"></a></dt>
+<dd><p>A <a href="time_unit.qmd">time_unit</a> object giving the cohort period.</p></dd>
+<dt id="arg-fn"><code>fn</code><a class="anchor" aria-label="anchor" href="#arg-fn"></a></dt>
+<dd><p>An <a href="fn.qmd">fn</a> object holding the transformation to execute.</p></dd>
+<dt id="arg-action"><code>action</code><a class="anchor" aria-label="anchor" href="#arg-action"></a></dt>
+<dd><p>An <a href="action.qmd">action</a> object describing the calculation for
+printing.</p></dd>
+<dt id="arg-value"><code>value</code><a class="anchor" aria-label="anchor" href="#arg-value"></a></dt>
+<dd><p>A <a href="value.qmd">value</a> object naming the measure and output column.</p></dd>
+</dl>
+
+## Value
+
+<p>A <code>segment_cohort</code> S7 object.
+</p>
+

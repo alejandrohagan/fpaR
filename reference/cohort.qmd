@@ -1,12 +1,17 @@
 ---
-title: "cohort"
+title: "Cohort Analysis"
+pagetitle: "Cohort Analysis — cohort"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/abc.R#L159)
+::: {.qrtdown-source .dont-index}
+Source: [`R/abc.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/abc.R)
+:::
 
-# `cohort()`
-
-Cohort Analysis
+<p>Database-friendly cohort analysis function.
+A remake of <a href="https://github.com/PeerChristensen/cohorts">https://github.com/PeerChristensen/cohorts</a>, combining
+<code>cohort_table_month</code>, <code>cohort_table_year</code>, and <code>cohort_table_day</code> into a single package.
+Rewritten for database compatibility and tested with Snowflake and DuckDB.
+</p>
 
 ## Usage
 
@@ -16,32 +21,42 @@ cohort(.data, .date, .value, time_unit = "month", period_label = FALSE)
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `.data` | tibble or dbi object |
-| `.date` | date column |
-| `.value` | id column |
-| `time_unit` | do you want summarize the date column to 'day', 'week', 'month','quarter' or 'year' |
-| `period_label` | do you want period labels or the dates c(TRUE , FALSE) |
+<dl class="qrtdown-arguments">
+<dt id="arg-data"><code>.data</code><a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
+<dd><p>tibble or dbi object</p></dd>
+<dt id="arg-date"><code>.date</code><a class="anchor" aria-label="anchor" href="#arg-date"></a></dt>
+<dd><p>date column</p></dd>
+<dt id="arg-value"><code>.value</code><a class="anchor" aria-label="anchor" href="#arg-value"></a></dt>
+<dd><p>id column</p></dd>
+<dt id="arg-time-unit"><code>time_unit</code><a class="anchor" aria-label="anchor" href="#arg-time-unit"></a></dt>
+<dd><p>do you want summarize the date column to 'day', 'week', 'month','quarter' or 'year'</p></dd>
+<dt id="arg-period-label"><code>period_label</code><a class="anchor" aria-label="anchor" href="#arg-period-label"></a></dt>
+<dd><p>do you want period labels or the dates c(TRUE , FALSE)</p></dd>
+</dl>
 
 ## Value
 
-segment object
-
-## Description
-
-Database-friendly cohort analysis function.
-A remake of [https://github.com/PeerChristensen/cohorts](https://github.com/PeerChristensen/cohorts), combining
-`cohort_table_month`, `cohort_table_year`, and `cohort_table_day` into a single package.
-Rewritten for database compatibility and tested with Snowflake and DuckDB.
+<p>segment object
+</p>
 
 ## Details
 
-- Groups your `.value` column by shared time attributes from the `.date` column.
-
-- Assigns each member to a cohort based on their first entry in `.date`.
-
-- Aggregates the cohort by the `time_unit` argument (`day`, `week`, `month`, `quarter`, or `year`).
-
-- Computes the distinct count of each cohort member over time.
+<ul>
+<li>
+<p> Groups your <code>.value</code> column by shared time attributes from the <code>.date</code> column.
+</p>
+</li>
+<li>
+<p> Assigns each member to a cohort based on their first entry in <code>.date</code>.
+</p>
+</li>
+<li>
+<p> Aggregates the cohort by the <code>time_unit</code> argument (<code>day</code>, <code>week</code>, <code>month</code>, <code>quarter</code>, or <code>year</code>).
+</p>
+</li>
+<li>
+<p> Computes the distinct count of each cohort member over time.
+</p>
+</li>
+</ul>
 

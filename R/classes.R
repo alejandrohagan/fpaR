@@ -7,6 +7,17 @@
 
 # time unit class when aggregating a date column-----------
 
+#' Time unit class
+#'
+#' @description
+#' `time_unit` records the calendar granularity that a date column is floored to
+#' before a time-intelligence calculation is run. The value is lower-cased on
+#' assignment and must be one of `"day"`, `"week"`, `"month"`, `"quarter"` or
+#' `"year"`.
+#'
+#' @param value A single string giving the time unit.
+#' @returns A `time_unit` S7 object.
+#' @keywords internal
 time_unit <- S7::new_class(
 
   ,name="time_unit"
@@ -40,6 +51,17 @@ time_unit <- S7::new_class(
 
 # action class to help with printing methods--------------
 
+#' Action class
+#'
+#' @description
+#' `action` carries the human-readable narrative shown by the `print()` methods.
+#' `value` is lower-cased and passed through `make_action_cli()` on assignment so
+#' it renders as cli-formatted bullets.
+#'
+#' @param value The action description, converted to cli markup on assignment.
+#' @param method A string describing the method used by the calculation.
+#' @returns An `action` S7 object.
+#' @keywords internal
 action <- S7::new_class(
   name="action"
   ,package = "ti"
@@ -63,6 +85,37 @@ action <- S7::new_class(
 
 # create data class to capture metadata ---------------
 
+#' Datum class
+#'
+#' @description
+#' `datum` wraps the user's table together with the metadata every
+#' time-intelligence function needs: which column holds the date, what calendar
+#' the dates should be interpreted against, and how the table is grouped. Most
+#' of its properties are read-only and computed on access from `data` and
+#' `date_vec`, so they always reflect the current table.
+#'
+#' @param data A `data.frame` or `tbl_dbi`. Converted to a lazy table with
+#'   [make_db_tbl()] on assignment.
+#' @param calendar_type One of `"standard"`, `"445"`, `"454"` or `"544"`.
+#'   Lower-cased on assignment.
+#' @param fiscal_year_start Integer between 1 and 12 giving the month the fiscal
+#'   year starts in.
+#' @param date_vec The name of the date column, as a string.
+#'
+#' @prop class_name `"dbi"` if `data` is a database table, otherwise `"tbl"`.
+#' @prop date_quo `date_vec` parsed to a symbol for tidy evaluation.
+#' @prop min_date The earliest value of the date column.
+#' @prop max_date The latest value of the date column.
+#' @prop date_range Number of days between `min_date` and `max_date`.
+#' @prop date_count Number of distinct dates present in the date column.
+#' @prop date_missing `date_range` minus `date_count`, i.e. gaps in the calendar.
+#' @prop group_indicator `TRUE` if `data` carries grouping variables.
+#' @prop group_quo The grouping variables as a list of symbols.
+#' @prop group_vec The grouping variables as a character vector.
+#' @prop group_count Number of grouping variables.
+#'
+#' @returns A `datum` S7 object.
+#' @keywords internal
 datum <- S7::new_class(
   name="datum"
   ,package = "ti"
@@ -253,6 +306,23 @@ datum <- S7::new_class(
 
 # value tbl class
 
+#' Value class
+#'
+#' @description
+#' `value` records which column is being measured and what the resulting column
+#' should be called. Assigning `new_column_name_vec` prefixes the supplied
+#' string onto `value_vec`, so setting it to `"ytd"` for a value column of
+#' `sales` gives `ytd_sales`.
+#'
+#' @param value_vec The name of the value column, as a string.
+#' @param new_column_name_vec A prefix for the output column; stored as
+#'   `paste0(prefix, "_", value_vec)`.
+#'
+#' @prop value_quo `value_vec` parsed to a symbol for tidy evaluation.
+#' @prop new_column_name_quo `new_column_name_vec` parsed to a symbol.
+#'
+#' @returns A `value` S7 object.
+#' @keywords internal
 value <- S7::new_class(
   "value"
   ,properties = list(
@@ -288,7 +358,26 @@ value <- S7::new_class(
 
 # function tbl class-----------------------
 
-
+#' Function class
+#'
+#' @description
+#' `fn` is the blueprint half of a lazy time-intelligence object. It holds the
+#' transformation to run ([fn_exec][fn]) plus the metadata that describes it,
+#' which is what lets [ytd()] and friends return an object cheaply and defer the
+#' real work to [calculate()].
+#'
+#' @param fn_exec A function taking a `ti` object and returning the transformed
+#'   table.
+#' @param fn_name Short name of the calculation, e.g. `"ytd"`.
+#' @param fn_long_name Human-readable name, e.g. `"year to date"`.
+#' @param shift The period the calculation shifts by, e.g. `"year"`.
+#' @param compare The period the calculation compares against.
+#' @param label Whether the calculation adds a period label column.
+#' @param new_date_column_name Name of the date column the calculation creates.
+#' @param lag_n Number of periods to lag by.
+#'
+#' @returns An `fn` S7 object.
+#' @keywords internal
 fn <- S7::new_class(
   "fn"
   ,package = "ti"
@@ -326,6 +415,26 @@ fn <- S7::new_class(
 )
 
 # ti class to bring everything together ----------------
+
+#' Time-intelligence class
+#'
+#' @description
+#' `ti` is the object returned by every time-intelligence function ([ytd()],
+#' [yoy()], [mtd()] and so on). It composes the data ([datum][datum]), the
+#' granularity ([time_unit][time_unit]), the measure ([value][value]), the
+#' calculation blueprint ([fn][fn]) and the print narrative ([action][action])
+#' into a single lazy object. Nothing is computed until it is passed to
+#' [calculate()].
+#'
+#' @param datum A [datum][datum] object holding the table and its date metadata.
+#' @param time_unit A [time_unit][time_unit] object giving the granularity.
+#' @param value A [value][value] object naming the measure and output column.
+#' @param fn An [fn][fn] object holding the transformation to execute.
+#' @param action An [action][action] object describing the calculation for
+#'   printing.
+#'
+#' @returns A `ti` S7 object.
+#' @keywords internal
 ti <- S7::new_class(
 
   name="ti"
@@ -362,7 +471,20 @@ ti <- S7::new_class(
 
 ## abc class---------
 
-
+#' Category class
+#'
+#' @description
+#' `category` holds the cumulative cut-points used by [abc()] to bucket group
+#' members. Assigning `category_names` derives one letter per cut-point from
+#' `category_values`, so the default three cut-points become `a`, `b` and `c`.
+#'
+#' @param category_values Numeric cumulative cut-points, all `<= 1`. Defaults to
+#'   `c(0.7, 0.96, 1)`.
+#' @param category_names Bucket labels; derived from the length of
+#'   `category_values` on assignment.
+#'
+#' @returns A `category` S7 object.
+#' @keywords internal
 category <- S7::new_class(
   name="category"
   ,package = "ti"
@@ -388,6 +510,23 @@ category <- S7::new_class(
 )
 
 
+#' ABC segmentation class
+#'
+#' @description
+#' `segment_abc` is the lazy object returned by [abc()]. It mirrors [ti][ti] but
+#' swaps the time-shift metadata for a [category][category] object holding the
+#' bucket cut-points. Pass it to [calculate()] to run the segmentation.
+#'
+#' @param datum A [datum][datum] object holding the table and its date metadata.
+#' @param category A [category][category] object giving the bucket cut-points.
+#' @param time_unit A [time_unit][time_unit] object giving the granularity.
+#' @param fn An [fn][fn] object holding the transformation to execute.
+#' @param action An [action][action] object describing the calculation for
+#'   printing.
+#' @param value A [value][value] object naming the measure and output column.
+#'
+#' @returns A `segment_abc` S7 object.
+#' @keywords internal
 segment_abc <- S7::new_class(
 
   ,name="segment_abc"
@@ -404,6 +543,23 @@ segment_abc <- S7::new_class(
 
 
 
+#' Cohort segmentation class
+#'
+#' @description
+#' `segment_cohort` is the lazy object returned by [cohort()]. It groups records
+#' by the period in which each group member first appears, then measures each
+#' cohort forward through time. Pass it to [calculate()] to run the
+#' segmentation.
+#'
+#' @param datum A [datum][datum] object holding the table and its date metadata.
+#' @param time_unit A [time_unit][time_unit] object giving the cohort period.
+#' @param fn An [fn][fn] object holding the transformation to execute.
+#' @param action An [action][action] object describing the calculation for
+#'   printing.
+#' @param value A [value][value] object naming the measure and output column.
+#'
+#' @returns A `segment_cohort` S7 object.
+#' @keywords internal
 segment_cohort <- S7::new_class(
 
   ,name="segment_cohort"

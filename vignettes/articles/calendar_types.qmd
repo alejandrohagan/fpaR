@@ -126,7 +126,7 @@ The fiscal year starts nearest to February. Each quarter has 13 weeks split into
 contoso::sales |>
   ytd(
     .date = order_date,
-    .value = margin,
+    .value = gross_margin,
     calendar_type = "445",
     fiscal_year_start = 2
   ) |>
@@ -144,7 +144,7 @@ contoso::sales |>
 contoso::sales |>
   ytd(
     .date = order_date,
-    .value = margin,
+    .value = gross_margin,
     calendar_type = "445",
     fiscal_year_start = 2
   ) |>
@@ -191,7 +191,7 @@ Notice that the `year`, `quarter`, `month`, and `week` columns now reflect the *
 contoso::sales |>
   mtd(
     .date = order_date,
-    .value = margin,
+    .value = gross_margin,
     calendar_type = "544",
     fiscal_year_start = 2
   ) |>
@@ -209,7 +209,7 @@ contoso::sales |>
 contoso::sales |>
   mtd(
     .date = order_date,
-    .value = margin,
+    .value = gross_margin,
     calendar_type = "544",
     fiscal_year_start = 2
   ) |>
@@ -257,7 +257,7 @@ contoso::sales |>  #<1>
   dplyr::group_by(store_key) |>  #<2>
   qtd(
     .date = order_date,  #<3>
-    .value = margin, #<4>
+    .value = gross_margin, #<4>
     calendar_type = "445", #<5>
     fiscal_year_start = 2 #<6>
   ) |>

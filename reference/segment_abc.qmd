@@ -1,0 +1,50 @@
+---
+title: "ABC segmentation class"
+pagetitle: "ABC segmentation class — segment_abc"
+---
+
+::: {.qrtdown-source .dont-index}
+Source: [`R/classes.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/classes.R)
+:::
+
+<p><code>segment_abc</code> is the lazy object returned by <code><a href="abc.qmd">abc()</a></code>. It mirrors <a href="ti.qmd">ti</a> but
+swaps the time-shift metadata for a <a href="category.qmd">category</a> object holding the
+bucket cut-points. Pass it to <code><a href="calculate.qmd">calculate()</a></code> to run the segmentation.
+</p>
+
+## Usage
+
+```r
+segment_abc(
+  datum = datum(),
+  category = category(),
+  time_unit = time_unit(),
+  fn = fn(),
+  action = action(),
+  value = value()
+)
+```
+
+## Arguments
+
+<dl class="qrtdown-arguments">
+<dt id="arg-datum"><code>datum</code><a class="anchor" aria-label="anchor" href="#arg-datum"></a></dt>
+<dd><p>A <a href="datum.qmd">datum</a> object holding the table and its date metadata.</p></dd>
+<dt id="arg-category"><code>category</code><a class="anchor" aria-label="anchor" href="#arg-category"></a></dt>
+<dd><p>A <a href="category.qmd">category</a> object giving the bucket cut-points.</p></dd>
+<dt id="arg-time-unit"><code>time_unit</code><a class="anchor" aria-label="anchor" href="#arg-time-unit"></a></dt>
+<dd><p>A <a href="time_unit.qmd">time_unit</a> object giving the granularity.</p></dd>
+<dt id="arg-fn"><code>fn</code><a class="anchor" aria-label="anchor" href="#arg-fn"></a></dt>
+<dd><p>An <a href="fn.qmd">fn</a> object holding the transformation to execute.</p></dd>
+<dt id="arg-action"><code>action</code><a class="anchor" aria-label="anchor" href="#arg-action"></a></dt>
+<dd><p>An <a href="action.qmd">action</a> object describing the calculation for
+printing.</p></dd>
+<dt id="arg-value"><code>value</code><a class="anchor" aria-label="anchor" href="#arg-value"></a></dt>
+<dd><p>A <a href="value.qmd">value</a> object naming the measure and output column.</p></dd>
+</dl>
+
+## Value
+
+<p>A <code>segment_abc</code> S7 object.
+</p>
+

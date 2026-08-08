@@ -1,33 +1,47 @@
 ---
-title: "print"
+title: "Print ti objects"
+pagetitle: "Print ti objects — print"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/methods.R#L158)
+::: {.qrtdown-source .dont-index}
+Source: [`R/methods.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/methods.R)
+:::
 
-# `print()`
+<p>Print ti objects
+</p>
+<p>Print segment objects
+</p>
+<p>Print segment objects
+</p>
 
-Print ti objects
+## Usage
+
+```r
+## S7 method for class <ti::ti>
+print(x, ...)
+
+## S7 method for class <ti::segment_abc>
+print(x, ...)
+
+## S7 method for class <ti::segment_cohort>
+print(x, ...)
+```
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `x` | A `ti` object. |
-| `...` | Unused. Present for S3/S7 compatibility; additional arguments are ignored. |
+<dl class="qrtdown-arguments">
+<dt id="arg-x"><code>x</code><a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>A <code>ti</code> object.</p></dd>
+<dt id="arg-"><code>...</code><a class="anchor" aria-label="anchor" href="#arg-"></a></dt>
+<dd><p>Unused. Present for S3/S7 compatibility; additional arguments are ignored.</p></dd>
+</dl>
 
 ## Value
 
-ti object
-
-segment object
-
-segment object
-
-## Description
-
-Print ti objects
-
-Print segment objects
-
-Print segment objects
+<p>ti object
+</p>
+<p>segment object
+</p>
+<p>segment object
+</p>
 

@@ -18,7 +18,7 @@ dbi object
 \details{
 This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
 by \link{calculate}
-This will return a dbi object that can converted to a tibble object with \code{\link[dplyr:compute]{dplyr::collect()}}
+This will return a dbi object that can converted to a tibble object with \code{\link[dplyr:collect]{dplyr::collect()}}
 }
 \seealso{
 \code{\link[=ytd]{ytd()}} for the function's class

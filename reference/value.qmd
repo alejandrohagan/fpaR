@@ -1,0 +1,49 @@
+---
+title: "Value class"
+pagetitle: "Value class — value"
+---
+
+::: {.qrtdown-source .dont-index}
+Source: [`R/classes.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/classes.R)
+:::
+
+<p><code>value</code> records which column is being measured and what the resulting column
+should be called. Assigning <code>new_column_name_vec</code> prefixes the supplied
+string onto <code>value_vec</code>, so setting it to <code>"ytd"</code> for a value column of
+<code>sales</code> gives <code>ytd_sales</code>.
+</p>
+
+## Usage
+
+```r
+value(value_vec = NA_character_, new_column_name_vec = character(0))
+```
+
+## Arguments
+
+<dl class="qrtdown-arguments">
+<dt id="arg-value-vec"><code>value_vec</code><a class="anchor" aria-label="anchor" href="#arg-value-vec"></a></dt>
+<dd><p>The name of the value column, as a string.</p></dd>
+<dt id="arg-new-column-name-vec"><code>new_column_name_vec</code><a class="anchor" aria-label="anchor" href="#arg-new-column-name-vec"></a></dt>
+<dd><p>A prefix for the output column; stored as
+<code>paste0(prefix, "_", value_vec)</code>.</p></dd>
+</dl>
+
+## Value
+
+<p>A <code>value</code> S7 object.
+</p>
+
+## Additional properties
+
+<dl>
+<dt><code>@value_quo</code></dt>
+<dd>
+<p><code>value_vec</code> parsed to a symbol for tidy evaluation.</p>
+</dd>
+<dt><code>@new_column_name_quo</code></dt>
+<dd>
+<p><code>new_column_name_vec</code> parsed to a symbol.</p>
+</dd>
+</dl>
+

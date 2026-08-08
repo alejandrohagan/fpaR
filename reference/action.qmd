@@ -1,0 +1,34 @@
+---
+title: "Action class"
+pagetitle: "Action class — action"
+---
+
+::: {.qrtdown-source .dont-index}
+Source: [`R/classes.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/classes.R)
+:::
+
+<p><code>action</code> carries the human-readable narrative shown by the <code>print()</code> methods.
+<code>value</code> is lower-cased and passed through <code>make_action_cli()</code> on assignment so
+it renders as cli-formatted bullets.
+</p>
+
+## Usage
+
+```r
+action(value = NULL, method = NA_character_)
+```
+
+## Arguments
+
+<dl class="qrtdown-arguments">
+<dt id="arg-value"><code>value</code><a class="anchor" aria-label="anchor" href="#arg-value"></a></dt>
+<dd><p>The action description, converted to cli markup on assignment.</p></dd>
+<dt id="arg-method"><code>method</code><a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
+<dd><p>A string describing the method used by the calculation.</p></dd>
+</dl>
+
+## Value
+
+<p>An <code>action</code> S7 object.
+</p>
+

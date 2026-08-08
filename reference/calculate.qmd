@@ -1,44 +1,86 @@
 ---
-title: "calculate"
+title: "Execute time-intelligence or segments class objects to return the underlying transformed table"
+pagetitle: "Execute time-intelligence or segments class objects to return the underlying transformed table — calculate"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/methods.R#L92)
+::: {.qrtdown-source .dont-index}
+Source: [`R/methods.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/methods.R)
+:::
 
-# `calculate()`
+<p>The <code>calculate()</code> function takes an object created by a time function (like <code>ytd()</code>, <code>mtd()</code>, or <code>qtd()</code>) or a segment function (like <code>cohort()</code> or <code>abc()</code>) and executes the underlying transformation logic.
+It translates the function blueprint into an actionable query, returning the final data table.
+</p>
 
-Execute time-intelligence or segments class objects to return the underlying transformed table
+## Usage
+
+```r
+calculate(x, ...)
+
+## S7 method for class <ti::ti>
+calculate(x, ...)
+
+## S7 method for class <ti::segment_cohort>
+calculate(x, ...)
+
+## S7 method for class <ti::segment_abc>
+calculate(x, ...)
+```
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `x` | ti object |
+<dl class="qrtdown-arguments">
+<dt id="arg-x"><code>x</code><a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>ti object</p></dd>
+<dt id="arg-"><code>...</code><a class="anchor" aria-label="anchor" href="#arg-"></a></dt>
+<dd><p>Not used.</p></dd>
+</dl>
 
 ## Value
 
-dbi object
-
-## Description
-
-The `calculate()` function takes an object created by a time function (like `ytd()`, `mtd()`, or `qtd()`) or a segment function (like `cohort()` or `abc()`) and executes the underlying transformation logic.
-It translates the function blueprint into an actionable query, returning the final data table.
+<p>dbi object
+</p>
 
 ## Details
 
-The TI and segment functions in **ti**—such as `ytd()` or `cohort()` and others—are designed to be **lazy and database-friendly**.
+<p>The TI and segment functions in <strong>ti</strong>—such as <code>ytd()</code> or <code>cohort()</code> and others—are designed to be <strong>lazy and database-friendly</strong>.
 They do not perform the heavy data transformation immediately.
-Instead, they return a blueprint object (of class `ti`,`segment_abc` or `segment_cohort`) that contains all the parameters and logic needed for the calculation.
-
-**`calculate()`** serves as the **execution engine**.
-
-When called, it interprets the blueprint and generates optimized R code or SQL code (using the `dbplyr` package) that is then executed efficiently on the data source, whether it's an in-memory `tibble` or a remote database backend (like `duckdb` or `snowflake`).
+Instead, they return a blueprint object (of class <code>ti</code>,<code>segment_abc</code> or <code>segment_cohort</code>) that contains all the parameters and logic needed for the calculation.
+</p>
+<p><strong><code>calculate()</code></strong> serves as the <strong>execution engine</strong>.
+</p>
+<p>When called, it interprets the blueprint and generates optimized R code or SQL code (using the <code>dbplyr</code> package) that is then executed efficiently on the data source, whether it's an in-memory <code>tibble</code> or a remote database backend (like <code>duckdb</code> or <code>snowflake</code>).
 This approach minimizes data transfer and improves performance for large datasets.
-
-The resulting table will be sorted by the relevant date column to ensure the correct temporal ordering of the calculated metrics.
+</p>
+<p>The resulting table will be sorted by the relevant date column to ensure the correct temporal ordering of the calculated metrics.
+</p>
 
 ## Examples
 
-```r
+```{r}
+#| include: false
+options(width = 80)
+set.seed(1014)
+.qrtdown_root <- local({
+  p <- normalizePath(".", winslash = "/", mustWork = FALSE)
+  while (!file.exists(file.path(p, "DESCRIPTION")) && dirname(p) != p) {
+    p <- dirname(p)
+  }
+  p
+})
+if (requireNamespace("pkgload", quietly = TRUE) &&
+    file.exists(file.path(.qrtdown_root, "DESCRIPTION"))) {
+  pkgload::load_all(.qrtdown_root, export_all = FALSE, helpers = FALSE,
+                    quiet = TRUE)
+} else {
+  library(ti)
+}
+```
+
+```{r}
+#| collapse: true
+#| comment: "#>"
+#| error: true
+
 x <- ytd(contoso::sales,.date=order_date,.value=quantity,calendar_type="standard")
 calculate(x)
 ```

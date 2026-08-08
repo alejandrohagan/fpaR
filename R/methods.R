@@ -2,14 +2,9 @@ NULL
 
 # create generics -----------
 
-create_calendar <- S7::new_generic("create_calendar","x")
-
-
-calculate <- S7::new_generic("calculate","x")
-
 #' Create Calendar Table
-#' @name create_calendar
 #' @param x ti object
+#' @param ... Not used.
 #'
 #' @returns dbi object
 #' @export
@@ -23,7 +18,10 @@ calculate <- S7::new_generic("calculate","x")
 #' If you want to summarize to a particular group, simply pass the tibble through to the [dplyr::group_by()] argument
 #' prior to function and the function will make summarize and make a complete calendar for each group item.
 #' @keywords internal
-S7::method(create_calendar,ti) <- function(x){
+create_calendar <- S7::new_generic("create_calendar","x")
+
+#' @rdname create_calendar
+S7::method(create_calendar,ti) <- function(x,...){
 
 
   summary_dbi <- x@datum@data |>
@@ -88,8 +86,8 @@ S7::method(create_calendar,ti) <- function(x){
 
 
 #' @title Execute time-intelligence or segments class objects to return the underlying transformed table
-#' @name calculate
 #' @param x ti object
+#' @param ... Not used.
 #' @description
 #' The `calculate()` function takes an object created by a time function (like `ytd()`, `mtd()`, or `qtd()`) or a segment function (like `cohort()` or `abc()`) and executes the underlying transformation logic.
 #' It translates the function blueprint into an actionable query, returning the final data table.
@@ -114,8 +112,10 @@ S7::method(create_calendar,ti) <- function(x){
 #' x <- ytd(contoso::sales,.date=order_date,.value=quantity,calendar_type="standard")
 #' calculate(x)
 #' }
+calculate <- S7::new_generic("calculate","x")
 
-S7::method(calculate,ti) <- function(x){
+#' @rdname calculate
+S7::method(calculate,ti) <- function(x,...){
 
   out <-   x@fn@fn_exec(x)|>
       dbplyr::window_order(date)
@@ -126,9 +126,7 @@ S7::method(calculate,ti) <- function(x){
 
 
 #' @rdname calculate
-#' @name calculate
-#' @export
-S7::method(calculate,segment_cohort) <- function(x){
+S7::method(calculate,segment_cohort) <- function(x,...){
 
   out <- x@fn@fn_exec(x)
 
@@ -139,9 +137,7 @@ S7::method(calculate,segment_cohort) <- function(x){
 
 
 #' @rdname calculate
-#' @name calculate
-#' @export
-S7::method(calculate,segment_abc) <- function(x){
+S7::method(calculate,segment_abc) <- function(x,...){
 
   out <- x@fn@fn_exec(x) |>
     dplyr::arrange(row_id)

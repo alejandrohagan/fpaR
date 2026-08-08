@@ -1,12 +1,14 @@
 ---
-title: "is_yyyy_mm_dd"
+title: "Validate an input is YYYY-MM-DD format"
+pagetitle: "Validate an input is YYYY-MM-DD format — is_yyyy_mm_dd"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R#L7)
+::: {.qrtdown-source .dont-index}
+Source: [`R/utils-misc.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R)
+:::
 
-# `is_yyyy_mm_dd()`
-
-Validate an input is YYYY-MM-DD format
+<p>Validate an input is YYYY-MM-DD format
+</p>
 
 ## Usage
 
@@ -16,11 +18,13 @@ is_yyyy_mm_dd(x)
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `x` | date column |
+<dl class="qrtdown-arguments">
+<dt id="arg-x"><code>x</code><a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>date column</p></dd>
+</dl>
 
 ## Value
 
-logical
+<p>logical
+</p>
 

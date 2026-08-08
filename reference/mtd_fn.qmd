@@ -1,12 +1,14 @@
 ---
-title: "mtd_fn"
+title: "Month-to-date execution function"
+pagetitle: "Month-to-date execution function — mtd_fn"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/time_intelligence_fn.R#L513)
+::: {.qrtdown-source .dont-index}
+Source: [`R/time_intelligence_fn.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/time_intelligence_fn.R)
+:::
 
-# `mtd_fn()`
-
-Month-to-date execution function
+<p><code><a href="mtd_fn.qmd">mtd_fn()</a></code> is the function that is called by <code><a href="mtd.qmd">mtd()</a></code> when passed through to <a href="calculate.qmd">calculate</a>
+</p>
 
 ## Usage
 
@@ -16,25 +18,25 @@ mtd_fn(x)
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `x` | ti object |
+<dl class="qrtdown-arguments">
+<dt id="arg-x"><code>x</code><a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>ti object</p></dd>
+</dl>
 
 ## Value
 
-dbi object
-
-## Description
-
-`mtd_fn()` is the function that is called by `mtd()` when passed through to calculate
+<p>dbi object
+</p>
 
 ## Details
 
-This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
-by calculate
-This will return a dbi object that can converted to a tibble object with `dplyr::collect()`
+<p>This is internal non exported function that is nested in ti class and is called upon when the underlying function is called
+by <a href="calculate.qmd">calculate</a>
+This will return a dbi object that can converted to a tibble object with <code><a href="https://dplyr.tidyverse.org/reference/compute.html">dplyr::collect()</a></code>
+</p>
 
-## See also
+## See Also
 
-`mtd()` for the function's intent
+<p><code><a href="mtd.qmd">mtd()</a></code> for the function's intent
+</p>
 

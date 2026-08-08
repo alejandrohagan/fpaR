@@ -90,7 +90,7 @@ contoso::sales |>
    dplyr::group_by(store_key) |> 
    ti::abc(
       category_values = c(0.4, 0.7, 0.9, 1), 
-      .value = margin
+      .value = gross_margin
       )
 ```
    
@@ -108,7 +108,7 @@ contoso::sales |>
    dplyr::group_by(store_key) |> 
    ti::abc(
       category_values = c(0.4, 0.7, 0.9, 1), 
-      .value = margin
+      .value = gross_margin
       ) |> 
    ti::calculate()
 ```
@@ -129,7 +129,7 @@ contoso::sales |>
    dplyr::group_by(store_key) |>
    ti::abc(
       category_values = c( 0.4,.7,.9,1),
-      .value = margin
+      .value = gross_margin
       ) |>
    ti::calculate() |>
    dplyr::collect() |>

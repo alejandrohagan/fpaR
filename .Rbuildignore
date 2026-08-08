@@ -36,3 +36,8 @@ ti.Rproj
 ^_brand\.yml$
 ^_freeze$
 ^_qrtdown-styles\.css$
+
+# qrtdown
+^_qrtdown$
+^articles$
+^README\.Rmd$

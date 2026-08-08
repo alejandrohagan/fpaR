@@ -1,12 +1,14 @@
 ---
-title: "detect_sql_dialect"
+title: "Detect SQL dialect from a DBI connection"
+pagetitle: "Detect SQL dialect from a DBI connection — detect_sql_dialect"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R#L876)
+::: {.qrtdown-source .dont-index}
+Source: [`R/utils-misc.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R)
+:::
 
-# `detect_sql_dialect()`
-
-Detect SQL dialect from a DBI connection
+<p>Detect SQL dialect from a DBI connection
+</p>
 
 ## Usage
 
@@ -16,11 +18,13 @@ detect_sql_dialect(.con)
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `.con` | A DBI connection object |
+<dl class="qrtdown-arguments">
+<dt id="arg-con"><code>.con</code><a class="anchor" aria-label="anchor" href="#arg-con"></a></dt>
+<dd><p>A DBI connection object</p></dd>
+</dl>
 
 ## Value
 
-A character string: "snowflake", "duckdb", or "postgres"
+<p>A character string: "snowflake", "duckdb", or "postgres"
+</p>
 

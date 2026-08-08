@@ -2,9 +2,26 @@
 % Please edit documentation in R/methods.R
 \name{calculate}
 \alias{calculate}
+\alias{calculate,ti::ti-method}
+\alias{calculate,ti::segment_cohort-method}
+\alias{calculate,ti::segment_abc-method}
 \title{Execute time-intelligence or segments class objects to return the underlying transformed table}
+\usage{
+calculate(x, ...)
+
+## S7 method for class <ti::ti>
+calculate(x, ...)
+
+## S7 method for class <ti::segment_cohort>
+calculate(x, ...)
+
+## S7 method for class <ti::segment_abc>
+calculate(x, ...)
+}
 \arguments{
 \item{x}{ti object}
+
+\item{...}{Not used.}
 }
 \value{
 dbi object

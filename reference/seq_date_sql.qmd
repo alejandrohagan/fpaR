@@ -1,12 +1,17 @@
 ---
-title: "seq_date_sql"
+title: "Generate a Cross-Dialect SQL Date Series"
+pagetitle: "Generate a Cross-Dialect SQL Date Series — seq_date_sql"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R#L716)
+::: {.qrtdown-source .dont-index}
+Source: [`R/utils-misc.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R)
+:::
 
-# `seq_date_sql()`
-
-Generate a Cross-Dialect SQL Date Series
+<p>Creates a lazy <code>dbplyr</code> table containing a continuous sequence of dates.
+The function automatically detects the SQL dialect of the connection and
+dispatches the most efficient native series generator (e.g., <code>GENERATE_SERIES</code>
+for DuckDB/Postgres or <code>GENERATOR</code> for Snowflake).
+</p>
 
 ## Usage
 
@@ -24,33 +29,37 @@ seq_date_sql(
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `.con` | A valid DBI connection object (e.g., DuckDB, Postgres, Snowflake) or a `dbplyr` simulated connection. |
-| `start_date` | A character string in 'YYYY-MM-DD' format or a Date object representing the start of the series. |
-| `end_date` | A character string in 'YYYY-MM-DD' format or a Date object representing the end of the series. |
-| `time_unit` | A character string specifying the interval. Must be one of: `"day"`, `"week"`, `"month"`, `"quarter"`, or `"year"`. |
-| `week_start` | description |
+<dl class="qrtdown-arguments">
+<dt id="arg-con"><code>.con</code><a class="anchor" aria-label="anchor" href="#arg-con"></a></dt>
+<dd><p>A valid DBI connection object (e.g., DuckDB, Postgres, Snowflake)
+or a <code>dbplyr</code> simulated connection.</p></dd>
+<dt id="arg-start-date"><code>start_date</code><a class="anchor" aria-label="anchor" href="#arg-start-date"></a></dt>
+<dd><p>A character string in 'YYYY-MM-DD' format or a Date object
+representing the start of the series.</p></dd>
+<dt id="arg-end-date"><code>end_date</code><a class="anchor" aria-label="anchor" href="#arg-end-date"></a></dt>
+<dd><p>A character string in 'YYYY-MM-DD' format or a Date object
+representing the end of the series.</p></dd>
+<dt id="arg-time-unit"><code>time_unit</code><a class="anchor" aria-label="anchor" href="#arg-time-unit"></a></dt>
+<dd><p>A character string specifying the interval. Must be one of:
+<code>"day"</code>, <code>"week"</code>, <code>"month"</code>, <code>"quarter"</code>, or <code>"year"</code>.</p></dd>
+<dt id="arg-week-start"><code>week_start</code><a class="anchor" aria-label="anchor" href="#arg-week-start"></a></dt>
+<dd><p>description</p></dd>
+</dl>
 
 ## Value
 
-A `tbl_lazy` (SQL) object with a single column `date`.
-
-## Description
-
-Creates a lazy `dbplyr` table containing a continuous sequence of dates.
-The function automatically detects the SQL dialect of the connection and
-dispatches the most efficient native series generator (e.g., `GENERATE_SERIES`
-for DuckDB/Postgres or `GENERATOR` for Snowflake).
+<p>A <code>tbl_lazy</code> (SQL) object with a single column <code>date</code>.
+</p>
 
 ## Details
 
-This function is designed to be "nestable," meaning the resulting SQL can be
-used safely inside larger `dplyr` pipelines. It avoids `WITH` clauses in
-dialects like DuckDB to prevent parser errors when `dbplyr` wraps the query
-in a subquery (e.g., SELECT * FROM (...) AS q01).
-
-For unit testing, the function supports `dbplyr` simulation objects. If a
-`TestConnection` is detected, it returns a `lazy_frame` to avoid metadata
+<p>This function is designed to be "nestable," meaning the resulting SQL can be
+used safely inside larger <code>dplyr</code> pipelines. It avoids <code>WITH</code> clauses in
+dialects like DuckDB to prevent parser errors when <code>dbplyr</code> wraps the query
+in a subquery (e.g., <code style="white-space: pre;">⁠SELECT * FROM (...) AS q01⁠</code>).
+</p>
+<p>For unit testing, the function supports <code>dbplyr</code> simulation objects. If a
+<code>TestConnection</code> is detected, it returns a <code>lazy_frame</code> to avoid metadata
 field queries that would otherwise fail on a mock connection.
+</p>
 

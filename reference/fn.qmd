@@ -1,0 +1,57 @@
+---
+title: "Function class"
+pagetitle: "Function class — fn"
+---
+
+::: {.qrtdown-source .dont-index}
+Source: [`R/classes.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/classes.R)
+:::
+
+<p><code>fn</code> is the blueprint half of a lazy time-intelligence object. It holds the
+transformation to run (<a href="fn.qmd">fn_exec</a>) plus the metadata that describes it,
+which is what lets <code><a href="ytd.qmd">ytd()</a></code> and friends return an object cheaply and defer the
+real work to <code><a href="calculate.qmd">calculate()</a></code>.
+</p>
+
+## Usage
+
+```r
+fn(
+  fn_exec = function() NULL,
+  fn_name = NA_character_,
+  fn_long_name = NA_character_,
+  shift = NA_character_,
+  compare = NA_character_,
+  label = FALSE,
+  new_date_column_name = NA_character_,
+  lag_n = 0
+)
+```
+
+## Arguments
+
+<dl class="qrtdown-arguments">
+<dt id="arg-fn-exec"><code>fn_exec</code><a class="anchor" aria-label="anchor" href="#arg-fn-exec"></a></dt>
+<dd><p>A function taking a <code>ti</code> object and returning the transformed
+table.</p></dd>
+<dt id="arg-fn-name"><code>fn_name</code><a class="anchor" aria-label="anchor" href="#arg-fn-name"></a></dt>
+<dd><p>Short name of the calculation, e.g. <code>"ytd"</code>.</p></dd>
+<dt id="arg-fn-long-name"><code>fn_long_name</code><a class="anchor" aria-label="anchor" href="#arg-fn-long-name"></a></dt>
+<dd><p>Human-readable name, e.g. <code>"year to date"</code>.</p></dd>
+<dt id="arg-shift"><code>shift</code><a class="anchor" aria-label="anchor" href="#arg-shift"></a></dt>
+<dd><p>The period the calculation shifts by, e.g. <code>"year"</code>.</p></dd>
+<dt id="arg-compare"><code>compare</code><a class="anchor" aria-label="anchor" href="#arg-compare"></a></dt>
+<dd><p>The period the calculation compares against.</p></dd>
+<dt id="arg-label"><code>label</code><a class="anchor" aria-label="anchor" href="#arg-label"></a></dt>
+<dd><p>Whether the calculation adds a period label column.</p></dd>
+<dt id="arg-new-date-column-name"><code>new_date_column_name</code><a class="anchor" aria-label="anchor" href="#arg-new-date-column-name"></a></dt>
+<dd><p>Name of the date column the calculation creates.</p></dd>
+<dt id="arg-lag-n"><code>lag_n</code><a class="anchor" aria-label="anchor" href="#arg-lag-n"></a></dt>
+<dd><p>Number of periods to lag by.</p></dd>
+</dl>
+
+## Value
+
+<p>An <code>fn</code> S7 object.
+</p>
+

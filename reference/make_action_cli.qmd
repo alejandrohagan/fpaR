@@ -1,12 +1,14 @@
 ---
-title: "make_action_cli"
+title: "Make Action field CLI args"
+pagetitle: "Make Action field CLI args — make_action_cli"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R#L52)
+::: {.qrtdown-source .dont-index}
+Source: [`R/utils-misc.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R)
+:::
 
-# `make_action_cli()`
-
-Make Action field CLI args
+<p>Make Action field CLI args
+</p>
 
 ## Usage
 
@@ -16,11 +18,13 @@ make_action_cli(x)
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `x` | action class |
+<dl class="qrtdown-arguments">
+<dt id="arg-x"><code>x</code><a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>action class</p></dd>
+</dl>
 
 ## Value
 
-list
+<p>list
+</p>
 

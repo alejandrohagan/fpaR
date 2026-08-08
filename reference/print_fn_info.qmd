@@ -1,12 +1,14 @@
 ---
-title: "print_fn_info"
+title: "Prints function header info"
+pagetitle: "Prints function header info — print_fn_info"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R#L78)
+::: {.qrtdown-source .dont-index}
+Source: [`R/utils-misc.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R)
+:::
 
-# `print_fn_info()`
-
-Prints function header info
+<p>Prints function header info
+</p>
 
 ## Usage
 
@@ -16,11 +18,13 @@ print_fn_info(x)
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `x` | ti or segment obj |
+<dl class="qrtdown-arguments">
+<dt id="arg-x"><code>x</code><a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>ti or segment obj</p></dd>
+</dl>
 
 ## Value
 
-print
+<p>print
+</p>
 

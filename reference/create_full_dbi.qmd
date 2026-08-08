@@ -1,12 +1,14 @@
 ---
-title: "create_full_dbi"
+title: "Title"
+pagetitle: "Title — create_full_dbi"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R#L513)
+::: {.qrtdown-source .dont-index}
+Source: [`R/utils-misc.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R)
+:::
 
-# `create_full_dbi()`
-
-Title
+<p>Title
+</p>
 
 ## Usage
 
@@ -16,11 +18,13 @@ create_full_dbi(x)
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `x` | ti object |
+<dl class="qrtdown-arguments">
+<dt id="arg-x"><code>x</code><a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>ti object</p></dd>
+</dl>
 
 ## Value
 
-DBI object
+<p>DBI object
+</p>
 

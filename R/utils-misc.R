@@ -523,12 +523,6 @@ create_full_dbi <- function(x){
 
 }
 
-#' Make an in memory database from a table
-#'
-#' @param x tibble or dbi object
-#' @export
-#' @returns dbi object
-#' @keywords internal
 #' Coerce data into a DuckDB-backed lazy table
 #'
 #' @description
@@ -537,7 +531,8 @@ create_full_dbi <- function(x){
 #' a `tbl_dbi`, it is returned unchanged.
 #'
 #' @param x A tibble, data.frame, or tbl_dbi object.
-#' @return A \code{tbl_dbi} object backed by DuckDB.
+#' @returns A \code{tbl_dbi} object backed by DuckDB.
+#' @export
 #'
 #' @details
 #' When converting a data.frame, this function preserves existing \code{dplyr}

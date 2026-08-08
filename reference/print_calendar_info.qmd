@@ -1,12 +1,14 @@
 ---
-title: "print_calendar_info"
+title: "Print calendar information block"
+pagetitle: "Print calendar information block — print_calendar_info"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R#L93)
+::: {.qrtdown-source .dont-index}
+Source: [`R/utils-misc.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R)
+:::
 
-# `print_calendar_info()`
-
-Print calendar information block
+<p>Print calendar information block
+</p>
 
 ## Usage
 
@@ -16,11 +18,13 @@ print_calendar_info(x)
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `x` | ti or segment obj |
+<dl class="qrtdown-arguments">
+<dt id="arg-x"><code>x</code><a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>ti or segment obj</p></dd>
+</dl>
 
 ## Value
 
-print
+<p>print
+</p>
 

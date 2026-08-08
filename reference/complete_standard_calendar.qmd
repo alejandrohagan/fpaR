@@ -1,12 +1,14 @@
 ---
-title: "complete_standard_calendar"
+title: "Title"
+pagetitle: "Title — complete_standard_calendar"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R#L447)
+::: {.qrtdown-source .dont-index}
+Source: [`R/utils-misc.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R)
+:::
 
-# `complete_standard_calendar()`
-
-Title
+<p>Title
+</p>
 
 ## Usage
 
@@ -16,12 +18,15 @@ complete_standard_calendar(.data, x)
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `.data` | DBI object |
-| `x` | ti object |
+<dl class="qrtdown-arguments">
+<dt id="arg-data"><code>.data</code><a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
+<dd><p>DBI object</p></dd>
+<dt id="arg-x"><code>x</code><a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>ti object</p></dd>
+</dl>
 
 ## Value
 
-DBI object
+<p>DBI object
+</p>
 

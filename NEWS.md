@@ -1,7 +1,27 @@
-# ti 4.2.0
+# ti 4.2.1
 
 ## Bug Fixes
-- Fixed test compatibility with contoso >= 2.1.0 (`margin` renamed to `gross_margin`)
+- Restored `calculate()` and `create_calendar()` to NAMESPACE. roxygen2 8.0.0 no
+  longer emits an export from `@export` on an `S7::method()<-` block, so both
+  generics were silently dropped and every call failed with "'calculate' is not
+  an exported object from 'namespace:ti'"
+- Removed the incorrect `export(print)` directive; the `print()` methods are
+  registered at load time by `S7::methods_register()`
+
+## Documentation
+- Documented the S7 generics on their `new_generic()` definitions, per
+  `vignette("rd-S7", package = "roxygen2")`
+- Documented all S7 classes, using `@prop` for read-only computed properties
+- Merged two roxygen blocks in `R/utils-misc.R` that had run together
+
+# ti 4.2.0
+
+This release fixes the check ERRORs that led to 'ti' being archived on CRAN on
+2026-04-06. It was never published to CRAN; its changes reach users in 4.2.1.
+
+## Bug Fixes
+- Fixed test compatibility with contoso >= 2.1.0 (`margin` renamed to `gross_margin`).
+  This was the cause of the CRAN check ERRORs in 4.0.0.
 - Fixed ABC temp table naming to prevent collisions in parallel usage
 - Fixed example in `abc()` documentation using old column name
 

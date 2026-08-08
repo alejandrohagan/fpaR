@@ -1,0 +1,97 @@
+---
+title: "Datum class"
+pagetitle: "Datum class — datum"
+---
+
+::: {.qrtdown-source .dont-index}
+Source: [`R/classes.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/classes.R)
+:::
+
+<p><code>datum</code> wraps the user's table together with the metadata every
+time-intelligence function needs: which column holds the date, what calendar
+the dates should be interpreted against, and how the table is grouped. Most
+of its properties are read-only and computed on access from <code>data</code> and
+<code>date_vec</code>, so they always reflect the current table.
+</p>
+
+## Usage
+
+```r
+datum(
+  data = NULL,
+  calendar_type = "standard",
+  fiscal_year_start = 1,
+  date_vec = NULL
+)
+```
+
+## Arguments
+
+<dl class="qrtdown-arguments">
+<dt id="arg-data"><code>data</code><a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
+<dd><p>A <code>data.frame</code> or <code>tbl_dbi</code>. Converted to a lazy table with
+<code><a href="make_db_tbl.qmd">make_db_tbl()</a></code> on assignment.</p></dd>
+<dt id="arg-calendar-type"><code>calendar_type</code><a class="anchor" aria-label="anchor" href="#arg-calendar-type"></a></dt>
+<dd><p>One of <code>"standard"</code>, <code>"445"</code>, <code>"454"</code> or <code>"544"</code>.
+Lower-cased on assignment.</p></dd>
+<dt id="arg-fiscal-year-start"><code>fiscal_year_start</code><a class="anchor" aria-label="anchor" href="#arg-fiscal-year-start"></a></dt>
+<dd><p>Integer between 1 and 12 giving the month the fiscal
+year starts in.</p></dd>
+<dt id="arg-date-vec"><code>date_vec</code><a class="anchor" aria-label="anchor" href="#arg-date-vec"></a></dt>
+<dd><p>The name of the date column, as a string.</p></dd>
+</dl>
+
+## Value
+
+<p>A <code>datum</code> S7 object.
+</p>
+
+## Additional properties
+
+<dl>
+<dt><code>@class_name</code></dt>
+<dd>
+<p><code>"dbi"</code> if <code>data</code> is a database table, otherwise <code>"tbl"</code>.</p>
+</dd>
+<dt><code>@date_quo</code></dt>
+<dd>
+<p><code>date_vec</code> parsed to a symbol for tidy evaluation.</p>
+</dd>
+<dt><code>@min_date</code></dt>
+<dd>
+<p>The earliest value of the date column.</p>
+</dd>
+<dt><code>@max_date</code></dt>
+<dd>
+<p>The latest value of the date column.</p>
+</dd>
+<dt><code>@date_range</code></dt>
+<dd>
+<p>Number of days between <code>min_date</code> and <code>max_date</code>.</p>
+</dd>
+<dt><code>@date_count</code></dt>
+<dd>
+<p>Number of distinct dates present in the date column.</p>
+</dd>
+<dt><code>@date_missing</code></dt>
+<dd>
+<p><code>date_range</code> minus <code>date_count</code>, i.e. gaps in the calendar.</p>
+</dd>
+<dt><code>@group_indicator</code></dt>
+<dd>
+<p><code>TRUE</code> if <code>data</code> carries grouping variables.</p>
+</dd>
+<dt><code>@group_quo</code></dt>
+<dd>
+<p>The grouping variables as a list of symbols.</p>
+</dd>
+<dt><code>@group_vec</code></dt>
+<dd>
+<p>The grouping variables as a character vector.</p>
+</dd>
+<dt><code>@group_count</code></dt>
+<dd>
+<p>Number of grouping variables.</p>
+</dd>
+</dl>
+

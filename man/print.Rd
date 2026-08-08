@@ -3,6 +3,16 @@
 \name{print}
 \alias{print}
 \title{Print ti objects}
+\usage{
+## S7 method for class <ti::ti>
+print(x, ...)
+
+## S7 method for class <ti::segment_abc>
+print(x, ...)
+
+## S7 method for class <ti::segment_cohort>
+print(x, ...)
+}
 \arguments{
 \item{x}{A \code{ti} object.}
 

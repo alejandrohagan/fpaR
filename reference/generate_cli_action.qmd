@@ -1,12 +1,14 @@
 ---
-title: "generate_cli_action"
+title: "Generate CLI actions"
+pagetitle: "Generate CLI actions — generate_cli_action"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R#L25)
+::: {.qrtdown-source .dont-index}
+Source: [`R/utils-misc.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/utils-misc.R)
+:::
 
-# `generate_cli_action()`
-
-Generate CLI actions
+<p>Generate CLI actions
+</p>
 
 ## Usage
 
@@ -16,12 +18,15 @@ generate_cli_action(x, word)
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `x` | input to test against |
-| `word` | the key word to validate |
+<dl class="qrtdown-arguments">
+<dt id="arg-x"><code>x</code><a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>input to test against</p></dd>
+<dt id="arg-word"><code>word</code><a class="anchor" aria-label="anchor" href="#arg-word"></a></dt>
+<dd><p>the key word to validate</p></dd>
+</dl>
 
 ## Value
 
-list
+<p>list
+</p>
 

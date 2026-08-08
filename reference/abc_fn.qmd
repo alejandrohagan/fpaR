@@ -1,12 +1,15 @@
 ---
-title: "abc_fn"
+title: "Classify a group by proportion of a variable (A,B,C,...)"
+pagetitle: "Classify a group by proportion of a variable (A,B,C,...) — abc_fn"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/ti/src/branch/main/R/abc.R#L80)
+::: {.qrtdown-source .dont-index}
+Source: [`R/abc.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/abc.R)
+:::
 
-# `abc_fn()`
-
-Classify a group by proportion of a variable (A,B,C,...)
+<p>This returns a table that will segment your data into A,B or C segments based on custom
+thresholds
+</p>
 
 ## Usage
 
@@ -16,16 +19,13 @@ abc_fn(x)
 
 ## Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `x` | segment object |
+<dl class="qrtdown-arguments">
+<dt id="arg-x"><code>x</code><a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>segment object</p></dd>
+</dl>
 
 ## Value
 
-a dbi objection
-
-## Description
-
-This returns a table that will segment your data into A,B or C segments based on custom
-thresholds
+<p>a dbi objection
+</p>
 

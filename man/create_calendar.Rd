@@ -2,9 +2,18 @@
 % Please edit documentation in R/methods.R
 \name{create_calendar}
 \alias{create_calendar}
+\alias{create_calendar,ti::ti-method}
 \title{Create Calendar Table}
+\usage{
+create_calendar(x, ...)
+
+## S7 method for class <ti::ti>
+create_calendar(x, ...)
+}
 \arguments{
 \item{x}{ti object}
+
+\item{...}{Not used.}
 }
 \value{
 dbi object

@@ -1,0 +1,36 @@
+---
+title: "Category class"
+pagetitle: "Category class — category"
+---
+
+::: {.qrtdown-source .dont-index}
+Source: [`R/classes.R`](https://codeberg.org/usrbinr/ti/src/branch/main/R/classes.R)
+:::
+
+<p><code>category</code> holds the cumulative cut-points used by <code><a href="abc.qmd">abc()</a></code> to bucket group
+members. Assigning <code>category_names</code> derives one letter per cut-point from
+<code>category_values</code>, so the default three cut-points become <code>a</code>, <code>b</code> and <code>c</code>.
+</p>
+
+## Usage
+
+```r
+category(category_values = c(0.7, 0.96, 1), category_names = NULL)
+```
+
+## Arguments
+
+<dl class="qrtdown-arguments">
+<dt id="arg-category-values"><code>category_values</code><a class="anchor" aria-label="anchor" href="#arg-category-values"></a></dt>
+<dd><p>Numeric cumulative cut-points, all <code style="white-space: pre;">⁠&lt;= 1⁠</code>. Defaults to
+<code>c(0.7, 0.96, 1)</code>.</p></dd>
+<dt id="arg-category-names"><code>category_names</code><a class="anchor" aria-label="anchor" href="#arg-category-names"></a></dt>
+<dd><p>Bucket labels; derived from the length of
+<code>category_values</code> on assignment.</p></dd>
+</dl>
+
+## Value
+
+<p>A <code>category</code> S7 object.
+</p>
+
