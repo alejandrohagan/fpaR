@@ -291,6 +291,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="./articles/cohort.html">
  <span class="dropdown-text">Cohort</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="./articles/databases.html">
+ <span class="dropdown-text">Working with Databases</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./articles/groups.html">
+ <span class="dropdown-text">Working with Groups</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./articles/index.html">
+ <span class="dropdown-text">More articles… (2 more)</span></a>
+  </li>  
     </ul>
 </li>
   <li class="nav-item">
@@ -346,10 +358,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Alejandro Hagan (author, maintainer)</li>
 </ul></section>
 </div></div>
-<section id="ti" class="level1 page-columns page-full"><h1>ti</h1>
 <p><img src="man/figures/ti_logo.png" align="right" width="120"></p>
 <section id="a-business-intelligence-toolkit-for-financial-planning-analysis-fpa" class="level2"><h2 class="anchored" data-anchor-id="a-business-intelligence-toolkit-for-financial-planning-analysis-fpa">A Business Intelligence Toolkit for Financial Planning &amp; Analysis (FP&amp;A)</h2>
-<p><code>ti</code> package is a collection of business intelligence tools designed to simplify common <strong>financial planning and analysis (FP&amp;A)</strong> tasks such as time intelligence calculations, group member segmentation and factor/variance analysis.</p>
+<p><code>ti</code> package is a collection of business intelligence tools designed to simplify common <strong>financial planning and analysis (FP&amp;A)</strong> tasks such as time intelligence calculations and group member segmentation.</p>
 <p>The package is inspired by best practices from a collection of blogs, books, industry research, and hands-on work experience, consolidating frequently performed business analyses into a fast, efficient, and reusable framework.</p>
 <p>In particular, the time intelligence functions are heavily inspired by <a href="https://www.sqlbi.com/" class="external-link">PowerBI DAX</a> functions.</p>
 <p>Under the hood, these functions are built upon the great foundations of:</p>
@@ -358,7 +369,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><a href="https://github.com/duckdb/duckdb-r" class="external-link">duckdb</a></li>
 <li><a href="https://lubridate.tidyverse.org/" class="external-link">lubridate</a></li>
 </ul>
-<p>All functions are designed to work with either tibbles or modern databases (DuckDB, Snowflake, SQLite, etc) with a unified syntax.</p>
+<p>All functions are designed to work with either tibbles or a database backend with a unified syntax. Dialect-specific date arithmetic is generated for DuckDB, Snowflake and Postgres; other <code>dbplyr</code> backends fall back to the DuckDB dialect and may need testing.</p>
 <p>Even if you are working with tibbles, all functions are optimized to leverage <a href="https://github.com/duckdb/duckdb-r" class="external-link">DuckDB</a> for increased speed and performance<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <p>By default, all functions return a lazy DBI object which you can return as a tibble with <a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link"><code>dplyr::collect()</code></a></p>
 </section><section id="key-features-benefits" class="level2"><h2 class="anchored" data-anchor-id="key-features-benefits">Key features &amp; benefits</h2>
@@ -407,24 +418,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 Table 1
 </figcaption><div aria-describedby="tbl-ti-fn-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="hdpjbanctc" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="aubpxkrvzd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>@import url("https://fonts.googleapis.com/css2?family=Fira+Code:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
-#hdpjbanctc table {
+#aubpxkrvzd table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#hdpjbanctc thead, #hdpjbanctc tbody, #hdpjbanctc tfoot, #hdpjbanctc tr, #hdpjbanctc td, #hdpjbanctc th {
+#aubpxkrvzd thead, #aubpxkrvzd tbody, #aubpxkrvzd tfoot, #aubpxkrvzd tr, #aubpxkrvzd td, #aubpxkrvzd th {
   border-style: none;
 }
 
-#hdpjbanctc p {
+#aubpxkrvzd p {
   margin: 0;
   padding: 0;
 }
 
-#hdpjbanctc .gt_table {
+#aubpxkrvzd .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -450,12 +461,12 @@ Table 1
   border-left-color: #D3D3D3;
 }
 
-#hdpjbanctc .gt_caption {
+#aubpxkrvzd .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#hdpjbanctc .gt_title {
+#aubpxkrvzd .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -467,7 +478,7 @@ Table 1
   border-bottom-width: 0;
 }
 
-#hdpjbanctc .gt_subtitle {
+#aubpxkrvzd .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -479,7 +490,7 @@ Table 1
   border-top-width: 0;
 }
 
-#hdpjbanctc .gt_heading {
+#aubpxkrvzd .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -491,13 +502,13 @@ Table 1
   border-right-color: #D3D3D3;
 }
 
-#hdpjbanctc .gt_bottom_border {
+#aubpxkrvzd .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hdpjbanctc .gt_col_headings {
+#aubpxkrvzd .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -512,7 +523,7 @@ Table 1
   border-right-color: #D3D3D3;
 }
 
-#hdpjbanctc .gt_col_heading {
+#aubpxkrvzd .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -532,7 +543,7 @@ Table 1
   overflow-x: hidden;
 }
 
-#hdpjbanctc .gt_column_spanner_outer {
+#aubpxkrvzd .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -544,15 +555,15 @@ Table 1
   padding-right: 4px;
 }
 
-#hdpjbanctc .gt_column_spanner_outer:first-child {
+#aubpxkrvzd .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hdpjbanctc .gt_column_spanner_outer:last-child {
+#aubpxkrvzd .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hdpjbanctc .gt_column_spanner {
+#aubpxkrvzd .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -564,11 +575,11 @@ Table 1
   width: 100%;
 }
 
-#hdpjbanctc .gt_spanner_row {
+#aubpxkrvzd .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#hdpjbanctc .gt_group_heading {
+#aubpxkrvzd .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -594,7 +605,7 @@ Table 1
   text-align: left;
 }
 
-#hdpjbanctc .gt_empty_group_heading {
+#aubpxkrvzd .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -609,15 +620,15 @@ Table 1
   vertical-align: middle;
 }
 
-#hdpjbanctc .gt_from_md > :first-child {
+#aubpxkrvzd .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hdpjbanctc .gt_from_md > :last-child {
+#aubpxkrvzd .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hdpjbanctc .gt_row {
+#aubpxkrvzd .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -636,7 +647,7 @@ Table 1
   overflow-x: hidden;
 }
 
-#hdpjbanctc .gt_stub {
+#aubpxkrvzd .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -649,7 +660,7 @@ Table 1
   padding-right: 5px;
 }
 
-#hdpjbanctc .gt_stub_row_group {
+#aubpxkrvzd .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -663,15 +674,15 @@ Table 1
   vertical-align: top;
 }
 
-#hdpjbanctc .gt_row_group_first td {
+#aubpxkrvzd .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#hdpjbanctc .gt_row_group_first th {
+#aubpxkrvzd .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#hdpjbanctc .gt_summary_row {
+#aubpxkrvzd .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -681,16 +692,16 @@ Table 1
   padding-right: 5px;
 }
 
-#hdpjbanctc .gt_first_summary_row {
+#aubpxkrvzd .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#hdpjbanctc .gt_first_summary_row.thick {
+#aubpxkrvzd .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#hdpjbanctc .gt_last_summary_row {
+#aubpxkrvzd .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -700,7 +711,7 @@ Table 1
   border-bottom-color: #D3D3D3;
 }
 
-#hdpjbanctc .gt_grand_summary_row {
+#aubpxkrvzd .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -710,7 +721,7 @@ Table 1
   padding-right: 5px;
 }
 
-#hdpjbanctc .gt_first_grand_summary_row {
+#aubpxkrvzd .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -720,7 +731,7 @@ Table 1
   border-top-color: #D3D3D3;
 }
 
-#hdpjbanctc .gt_last_grand_summary_row_top {
+#aubpxkrvzd .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -730,11 +741,11 @@ Table 1
   border-bottom-color: #D3D3D3;
 }
 
-#hdpjbanctc .gt_striped {
+#aubpxkrvzd .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hdpjbanctc .gt_table_body {
+#aubpxkrvzd .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -743,7 +754,7 @@ Table 1
   border-bottom-color: #D3D3D3;
 }
 
-#hdpjbanctc .gt_footnotes {
+#aubpxkrvzd .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -757,7 +768,7 @@ Table 1
   border-right-color: #D3D3D3;
 }
 
-#hdpjbanctc .gt_footnote {
+#aubpxkrvzd .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -766,7 +777,7 @@ Table 1
   padding-right: 5px;
 }
 
-#hdpjbanctc .gt_sourcenotes {
+#aubpxkrvzd .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -780,7 +791,7 @@ Table 1
   border-right-color: #D3D3D3;
 }
 
-#hdpjbanctc .gt_sourcenote {
+#aubpxkrvzd .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -788,72 +799,72 @@ Table 1
   padding-right: 5px;
 }
 
-#hdpjbanctc .gt_left {
+#aubpxkrvzd .gt_left {
   text-align: left;
 }
 
-#hdpjbanctc .gt_center {
+#aubpxkrvzd .gt_center {
   text-align: center;
 }
 
-#hdpjbanctc .gt_right {
+#aubpxkrvzd .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hdpjbanctc .gt_font_normal {
+#aubpxkrvzd .gt_font_normal {
   font-weight: normal;
 }
 
-#hdpjbanctc .gt_font_bold {
+#aubpxkrvzd .gt_font_bold {
   font-weight: bold;
 }
 
-#hdpjbanctc .gt_font_italic {
+#aubpxkrvzd .gt_font_italic {
   font-style: italic;
 }
 
-#hdpjbanctc .gt_super {
+#aubpxkrvzd .gt_super {
   font-size: 65%;
 }
 
-#hdpjbanctc .gt_footnote_marks {
+#aubpxkrvzd .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#hdpjbanctc .gt_asterisk {
+#aubpxkrvzd .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#hdpjbanctc .gt_indent_1 {
+#aubpxkrvzd .gt_indent_1 {
   text-indent: 5px;
 }
 
-#hdpjbanctc .gt_indent_2 {
+#aubpxkrvzd .gt_indent_2 {
   text-indent: 10px;
 }
 
-#hdpjbanctc .gt_indent_3 {
+#aubpxkrvzd .gt_indent_3 {
   text-indent: 15px;
 }
 
-#hdpjbanctc .gt_indent_4 {
+#aubpxkrvzd .gt_indent_4 {
   text-indent: 20px;
 }
 
-#hdpjbanctc .gt_indent_5 {
+#aubpxkrvzd .gt_indent_5 {
   text-indent: 25px;
 }
 
-#hdpjbanctc .katex-display {
+#aubpxkrvzd .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#hdpjbanctc div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#aubpxkrvzd div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1039,24 +1050,24 @@ Table 1
 Table 2
 </figcaption><div aria-describedby="tbl-abc-fn-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca" class="page-columns page-full">
 <div class="cell-output-display column-screen">
-<div id="kihrifbxiw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="mgvimcindo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>@import url("https://fonts.googleapis.com/css2?family=Fira+Code:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
-#kihrifbxiw table {
+#mgvimcindo table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#kihrifbxiw thead, #kihrifbxiw tbody, #kihrifbxiw tfoot, #kihrifbxiw tr, #kihrifbxiw td, #kihrifbxiw th {
+#mgvimcindo thead, #mgvimcindo tbody, #mgvimcindo tfoot, #mgvimcindo tr, #mgvimcindo td, #mgvimcindo th {
   border-style: none;
 }
 
-#kihrifbxiw p {
+#mgvimcindo p {
   margin: 0;
   padding: 0;
 }
 
-#kihrifbxiw .gt_table {
+#mgvimcindo .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1082,12 +1093,12 @@ Table 2
   border-left-color: #D3D3D3;
 }
 
-#kihrifbxiw .gt_caption {
+#mgvimcindo .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#kihrifbxiw .gt_title {
+#mgvimcindo .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1099,7 +1110,7 @@ Table 2
   border-bottom-width: 0;
 }
 
-#kihrifbxiw .gt_subtitle {
+#mgvimcindo .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1111,7 +1122,7 @@ Table 2
   border-top-width: 0;
 }
 
-#kihrifbxiw .gt_heading {
+#mgvimcindo .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1123,13 +1134,13 @@ Table 2
   border-right-color: #D3D3D3;
 }
 
-#kihrifbxiw .gt_bottom_border {
+#mgvimcindo .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#kihrifbxiw .gt_col_headings {
+#mgvimcindo .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1144,7 +1155,7 @@ Table 2
   border-right-color: #D3D3D3;
 }
 
-#kihrifbxiw .gt_col_heading {
+#mgvimcindo .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1164,7 +1175,7 @@ Table 2
   overflow-x: hidden;
 }
 
-#kihrifbxiw .gt_column_spanner_outer {
+#mgvimcindo .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1176,15 +1187,15 @@ Table 2
   padding-right: 4px;
 }
 
-#kihrifbxiw .gt_column_spanner_outer:first-child {
+#mgvimcindo .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#kihrifbxiw .gt_column_spanner_outer:last-child {
+#mgvimcindo .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#kihrifbxiw .gt_column_spanner {
+#mgvimcindo .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1196,11 +1207,11 @@ Table 2
   width: 100%;
 }
 
-#kihrifbxiw .gt_spanner_row {
+#mgvimcindo .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#kihrifbxiw .gt_group_heading {
+#mgvimcindo .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1226,7 +1237,7 @@ Table 2
   text-align: left;
 }
 
-#kihrifbxiw .gt_empty_group_heading {
+#mgvimcindo .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1241,15 +1252,15 @@ Table 2
   vertical-align: middle;
 }
 
-#kihrifbxiw .gt_from_md > :first-child {
+#mgvimcindo .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#kihrifbxiw .gt_from_md > :last-child {
+#mgvimcindo .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#kihrifbxiw .gt_row {
+#mgvimcindo .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1268,7 +1279,7 @@ Table 2
   overflow-x: hidden;
 }
 
-#kihrifbxiw .gt_stub {
+#mgvimcindo .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1281,7 +1292,7 @@ Table 2
   padding-right: 5px;
 }
 
-#kihrifbxiw .gt_stub_row_group {
+#mgvimcindo .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1295,15 +1306,15 @@ Table 2
   vertical-align: top;
 }
 
-#kihrifbxiw .gt_row_group_first td {
+#mgvimcindo .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#kihrifbxiw .gt_row_group_first th {
+#mgvimcindo .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#kihrifbxiw .gt_summary_row {
+#mgvimcindo .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1313,16 +1324,16 @@ Table 2
   padding-right: 5px;
 }
 
-#kihrifbxiw .gt_first_summary_row {
+#mgvimcindo .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#kihrifbxiw .gt_first_summary_row.thick {
+#mgvimcindo .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#kihrifbxiw .gt_last_summary_row {
+#mgvimcindo .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1332,7 +1343,7 @@ Table 2
   border-bottom-color: #D3D3D3;
 }
 
-#kihrifbxiw .gt_grand_summary_row {
+#mgvimcindo .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1342,7 +1353,7 @@ Table 2
   padding-right: 5px;
 }
 
-#kihrifbxiw .gt_first_grand_summary_row {
+#mgvimcindo .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1352,7 +1363,7 @@ Table 2
   border-top-color: #D3D3D3;
 }
 
-#kihrifbxiw .gt_last_grand_summary_row_top {
+#mgvimcindo .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1362,11 +1373,11 @@ Table 2
   border-bottom-color: #D3D3D3;
 }
 
-#kihrifbxiw .gt_striped {
+#mgvimcindo .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#kihrifbxiw .gt_table_body {
+#mgvimcindo .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1375,7 +1386,7 @@ Table 2
   border-bottom-color: #D3D3D3;
 }
 
-#kihrifbxiw .gt_footnotes {
+#mgvimcindo .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1389,7 +1400,7 @@ Table 2
   border-right-color: #D3D3D3;
 }
 
-#kihrifbxiw .gt_footnote {
+#mgvimcindo .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1398,7 +1409,7 @@ Table 2
   padding-right: 5px;
 }
 
-#kihrifbxiw .gt_sourcenotes {
+#mgvimcindo .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1412,7 +1423,7 @@ Table 2
   border-right-color: #D3D3D3;
 }
 
-#kihrifbxiw .gt_sourcenote {
+#mgvimcindo .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1420,72 +1431,72 @@ Table 2
   padding-right: 5px;
 }
 
-#kihrifbxiw .gt_left {
+#mgvimcindo .gt_left {
   text-align: left;
 }
 
-#kihrifbxiw .gt_center {
+#mgvimcindo .gt_center {
   text-align: center;
 }
 
-#kihrifbxiw .gt_right {
+#mgvimcindo .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#kihrifbxiw .gt_font_normal {
+#mgvimcindo .gt_font_normal {
   font-weight: normal;
 }
 
-#kihrifbxiw .gt_font_bold {
+#mgvimcindo .gt_font_bold {
   font-weight: bold;
 }
 
-#kihrifbxiw .gt_font_italic {
+#mgvimcindo .gt_font_italic {
   font-style: italic;
 }
 
-#kihrifbxiw .gt_super {
+#mgvimcindo .gt_super {
   font-size: 65%;
 }
 
-#kihrifbxiw .gt_footnote_marks {
+#mgvimcindo .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#kihrifbxiw .gt_asterisk {
+#mgvimcindo .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#kihrifbxiw .gt_indent_1 {
+#mgvimcindo .gt_indent_1 {
   text-indent: 5px;
 }
 
-#kihrifbxiw .gt_indent_2 {
+#mgvimcindo .gt_indent_2 {
   text-indent: 10px;
 }
 
-#kihrifbxiw .gt_indent_3 {
+#mgvimcindo .gt_indent_3 {
   text-indent: 15px;
 }
 
-#kihrifbxiw .gt_indent_4 {
+#mgvimcindo .gt_indent_4 {
   text-indent: 20px;
 }
 
-#kihrifbxiw .gt_indent_5 {
+#mgvimcindo .gt_indent_5 {
   text-indent: 25px;
 }
 
-#kihrifbxiw .katex-display {
+#mgvimcindo .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#kihrifbxiw div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#mgvimcindo div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1528,7 +1539,7 @@ Table 2
 </section></section></section><section id="additional-references-and-inspirations" class="level2"><h2 class="anchored" data-anchor-id="additional-references-and-inspirations">Additional references and inspirations</h2>
 <ul>
 <li><a href="https://github.com/PeerChristensen/cohorts" class="external-link">PeerChristensen’s Cohort Package</a></li>
-</ul></section></section><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+</ul></section><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
 <li id="fn1"><p>I plan to use <a href="https://duckplyr.tidyverse.org/index.html" class="external-link">duckplyr</a> once it expands support for lubridate functions<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>

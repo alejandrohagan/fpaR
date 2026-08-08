@@ -5,7 +5,8 @@
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.9.38">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Current full period month over previous full period month — mom – ti</title>
+<meta name="author" content="Alejandro Hagan">
+<title>Calendar Completion and Missing Dates – ti</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -333,23 +334,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
    
   <ul>
-<li><a href="#usage" id="toc-usage" class="nav-link active" data-scroll-target="#usage">Usage</a></li>
-  <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
-  <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
-  <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
-  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+<li><a href="#the-problem-with-gaps" id="toc-the-problem-with-gaps" class="nav-link active" data-scroll-target="#the-problem-with-gaps">The problem with gaps</a></li>
+  <li><a href="#what-ti-does-instead" id="toc-what-ti-does-instead" class="nav-link" data-scroll-target="#what-ti-does-instead">What ti does instead</a></li>
+  <li><a href="#the-missing_date_indicator-column" id="toc-the-missing_date_indicator-column" class="nav-link" data-scroll-target="#the-missing_date_indicator-column">The <code>missing_date_indicator</code> column</a></li>
+  <li><a href="#what-ti-refuses-to-fill" id="toc-what-ti-refuses-to-fill" class="nav-link" data-scroll-target="#what-ti-refuses-to-fill">What ti refuses to fill</a></li>
+  <li><a href="#inspecting-gaps-before-you-calculate" id="toc-inspecting-gaps-before-you-calculate" class="nav-link" data-scroll-target="#inspecting-gaps-before-you-calculate">Inspecting gaps before you calculate</a></li>
+  <li><a href="#a-related-tool-calendar-attributes" id="toc-a-related-tool-calendar-attributes" class="nav-link" data-scroll-target="#a-related-tool-calendar-attributes">A related tool: calendar attributes</a></li>
+  <li><a href="#key-points" id="toc-key-points" class="nav-link" data-scroll-target="#key-points">Key points</a></li>
   </ul></nav>
 </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<h1 class="title">Current full period month over previous full period month</h1>
+<h1 class="title">Calendar Completion and Missing Dates</h1>
+<p class="subtitle lead">Why ti fills your calendar, and what it refuses to fill</p>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Alejandro Hagan </p>
+          </div>
+  </div>
     
   
     
@@ -357,193 +366,312 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   
 
 
-</header><div class="qrtdown-source dont-index">
-<p>Source: <a href="https://codeberg.org/usrbinr/ti/src/branch/main/R/time_intelligence_classes.R"><code>R/time_intelligence_classes.R</code></a></p>
-</div>
-<p>
-This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting any groups that are passed through with <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>
-</p>
-<p>
-Use <a href="../reference/calculate.html">calculate</a> to return the results
-</p>
-<section id="usage" class="level2"><h2 class="anchored" data-anchor-id="usage">Usage</h2>
-<div class="code-copy-outer-scaffold">
-<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mom</span>(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  .data,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  .date,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  .value,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">calendar_type =</span> <span class="st">"standard"</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">lag_n =</span> <span class="dv">1</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">fiscal_year_start =</span> <span class="dv">1</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
-</div>
-</section><section id="arguments" class="level2"><h2 class="anchored" data-anchor-id="arguments">Arguments</h2>
-<dl class="qrtdown-arguments">
-<dt id="arg-data">
-<code>.data</code><a class="anchor" aria-label="anchor" href="#arg-data"></a>
-</dt>
-<dd>
-<p>
-tibble or dbi object (either grouped or ungrouped)
-</p>
-</dd>
-<dt id="arg-date">
-<code>.date</code><a class="anchor" aria-label="anchor" href="#arg-date"></a>
-</dt>
-<dd>
-<p>
-the date column to group by. Must be a Date or POSIXt type.
-</p>
-</dd>
-<dt id="arg-value">
-<code>.value</code><a class="anchor" aria-label="anchor" href="#arg-value"></a>
-</dt>
-<dd>
-<p>
-the value column to summarize. Must be numeric.
-</p>
-</dd>
-<dt id="arg-calendar-type">
-<code>calendar_type</code><a class="anchor" aria-label="anchor" href="#arg-calendar-type"></a>
-</dt>
-<dd>
-<p>
-select either ‘standard’, ‘445’, ‘454’, or ‘544’ calendar, see ‘Details’ for additional information
-</p>
-</dd>
-<dt id="arg-lag-n">
-<code>lag_n</code><a class="anchor" aria-label="anchor" href="#arg-lag-n"></a>
-</dt>
-<dd>
-<p>
-the number of periods to lag
-</p>
-</dd>
-<dt id="arg-fiscal-year-start">
-<code>fiscal_year_start</code><a class="anchor" aria-label="anchor" href="#arg-fiscal-year-start"></a>
-</dt>
-<dd>
-<p>
-integer 1-12, the month the fiscal year starts nearest to (default 1 = January). Only used with retail calendars (‘445’, ‘454’, ‘544’).
-</p>
-</dd>
-</dl></section><section id="value" class="level2"><h2 class="anchored" data-anchor-id="value">Value</h2>
-<p>
-ti object
-</p>
-</section><section id="details" class="level2"><h2 class="anchored" data-anchor-id="details">Details</h2>
-<ul>
-<li>
-<p>
-This function creates a complete calendar object that fills in any missing days, weeks, months, quarters, or years
-</p>
-</li>
-<li>
-<p>
-If you provide a grouped object with <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, it will generate a complete calendar for each group
-</p>
-</li>
-<li>
-<p>
-The function creates a <code>ti</code> object, which pre-processes the data and arguments for further downstream functions
-</p>
-</li>
-</ul>
-<h4 class="anchored">
-<strong>NA Handling</strong>
-</h4>
-<ul>
-<li>
-<p>
-NA values in the <code>.value</code> column propagate through cumulative sums (cumsum returns NA once an NA is encountered)
-</p>
-</li>
-<li>
-<p>
-NA values in the <code>.date</code> column are excluded from the calendar join and will not appear in results
-</p>
-</li>
-<li>
-</li>
-<li>
-<p>
-Missing dates (gaps in your data) are filled with 0 values, not NA
-</p>
-</li>
-</ul>
-<p>
-<strong>standard calendar</strong>
-</p>
-<ul>
-<li>
-<p>
-The standard calendar splits the year into 12 months (with 28–31 days each) and uses a 7-day week
-</p>
-</li>
-<li>
-<p>
-It automatically accounts for leap years every four years to match the Gregorian calendar
-</p>
-</li>
-</ul>
-<p>
-<strong>5-5-4 calendar</strong>
-</p>
-<ul>
-<li>
-<p>
-The 5-5-4 calendar divides the fiscal year into 52 weeks (occasionally 53), organizing each quarter into two 5-week periods and one 4-week period.
-</p>
-</li>
-<li>
-<p>
-This system is commonly used in retail and financial reporting
-</p>
-</li>
-</ul></section><section id="see-also" class="level2"><h2 class="anchored" data-anchor-id="see-also">See Also</h2>
-<p>
-Other time_intelligence: <code><a href="../reference/atd.html">atd()</a></code>, <code><a href="../reference/dod.html">dod()</a></code>, <code><a href="../reference/momtd.html">momtd()</a></code>, <code><a href="../reference/mtd.html">mtd()</a></code>, <code><a href="../reference/mtdopm.html">mtdopm()</a></code>, <code><a href="../reference/pmtd.html">pmtd()</a></code>, <code><a href="../reference/pqtd.html">pqtd()</a></code>, <code><a href="../reference/pwtd.html">pwtd()</a></code>, <code><a href="../reference/pytd.html">pytd()</a></code>, <code><a href="../reference/qoq.html">qoq()</a></code>, <code><a href="../reference/qoqtd.html">qoqtd()</a></code>, <code><a href="../reference/qtd.html">qtd()</a></code>, <code><a href="../reference/qtdopq.html">qtdopq()</a></code>, <code><a href="../reference/wow.html">wow()</a></code>, <code><a href="../reference/wowtd.html">wowtd()</a></code>, <code><a href="../reference/wtd.html">wtd()</a></code>, <code><a href="../reference/wtdopw.html">wtdopw()</a></code>, <code><a href="../reference/yoy.html">yoy()</a></code>, <code><a href="../reference/yoytd.html">yoytd()</a></code>, <code><a href="../reference/ytd.html">ytd()</a></code>, <code><a href="../reference/ytdopy.html">ytdopy()</a></code>
-</p>
-</section><section id="examples" class="level2"><h2 class="anchored" data-anchor-id="examples">Examples</h2>
+</header><section id="the-problem-with-gaps" class="level2"><h2 class="anchored" data-anchor-id="the-problem-with-gaps">The problem with gaps</h2>
+<p>Transactional data has holes in it. Stores close on holidays, no one orders on a Sunday, a product sells nothing for a week. Your table has no row for those days — not a row with a zero, no row at all.</p>
+<p>That is fine until you compare periods. Consider a week of margin data with three days missing:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mom</span>(contoso<span class="sc">::</span>sales,<span class="at">.date=</span>order_date,<span class="at">.value=</span>quantity,<span class="at">calendar_type=</span><span class="st">'standard'</span>,<span class="at">lag_n=</span><span class="dv">1</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Month over month ────────────────────────────────────────────────────────────</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Function: `mom` was executed</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Description: ──</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; This creates a full month `sum()` of the previous month quantity and compares</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; it with the full month `sum()` current month quantity from the start of the</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; standard calendar month to the end of the month</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Calendar: ──</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • The calendar aggregated order_date to the month time unit</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • A standard calendar is created with 0 groups</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • Calendar ranges from 2021-05-18 to 2024-04-20</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • 222 days were missing and replaced with 0</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • New date column date, year, quarter, month was created from order_date</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Actions: ──</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔Aggregate</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔Shift 1 month</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔Compare previous full month</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✖Proportion of Total</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✖Count Distinct</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Next Steps: ──</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • Use `calculate()` to return the results</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>gappy <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">order_date =</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">"2024-01-01"</span>, <span class="st">"2024-01-03"</span>, <span class="st">"2024-01-06"</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"2024-01-07"</span>, <span class="st">"2024-01-08"</span>, <span class="st">"2024-01-09"</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"2024-01-11"</span>)),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">amount     =</span> <span class="fu">c</span>(<span class="dv">1200</span>, <span class="dv">1100</span>, <span class="dv">1300</span>, <span class="dv">900</span>, <span class="dv">1200</span>, <span class="dv">850</span>, <span class="dv">1450</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>gappy</span></code></pre></div>
 <button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
 </div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 2
+  order_date amount
+  &lt;date&gt;      &lt;dbl&gt;
+1 2024-01-01   1200
+2 2024-01-03   1100
+3 2024-01-06   1300
+4 2024-01-07    900
+5 2024-01-08   1200
+6 2024-01-09    850
+7 2024-01-11   1450</code></pre>
 </div>
-
-
-</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+</div>
+<p>If you reach for <a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link"><code>dplyr::lag()</code></a> to compute a day-over-day change, you get the wrong answer:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>gappy <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">previous_row =</span> <span class="fu">lag</span>(amount),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">change       =</span> amount <span class="sc">-</span> previous_row</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 4
+  order_date amount previous_row change
+  &lt;date&gt;      &lt;dbl&gt;        &lt;dbl&gt;  &lt;dbl&gt;
+1 2024-01-01   1200           NA     NA
+2 2024-01-03   1100         1200   -100
+3 2024-01-06   1300         1100    200
+4 2024-01-07    900         1300   -400
+5 2024-01-08   1200          900    300
+6 2024-01-09    850         1200   -350
+7 2024-01-11   1450          850    600</code></pre>
+</div>
+</div>
+<p>The row labelled <code>2024-01-03</code> reports a change against <code>2024-01-01</code>. But those are not consecutive days — January 2nd is missing. <code>lag()</code> gives you the <strong>previous row</strong>, and you asked for the <strong>previous day</strong>. On a table with gaps those are different questions.</p>
+<p>The problem compounds as the gaps widen. <code>2024-01-06</code> is compared against <code>2024-01-03</code>, three days earlier.</p>
+</section><section id="what-ti-does-instead" class="level2"><h2 class="anchored" data-anchor-id="what-ti-does-instead">What ti does instead</h2>
+<p>Every <code>ti</code> calculation begins by building a complete calendar for the requested time unit, then joining your data onto it. Missing days appear as rows with a zero value:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>filled <span class="ot">&lt;-</span> gappy <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dod</span>(<span class="at">.date =</span> order_date, <span class="at">.value =</span> amount, <span class="at">calendar_type =</span> <span class="st">"standard"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>filled <span class="sc">|&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(date, amount, dod_amount, missing_date_indicator)</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 11 × 4
+   date                amount dod_amount missing_date_indicator
+   &lt;dttm&gt;               &lt;dbl&gt;      &lt;dbl&gt;                  &lt;dbl&gt;
+ 1 2024-01-01 00:00:00   1200         NA                      0
+ 2 2024-01-02 00:00:00      0       1200                      1
+ 3 2024-01-03 00:00:00   1100          0                      0
+ 4 2024-01-04 00:00:00      0       1100                      1
+ 5 2024-01-05 00:00:00      0          0                      1
+ 6 2024-01-06 00:00:00   1300          0                      0
+ 7 2024-01-07 00:00:00    900       1300                      0
+ 8 2024-01-08 00:00:00   1200        900                      0
+ 9 2024-01-09 00:00:00    850       1200                      0
+10 2024-01-10 00:00:00      0        850                      1
+11 2024-01-11 00:00:00   1450          0                      0</code></pre>
+</div>
+</div>
+<p>Now January 2nd exists, holds a zero, and the day-over-day comparison lines up with the actual calendar.</p>
+</section><section id="the-missing_date_indicator-column" class="level2"><h2 class="anchored" data-anchor-id="the-missing_date_indicator-column">The <code>missing_date_indicator</code> column</h2>
+<p>Zero-filling is useful for arithmetic and dangerous for interpretation. A day with no sales and a day with genuinely zero margin look identical once both are zeroes.</p>
+<p>So <code>ti</code> labels them. Every completed calendar carries a <code>missing_date_indicator</code> column: <code>1</code> if the row was invented to fill a gap, <code>0</code> if it came from your data.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>filled <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(missing_date_indicator)</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  missing_date_indicator     n
+                   &lt;dbl&gt; &lt;int&gt;
+1                      0     7
+2                      1     4</code></pre>
+</div>
+</div>
+<p>Use it to keep the two cases apart. To count only trading days:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>filled <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(missing_date_indicator <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">trading_days =</span> <span class="fu">n</span>(),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_amount  =</span> <span class="fu">mean</span>(amount)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  trading_days mean_amount
+         &lt;int&gt;       &lt;dbl&gt;
+1            7       1143.</code></pre>
+</div>
+</div>
+<p>Compare that against the naive average over all rows, which is dragged toward zero by the padding:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>filled <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">all_rows    =</span> <span class="fu">n</span>(),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_amount =</span> <span class="fu">mean</span>(amount)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  all_rows mean_amount
+     &lt;int&gt;       &lt;dbl&gt;
+1       11        727.</code></pre>
+</div>
+</div>
+<p>Both numbers are legitimate; they answer different questions. Averaging over the calendar tells you daily run rate including closures. Averaging over trading days tells you how a trading day performs. The indicator lets you choose deliberately rather than by accident.</p>
+</section><section id="what-ti-refuses-to-fill" class="level2"><h2 class="anchored" data-anchor-id="what-ti-refuses-to-fill">What ti refuses to fill</h2>
+<p>Calendar completion is bounded. <code>ti</code> fills gaps <em>inside</em> the observed date range and does not extend beyond it. There is no back-filling to the start of the year and no padding forward to today.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>filled <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">first_row =</span> <span class="fu">min</span>(date), <span class="at">last_row =</span> <span class="fu">max</span>(date))</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  first_row           last_row           
+  &lt;dttm&gt;              &lt;dttm&gt;             
+1 2024-01-01 00:00:00 2024-01-11 00:00:00</code></pre>
+</div>
+</div>
+<p>The series runs from the first observed date to the last, and no further. Data you never had does not get invented.</p>
+<p>This bounding is applied <strong>per group</strong>. Each group’s calendar is completed within that group’s own first and last observation, which matters whenever groups enter or leave at different times:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>openings <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">store      =</span> <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"A"</span>, <span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"B"</span>),</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">order_date =</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">"2024-01-01"</span>, <span class="st">"2024-01-03"</span>, <span class="st">"2024-03-01"</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"2024-03-01"</span>, <span class="st">"2024-03-05"</span>)),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">amount     =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>, <span class="dv">50</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>openings <span class="sc">|&gt;</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(store) <span class="sc">|&gt;</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ytd</span>(<span class="at">.date =</span> order_date, <span class="at">.value =</span> amount, <span class="at">calendar_type =</span> <span class="st">"standard"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>() <span class="sc">|&gt;</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="sc">|&gt;</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">first_date =</span> <span class="fu">min</span>(date), <span class="at">last_date =</span> <span class="fu">max</span>(date), <span class="at">n_rows =</span> <span class="fu">n</span>(), <span class="at">.by =</span> store) <span class="sc">|&gt;</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(store)</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 4
+  store first_date          last_date           n_rows
+  &lt;chr&gt; &lt;dttm&gt;              &lt;dttm&gt;               &lt;int&gt;
+1 A     2024-01-01 00:00:00 2024-03-01 00:00:00     61
+2 B     2024-03-01 00:00:00 2024-03-05 00:00:00      5</code></pre>
+</div>
+</div>
+<p>Store B opens in March and its series starts in March. It is not given two months of zeroes to match store A. A store that opened in March did not have a bad January — it had no January, and padding it would corrupt every average and year-over-year comparison that touches it.</p>
+</section><section id="inspecting-gaps-before-you-calculate" class="level2"><h2 class="anchored" data-anchor-id="inspecting-gaps-before-you-calculate">Inspecting gaps before you calculate</h2>
+<p>A <code>ti</code> object reports what it found before you run anything. Printing one summarises the calendar it intends to build, including how many dates were missing:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>gappy <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dod</span>(<span class="at">.date =</span> order_date, <span class="at">.value =</span> amount, <span class="at">calendar_type =</span> <span class="st">"standard"</span>)</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Day over day ────────────────────────────────────────────────────────────────</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Function: `dod` was executed</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Description: ──</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>This creates a full day `sum()` of the previous day amount and compares it with
+the full day `sum()` current day amount from the start of the standard calendar
+day to the end of the day</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Calendar: ──</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>• The calendar aggregated order_date to the day time unit
+• A standard calendar is created with 0 groups
+• Calendar ranges from 2024-01-01 to 2024-01-11
+• 3 days were missing and replaced with 0
+• New date column date was created from order_date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Actions: ──</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔Aggregate</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔Shift 1 day</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔Compare previous day</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✖Proportion of Total</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✖Count Distinct</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Next Steps: ──</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Use `calculate()` to return the results</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>────────────────────────────────────────────────────────────────────────────────</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+</div>
+<p>If the missing-date count is far higher than you expect, that is usually a signal about the data rather than the calculation — a wrong grouping column, a filter applied too early, or a date column that is not the one you meant.</p>
+</section><section id="a-related-tool-calendar-attributes" class="level2"><h2 class="anchored" data-anchor-id="a-related-tool-calendar-attributes">A related tool: calendar attributes</h2>
+<p><a href="../reference/augment_standard_calendar.html"><code>augment_standard_calendar()</code></a> solves a different problem and is worth knowing about. It does <strong>not</strong> fill gaps — it annotates the rows you already have with calendar context: period boundaries, day counts, and how far through each period a date sits.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>augmented <span class="ot">&lt;-</span> gappy <span class="sc">|&gt;</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment_standard_calendar</span>(<span class="at">.date =</span> order_date) <span class="sc">|&gt;</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>augmented <span class="sc">|&gt;</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(order_date, month_end_date, days_complete_in_month,</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>         days_remaining_in_month, weekend_indicator) <span class="sc">|&gt;</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>)</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 5
+  order_date month_end_date days_complete_in_month days_remaining_in_month
+  &lt;date&gt;     &lt;date&gt;         &lt;drtn&gt;                 &lt;drtn&gt;                 
+1 2024-01-01 2024-01-31     0 days                 30 days                
+2 2024-01-03 2024-01-31     2 days                 28 days                
+3 2024-01-06 2024-01-31     5 days                 25 days                
+4 2024-01-07 2024-01-31     6 days                 24 days                
+5 2024-01-08 2024-01-31     7 days                 23 days                
+# ℹ 1 more variable: weekend_indicator &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<p>These columns are what you need for pacing and run-rate work — projecting a partial month to a full month, or explaining a shortfall by weekend placement rather than performance. The full set covers year, quarter, month and week boundaries, day-of-week and month labels, and complete/remaining day counts for each period.</p>
+</section><section id="key-points" class="level2"><h2 class="anchored" data-anchor-id="key-points">Key points</h2>
+<ul>
+<li>
+<a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link"><code>dplyr::lag()</code></a> gives you the previous <strong>row</strong>; period comparisons need the previous <strong>date</strong>. On gappy data these differ.</li>
+<li>
+<code>ti</code> completes the calendar before calculating, so comparisons align to real dates.</li>
+<li>
+<code>missing_date_indicator</code> marks invented rows — filter on it to separate closures from genuine zeroes.</li>
+<li>Completion is bounded by the observed range and never extends past it.</li>
+<li>Bounds are per group, so late-starting groups are not zero-padded backwards.</li>
+<li>Print the object to see the missing-date count before running the query.</li>
+</ul></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
     if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {

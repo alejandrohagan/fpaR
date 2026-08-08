@@ -5,7 +5,8 @@
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.9.38">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Current full period month over previous full period month — mom – ti</title>
+<meta name="author" content="Alejandro Hagan">
+<title>Working with Databases – ti</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -333,23 +334,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
    
   <ul>
-<li><a href="#usage" id="toc-usage" class="nav-link active" data-scroll-target="#usage">Usage</a></li>
-  <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
-  <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
-  <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
-  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+<li><a href="#everything-is-lazy" id="toc-everything-is-lazy" class="nav-link active" data-scroll-target="#everything-is-lazy">Everything is lazy</a></li>
+  <li><a href="#connecting-to-a-database" id="toc-connecting-to-a-database" class="nav-link" data-scroll-target="#connecting-to-a-database">Connecting to a database</a></li>
+  <li><a href="#seeing-the-generated-sql" id="toc-seeing-the-generated-sql" class="nav-link" data-scroll-target="#seeing-the-generated-sql">Seeing the generated SQL</a></li>
+  <li><a href="#collect-last-not-first" id="toc-collect-last-not-first" class="nav-link" data-scroll-target="#collect-last-not-first">Collect last, not first</a></li>
+  <li><a href="#tibbles-get-a-database-too" id="toc-tibbles-get-a-database-too" class="nav-link" data-scroll-target="#tibbles-get-a-database-too">Tibbles get a database too</a></li>
+  <li><a href="#dialect-support" id="toc-dialect-support" class="nav-link" data-scroll-target="#dialect-support">Dialect support</a></li>
+  <li><a href="#key-points" id="toc-key-points" class="nav-link" data-scroll-target="#key-points">Key points</a></li>
   </ul></nav>
 </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<h1 class="title">Current full period month over previous full period month</h1>
+<h1 class="title">Working with Databases</h1>
+<p class="subtitle lead">How ti builds SQL, and why you should collect() last</p>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Alejandro Hagan </p>
+          </div>
+  </div>
     
   
     
@@ -357,193 +366,320 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   
 
 
-</header><div class="qrtdown-source dont-index">
-<p>Source: <a href="https://codeberg.org/usrbinr/ti/src/branch/main/R/time_intelligence_classes.R"><code>R/time_intelligence_classes.R</code></a></p>
-</div>
-<p>
-This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting any groups that are passed through with <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>
-</p>
-<p>
-Use <a href="../reference/calculate.html">calculate</a> to return the results
-</p>
-<section id="usage" class="level2"><h2 class="anchored" data-anchor-id="usage">Usage</h2>
-<div class="code-copy-outer-scaffold">
-<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mom</span>(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  .data,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  .date,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  .value,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">calendar_type =</span> <span class="st">"standard"</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">lag_n =</span> <span class="dv">1</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">fiscal_year_start =</span> <span class="dv">1</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
-</div>
-</section><section id="arguments" class="level2"><h2 class="anchored" data-anchor-id="arguments">Arguments</h2>
-<dl class="qrtdown-arguments">
-<dt id="arg-data">
-<code>.data</code><a class="anchor" aria-label="anchor" href="#arg-data"></a>
-</dt>
-<dd>
-<p>
-tibble or dbi object (either grouped or ungrouped)
-</p>
-</dd>
-<dt id="arg-date">
-<code>.date</code><a class="anchor" aria-label="anchor" href="#arg-date"></a>
-</dt>
-<dd>
-<p>
-the date column to group by. Must be a Date or POSIXt type.
-</p>
-</dd>
-<dt id="arg-value">
-<code>.value</code><a class="anchor" aria-label="anchor" href="#arg-value"></a>
-</dt>
-<dd>
-<p>
-the value column to summarize. Must be numeric.
-</p>
-</dd>
-<dt id="arg-calendar-type">
-<code>calendar_type</code><a class="anchor" aria-label="anchor" href="#arg-calendar-type"></a>
-</dt>
-<dd>
-<p>
-select either ‘standard’, ‘445’, ‘454’, or ‘544’ calendar, see ‘Details’ for additional information
-</p>
-</dd>
-<dt id="arg-lag-n">
-<code>lag_n</code><a class="anchor" aria-label="anchor" href="#arg-lag-n"></a>
-</dt>
-<dd>
-<p>
-the number of periods to lag
-</p>
-</dd>
-<dt id="arg-fiscal-year-start">
-<code>fiscal_year_start</code><a class="anchor" aria-label="anchor" href="#arg-fiscal-year-start"></a>
-</dt>
-<dd>
-<p>
-integer 1-12, the month the fiscal year starts nearest to (default 1 = January). Only used with retail calendars (‘445’, ‘454’, ‘544’).
-</p>
-</dd>
-</dl></section><section id="value" class="level2"><h2 class="anchored" data-anchor-id="value">Value</h2>
-<p>
-ti object
-</p>
-</section><section id="details" class="level2"><h2 class="anchored" data-anchor-id="details">Details</h2>
-<ul>
-<li>
-<p>
-This function creates a complete calendar object that fills in any missing days, weeks, months, quarters, or years
-</p>
-</li>
-<li>
-<p>
-If you provide a grouped object with <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, it will generate a complete calendar for each group
-</p>
-</li>
-<li>
-<p>
-The function creates a <code>ti</code> object, which pre-processes the data and arguments for further downstream functions
-</p>
-</li>
-</ul>
-<h4 class="anchored">
-<strong>NA Handling</strong>
-</h4>
-<ul>
-<li>
-<p>
-NA values in the <code>.value</code> column propagate through cumulative sums (cumsum returns NA once an NA is encountered)
-</p>
-</li>
-<li>
-<p>
-NA values in the <code>.date</code> column are excluded from the calendar join and will not appear in results
-</p>
-</li>
-<li>
-</li>
-<li>
-<p>
-Missing dates (gaps in your data) are filled with 0 values, not NA
-</p>
-</li>
-</ul>
-<p>
-<strong>standard calendar</strong>
-</p>
-<ul>
-<li>
-<p>
-The standard calendar splits the year into 12 months (with 28–31 days each) and uses a 7-day week
-</p>
-</li>
-<li>
-<p>
-It automatically accounts for leap years every four years to match the Gregorian calendar
-</p>
-</li>
-</ul>
-<p>
-<strong>5-5-4 calendar</strong>
-</p>
-<ul>
-<li>
-<p>
-The 5-5-4 calendar divides the fiscal year into 52 weeks (occasionally 53), organizing each quarter into two 5-week periods and one 4-week period.
-</p>
-</li>
-<li>
-<p>
-This system is commonly used in retail and financial reporting
-</p>
-</li>
-</ul></section><section id="see-also" class="level2"><h2 class="anchored" data-anchor-id="see-also">See Also</h2>
-<p>
-Other time_intelligence: <code><a href="../reference/atd.html">atd()</a></code>, <code><a href="../reference/dod.html">dod()</a></code>, <code><a href="../reference/momtd.html">momtd()</a></code>, <code><a href="../reference/mtd.html">mtd()</a></code>, <code><a href="../reference/mtdopm.html">mtdopm()</a></code>, <code><a href="../reference/pmtd.html">pmtd()</a></code>, <code><a href="../reference/pqtd.html">pqtd()</a></code>, <code><a href="../reference/pwtd.html">pwtd()</a></code>, <code><a href="../reference/pytd.html">pytd()</a></code>, <code><a href="../reference/qoq.html">qoq()</a></code>, <code><a href="../reference/qoqtd.html">qoqtd()</a></code>, <code><a href="../reference/qtd.html">qtd()</a></code>, <code><a href="../reference/qtdopq.html">qtdopq()</a></code>, <code><a href="../reference/wow.html">wow()</a></code>, <code><a href="../reference/wowtd.html">wowtd()</a></code>, <code><a href="../reference/wtd.html">wtd()</a></code>, <code><a href="../reference/wtdopw.html">wtdopw()</a></code>, <code><a href="../reference/yoy.html">yoy()</a></code>, <code><a href="../reference/yoytd.html">yoytd()</a></code>, <code><a href="../reference/ytd.html">ytd()</a></code>, <code><a href="../reference/ytdopy.html">ytdopy()</a></code>
-</p>
-</section><section id="examples" class="level2"><h2 class="anchored" data-anchor-id="examples">Examples</h2>
+</header><section id="everything-is-lazy" class="level2"><h2 class="anchored" data-anchor-id="everything-is-lazy">Everything is lazy</h2>
+<p><code>ti</code> never touches your data when you call a time-intelligence function. <a href="../reference/ytd.html"><code>ytd()</code></a>, <a href="../reference/mtd.html"><code>mtd()</code></a>, <a href="../reference/yoy.html"><code>yoy()</code></a> and the rest all return a <strong>blueprint</strong> — an object describing the calculation to run. Nothing executes until you ask for it.</p>
+<p>There are three distinct stages:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead><tr class="header">
+<th>Stage</th>
+<th>Call</th>
+<th>What happens</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Describe</strong></td>
+<td><code>mtd(...)</code></td>
+<td>Returns a <code>ti</code> object. No query, no data movement.</td>
+</tr>
+<tr class="even">
+<td><strong>Compile</strong></td>
+<td><a href="../reference/calculate.html"><code>calculate()</code></a></td>
+<td>Builds the query. Still lazy — a <code>tbl_dbi</code>, not a tibble.</td>
+</tr>
+<tr class="odd">
+<td><strong>Execute</strong></td>
+<td><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link"><code>dplyr::collect()</code></a></td>
+<td>Runs the query and pulls the result into R.</td>
+</tr>
+</tbody>
+</table>
+<p>This matters because the expensive part — the windowed aggregation — happens <strong>in the database</strong>, not in R.</p>
+</section><section id="connecting-to-a-database" class="level2"><h2 class="anchored" data-anchor-id="connecting-to-a-database">Connecting to a database</h2>
+<p><code>ti</code> works on any <code>dbplyr</code>-backed table. Here is a DuckDB connection with the Contoso sales data loaded into it:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mom</span>(contoso<span class="sc">::</span>sales,<span class="at">.date=</span>order_date,<span class="at">.value=</span>quantity,<span class="at">calendar_type=</span><span class="st">'standard'</span>,<span class="at">lag_n=</span><span class="dv">1</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Month over month ────────────────────────────────────────────────────────────</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Function: `mom` was executed</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Description: ──</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; This creates a full month `sum()` of the previous month quantity and compares</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; it with the full month `sum()` current month quantity from the start of the</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; standard calendar month to the end of the month</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Calendar: ──</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • The calendar aggregated order_date to the month time unit</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • A standard calendar is created with 0 groups</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • Calendar ranges from 2021-05-18 to 2024-04-20</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • 222 days were missing and replaced with 0</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • New date column date, year, quarter, month was created from order_date</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Actions: ──</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔Aggregate</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔Shift 1 month</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔Compare previous full month</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✖Proportion of Total</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✖Count Distinct</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Next Steps: ──</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • Use `calculate()` to return the results</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(duckdb<span class="sc">::</span><span class="fu">duckdb</span>())</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dbWriteTable</span>(con, <span class="st">"sales"</span>, contoso<span class="sc">::</span>sales)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>db_sales <span class="ot">&lt;-</span> <span class="fu">tbl</span>(con, <span class="st">"sales"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>db_sales</span></code></pre></div>
 <button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
 </div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A query:  ?? x 20
+# Database: DuckDB 1.5.2 [hagan@Linux 7.0.11-76070011-generic:R 4.6.1/:memory:]
+   order_key line_number order_date delivery_date customer_key store_key
+       &lt;dbl&gt;       &lt;dbl&gt; &lt;date&gt;     &lt;date&gt;               &lt;dbl&gt;     &lt;dbl&gt;
+ 1    233000           0 2021-05-18 2021-05-18         1855811       585
+ 2    233100           0 2021-05-19 2021-05-19         1345436       550
+ 3    233100           1 2021-05-19 2021-05-19         1345436       550
+ 4    233100           2 2021-05-19 2021-05-19         1345436       550
+ 5    233200           0 2021-05-20 2021-05-20          926315       370
+ 6    233200           1 2021-05-20 2021-05-20          926315       370
+ 7    233200           2 2021-05-20 2021-05-20          926315       370
+ 8    233200           3 2021-05-20 2021-05-20          926315       370
+ 9    233300           0 2021-05-21 2021-05-21          116391        60
+10    233300           1 2021-05-21 2021-05-21          116391        60
+# ℹ more rows
+# ℹ 14 more variables: product_key &lt;dbl&gt;, quantity &lt;dbl&gt;, unit_price &lt;dbl&gt;,
+#   net_price &lt;dbl&gt;, unit_cost &lt;dbl&gt;, currency_code &lt;chr&gt;, exchange_rate &lt;dbl&gt;,
+#   gross_revenue &lt;dbl&gt;, net_revenue &lt;dbl&gt;, unit_discount &lt;dbl&gt;,
+#   discounts &lt;dbl&gt;, cogs &lt;dbl&gt;, gross_margin &lt;dbl&gt;, unit_margin &lt;dbl&gt;</code></pre>
 </div>
+</div>
+<p>The syntax from here is identical to the tibble syntax used everywhere else in these articles:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> db_sales <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mtd</span>(<span class="at">.date =</span> order_date, <span class="at">.value =</span> gross_margin, <span class="at">calendar_type =</span> <span class="st">"standard"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(result)</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "ti::ti"    "S7_object"</code></pre>
+</div>
+</div>
+<p>Still no query. <a href="../reference/calculate.html"><code>calculate()</code></a> compiles it:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>compiled <span class="ot">&lt;-</span> <span class="fu">calculate</span>(result)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(compiled)</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "tbl_duckdb_connection" "tbl_dbi"               "tbl_sql"              
+[4] "tbl_lazy"              "tbl"                  </code></pre>
+</div>
+</div>
+<p>Note that <code>compiled</code> is a <code>tbl_dbi</code> — a lazy database table. The data is still in DuckDB.</p>
+</section><section id="seeing-the-generated-sql" class="level2"><h2 class="anchored" data-anchor-id="seeing-the-generated-sql">Seeing the generated SQL</h2>
+<p>Because the result is a lazy <code>dbplyr</code> table, <a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link"><code>dplyr::show_query()</code></a> will show you exactly what <code>ti</code> wrote:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>compiled <span class="sc">|&gt;</span> <span class="fu">show_query</span>()</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;SQL&gt;
+SELECT
+  date,
+  "year",
+  "month",
+  "quarter",
+  "week",
+  "day",
+  gross_margin,
+  SUM(gross_margin) OVER (PARTITION BY "year", "month" ORDER BY date ROWS UNBOUNDED PRECEDING) AS mtd_gross_margin,
+  missing_date_indicator
+FROM (
+  SELECT
+    date,
+    "year",
+    "quarter",
+    EXTRACT(MONTH FROM date) AS "month",
+    "week",
+    "day",
+    gross_margin,
+    missing_date_indicator
+  FROM (
+    SELECT
+      date,
+      "year",
+      EXTRACT(QUARTER FROM date) AS "quarter",
+      "month",
+      "week",
+      "day",
+      gross_margin,
+      missing_date_indicator
+    FROM (
+      SELECT
+        date,
+        EXTRACT(year FROM date) AS "year",
+        "quarter",
+        "month",
+        "week",
+        "day",
+        gross_margin,
+        missing_date_indicator
+      FROM (
+        SELECT
+          date,
+          "year",
+          "quarter",
+          "month",
+          "week",
+          "day",
+          COALESCE(gross_margin, 0.0) AS gross_margin,
+          CASE WHEN ((gross_margin IS NULL)) THEN 1.0 WHEN NOT ((gross_margin IS NULL)) THEN 0.0 END AS missing_date_indicator
+        FROM (
+          SELECT
+            COALESCE(LHS.date, RHS.date) AS date,
+            "year",
+            "quarter",
+            "month",
+            "week",
+            "day",
+            gross_margin
+          FROM (
+            SELECT date, "year", "quarter", "month", "week", "day"
+            FROM (
+              SELECT
+                DATE_TRUNC('day', date) AS date,
+                "year",
+                "quarter",
+                "month",
+                "week",
+                "day"
+              FROM (
+                SELECT *, EXTRACT(day FROM date) AS "day"
+                FROM (
+WITH DATE_SERIES AS (
+SELECT
 
+GENERATE_SERIES(
+   MIN(DATE_TRUNC('day', DATE '2021-05-18'::date::date))::DATE
+  ,MAX(DATE_TRUNC('day', DATE '2024-04-20'::date::date))::DATE
+  ,INTERVAL '1 day'
+) AS DATE_LIST),
 
-</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+CALENDAR_TBL AS (
+      SELECT
+
+      UNNEST(DATE_LIST)::DATE AS date
+
+      FROM DATE_SERIES
+
+      )
+SELECT *
+,EXTRACT(YEAR FROM date) AS year
+,EXTRACT(QUARTER FROM date) AS quarter
+,EXTRACT(month FROM date) AS month
+,FLOOR((EXTRACT(DOY FROM date) - 1) / 7) + 1 AS week
+
+FROM CALENDAR_TBL
+
+                ) AS q01
+              ) AS q01
+            ) AS q01
+            GROUP BY date, "year", "quarter", "month", "week", "day"
+          ) AS LHS
+          FULL JOIN (
+            SELECT date, SUM(gross_margin) AS gross_margin
+            FROM (
+              SELECT
+                *,
+                DATE_TRUNC('day', order_date) AS date,
+                'day' AS time_unit
+              FROM sales
+            ) AS q01
+            GROUP BY date
+          ) AS RHS
+            ON (LHS.date = RHS.date)
+        ) AS q01
+      ) AS q01
+    ) AS q01
+  ) AS q01
+) AS q01</code></pre>
+</div>
+</div>
+<p>The period-to-date calculation compiles down to a <strong>SQL window function</strong> partitioned by the period columns. <code>ti</code> is not looping in R and it is not pulling your table into memory — it is writing the query you would have written by hand.</p>
+</section><section id="collect-last-not-first" class="level2"><h2 class="anchored" data-anchor-id="collect-last-not-first">Collect last, not first</h2>
+<p>The single most important habit: <strong>keep the pipeline lazy for as long as possible and call <code>collect()</code> at the very end.</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="annotated-cell-5"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a>compiled <span class="sc">|&gt;</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-5-2" class="code-annotation-target"><a href="#annotated-cell-5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2023</span>, month <span class="sc">==</span> <span class="dv">6</span>) <span class="sc">|&gt;</span></span>
+<span id="annotated-cell-5-3"><a href="#annotated-cell-5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date) <span class="sc">|&gt;</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-5-4" class="code-annotation-target"><a href="#annotated-cell-5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="sc">|&gt;</span></span>
+<span id="annotated-cell-5-5"><a href="#annotated-cell-5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>)</span><div class="code-annotation-gutter-bg"></div>
+<div class="code-annotation-gutter"></div></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="2" data-code-annotation="1">Filtering happens <em>in the database</em>, on the full result set.</span>
+</dd>
+<dt data-target-cell="annotated-cell-5" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="4" data-code-annotation="2">Only the filtered rows cross the boundary into R.</span>
+</dd>
+</dl>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 9
+  date                 year month quarter  week   day gross_margin
+  &lt;dttm&gt;              &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;        &lt;dbl&gt;
+1 2023-06-01 00:00:00  2023     6       2    22     1        3132.
+2 2023-06-02 00:00:00  2023     6       2    22     2        3380.
+3 2023-06-03 00:00:00  2023     6       2    22     3       12390.
+4 2023-06-04 00:00:00  2023     6       2    23     4           0 
+5 2023-06-05 00:00:00  2023     6       2    23     5         810.
+# ℹ 2 more variables: mtd_gross_margin &lt;dbl&gt;, missing_date_indicator &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<p>If you had called <code>collect()</code> before the <code>filter()</code>, DuckDB would have handed R every row and then R would have thrown most of them away.</p>
+</section><section id="tibbles-get-a-database-too" class="level2"><h2 class="anchored" data-anchor-id="tibbles-get-a-database-too">Tibbles get a database too</h2>
+<p>You do not need to set up a connection to benefit from this. When you pass a plain <code>data.frame</code> or tibble, <code>ti</code> registers it into a temporary in-memory DuckDB instance with <a href="../reference/make_db_tbl.html"><code>make_db_tbl()</code></a>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>contoso<span class="sc">::</span>sales <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mtd</span>(order_date, gross_margin, <span class="st">"standard"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>() <span class="sc">|&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">class</span>()</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "tbl_duckdb_connection" "tbl_dbi"               "tbl_sql"              
+[4] "tbl_lazy"              "tbl"                  </code></pre>
+</div>
+</div>
+<p>The result is a <code>tbl_duckdb_connection</code>, not a tibble — even though the input was a tibble. Registration uses DuckDB’s <code>duckdb_register()</code>, which is a virtual registration rather than a physical copy, so it is fast and does not duplicate your data.</p>
+<p>This is why every example in these articles ends with <a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link"><code>dplyr::collect()</code></a>.</p>
+</section><section id="dialect-support" class="level2"><h2 class="anchored" data-anchor-id="dialect-support">Dialect support</h2>
+<p>Date arithmetic differs across SQL engines, so <code>ti</code> detects the backend from the connection and generates the appropriate expression. Three dialects are recognised explicitly:</p>
+<table class="caption-top table">
+<thead><tr class="header">
+<th>Backend</th>
+<th>Status</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>DuckDB</td>
+<td>Recognised</td>
+</tr>
+<tr class="even">
+<td>Snowflake</td>
+<td>Recognised</td>
+</tr>
+<tr class="odd">
+<td>Postgres</td>
+<td>Recognised</td>
+</tr>
+<tr class="even">
+<td>Anything else</td>
+<td>Falls back to the DuckDB dialect</td>
+</tr>
+</tbody>
+</table>
+<p>The fallback is often fine, since many engines accept DuckDB-compatible date arithmetic. But it is a fallback, not a guarantee — if you are running <code>ti</code> against a backend not in the list above, verify the output of <code>show_query()</code> before trusting the numbers.</p>
+</section><section id="key-points" class="level2"><h2 class="anchored" data-anchor-id="key-points">Key points</h2>
+<ul>
+<li>Time-intelligence functions describe work; <a href="../reference/calculate.html"><code>calculate()</code></a> compiles it; <code>collect()</code> runs it.</li>
+<li>Use <code>show_query()</code> to inspect the SQL — period-to-date becomes a window function.</li>
+<li>Filter, join and arrange <em>before</em> <code>collect()</code> so the database does the work.</li>
+<li>Tibbles are transparently promoted to DuckDB, so the return value is always a lazy table.</li>
+<li>DuckDB, Snowflake and Postgres get dialect-specific date arithmetic; other backends fall back to DuckDB’s.</li>
+</ul></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
     if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {

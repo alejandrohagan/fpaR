@@ -5,7 +5,8 @@
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.9.38">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Current full period month over previous full period month — mom – ti</title>
+<meta name="author" content="Alejandro Hagan">
+<title>Working with Groups – ti</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -333,23 +334,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
    
   <ul>
-<li><a href="#usage" id="toc-usage" class="nav-link active" data-scroll-target="#usage">Usage</a></li>
-  <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
-  <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
-  <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
-  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+<li><a href="#grouping-is-the-main-dial" id="toc-grouping-is-the-main-dial" class="nav-link active" data-scroll-target="#grouping-is-the-main-dial">Grouping is the main dial</a></li>
+  <li><a href="#the-cumulative-sum-resets-per-group" id="toc-the-cumulative-sum-resets-per-group" class="nav-link" data-scroll-target="#the-cumulative-sum-resets-per-group">The cumulative sum resets per group</a></li>
+  <li><a href="#multiple-grouping-levels" id="toc-multiple-grouping-levels" class="nav-link" data-scroll-target="#multiple-grouping-levels">Multiple grouping levels</a></li>
+  <li><a href="#each-group-gets-its-own-calendar-range" id="toc-each-group-gets-its-own-calendar-range" class="nav-link" data-scroll-target="#each-group-gets-its-own-calendar-range">Each group gets its own calendar range</a></li>
+  <li><a href="#checking-your-grouping-before-you-run" id="toc-checking-your-grouping-before-you-run" class="nav-link" data-scroll-target="#checking-your-grouping-before-you-run">Checking your grouping before you run</a></li>
+  <li><a href="#grouping-and-segmentation" id="toc-grouping-and-segmentation" class="nav-link" data-scroll-target="#grouping-and-segmentation">Grouping and segmentation</a></li>
+  <li><a href="#key-points" id="toc-key-points" class="nav-link" data-scroll-target="#key-points">Key points</a></li>
   </ul></nav>
 </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<h1 class="title">Current full period month over previous full period month</h1>
+<h1 class="title">Working with Groups</h1>
+<p class="subtitle lead">How grouping changes every calculation in the package</p>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Alejandro Hagan </p>
+          </div>
+  </div>
     
   
     
@@ -357,193 +366,267 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   
 
 
-</header><div class="qrtdown-source dont-index">
-<p>Source: <a href="https://codeberg.org/usrbinr/ti/src/branch/main/R/time_intelligence_classes.R"><code>R/time_intelligence_classes.R</code></a></p>
-</div>
-<p>
-This calculates the monthly cumulative sum of targeted value using a standard or 5-5-4 calendar respecting any groups that are passed through with <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>
-</p>
-<p>
-Use <a href="../reference/calculate.html">calculate</a> to return the results
-</p>
-<section id="usage" class="level2"><h2 class="anchored" data-anchor-id="usage">Usage</h2>
-<div class="code-copy-outer-scaffold">
-<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mom</span>(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  .data,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  .date,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  .value,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">calendar_type =</span> <span class="st">"standard"</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">lag_n =</span> <span class="dv">1</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">fiscal_year_start =</span> <span class="dv">1</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
-</div>
-</section><section id="arguments" class="level2"><h2 class="anchored" data-anchor-id="arguments">Arguments</h2>
-<dl class="qrtdown-arguments">
-<dt id="arg-data">
-<code>.data</code><a class="anchor" aria-label="anchor" href="#arg-data"></a>
-</dt>
-<dd>
-<p>
-tibble or dbi object (either grouped or ungrouped)
-</p>
-</dd>
-<dt id="arg-date">
-<code>.date</code><a class="anchor" aria-label="anchor" href="#arg-date"></a>
-</dt>
-<dd>
-<p>
-the date column to group by. Must be a Date or POSIXt type.
-</p>
-</dd>
-<dt id="arg-value">
-<code>.value</code><a class="anchor" aria-label="anchor" href="#arg-value"></a>
-</dt>
-<dd>
-<p>
-the value column to summarize. Must be numeric.
-</p>
-</dd>
-<dt id="arg-calendar-type">
-<code>calendar_type</code><a class="anchor" aria-label="anchor" href="#arg-calendar-type"></a>
-</dt>
-<dd>
-<p>
-select either ‘standard’, ‘445’, ‘454’, or ‘544’ calendar, see ‘Details’ for additional information
-</p>
-</dd>
-<dt id="arg-lag-n">
-<code>lag_n</code><a class="anchor" aria-label="anchor" href="#arg-lag-n"></a>
-</dt>
-<dd>
-<p>
-the number of periods to lag
-</p>
-</dd>
-<dt id="arg-fiscal-year-start">
-<code>fiscal_year_start</code><a class="anchor" aria-label="anchor" href="#arg-fiscal-year-start"></a>
-</dt>
-<dd>
-<p>
-integer 1-12, the month the fiscal year starts nearest to (default 1 = January). Only used with retail calendars (‘445’, ‘454’, ‘544’).
-</p>
-</dd>
-</dl></section><section id="value" class="level2"><h2 class="anchored" data-anchor-id="value">Value</h2>
-<p>
-ti object
-</p>
-</section><section id="details" class="level2"><h2 class="anchored" data-anchor-id="details">Details</h2>
-<ul>
-<li>
-<p>
-This function creates a complete calendar object that fills in any missing days, weeks, months, quarters, or years
-</p>
-</li>
-<li>
-<p>
-If you provide a grouped object with <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, it will generate a complete calendar for each group
-</p>
-</li>
-<li>
-<p>
-The function creates a <code>ti</code> object, which pre-processes the data and arguments for further downstream functions
-</p>
-</li>
-</ul>
-<h4 class="anchored">
-<strong>NA Handling</strong>
-</h4>
-<ul>
-<li>
-<p>
-NA values in the <code>.value</code> column propagate through cumulative sums (cumsum returns NA once an NA is encountered)
-</p>
-</li>
-<li>
-<p>
-NA values in the <code>.date</code> column are excluded from the calendar join and will not appear in results
-</p>
-</li>
-<li>
-</li>
-<li>
-<p>
-Missing dates (gaps in your data) are filled with 0 values, not NA
-</p>
-</li>
-</ul>
-<p>
-<strong>standard calendar</strong>
-</p>
-<ul>
-<li>
-<p>
-The standard calendar splits the year into 12 months (with 28–31 days each) and uses a 7-day week
-</p>
-</li>
-<li>
-<p>
-It automatically accounts for leap years every four years to match the Gregorian calendar
-</p>
-</li>
-</ul>
-<p>
-<strong>5-5-4 calendar</strong>
-</p>
-<ul>
-<li>
-<p>
-The 5-5-4 calendar divides the fiscal year into 52 weeks (occasionally 53), organizing each quarter into two 5-week periods and one 4-week period.
-</p>
-</li>
-<li>
-<p>
-This system is commonly used in retail and financial reporting
-</p>
-</li>
-</ul></section><section id="see-also" class="level2"><h2 class="anchored" data-anchor-id="see-also">See Also</h2>
-<p>
-Other time_intelligence: <code><a href="../reference/atd.html">atd()</a></code>, <code><a href="../reference/dod.html">dod()</a></code>, <code><a href="../reference/momtd.html">momtd()</a></code>, <code><a href="../reference/mtd.html">mtd()</a></code>, <code><a href="../reference/mtdopm.html">mtdopm()</a></code>, <code><a href="../reference/pmtd.html">pmtd()</a></code>, <code><a href="../reference/pqtd.html">pqtd()</a></code>, <code><a href="../reference/pwtd.html">pwtd()</a></code>, <code><a href="../reference/pytd.html">pytd()</a></code>, <code><a href="../reference/qoq.html">qoq()</a></code>, <code><a href="../reference/qoqtd.html">qoqtd()</a></code>, <code><a href="../reference/qtd.html">qtd()</a></code>, <code><a href="../reference/qtdopq.html">qtdopq()</a></code>, <code><a href="../reference/wow.html">wow()</a></code>, <code><a href="../reference/wowtd.html">wowtd()</a></code>, <code><a href="../reference/wtd.html">wtd()</a></code>, <code><a href="../reference/wtdopw.html">wtdopw()</a></code>, <code><a href="../reference/yoy.html">yoy()</a></code>, <code><a href="../reference/yoytd.html">yoytd()</a></code>, <code><a href="../reference/ytd.html">ytd()</a></code>, <code><a href="../reference/ytdopy.html">ytdopy()</a></code>
-</p>
-</section><section id="examples" class="level2"><h2 class="anchored" data-anchor-id="examples">Examples</h2>
+</header><section id="grouping-is-the-main-dial" class="level2"><h2 class="anchored" data-anchor-id="grouping-is-the-main-dial">Grouping is the main dial</h2>
+<p>Every time-intelligence and segmentation function in <code>ti</code> respects <a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link"><code>dplyr::group_by()</code></a>. There is no <code>.by</code> argument and no <code>group</code> parameter — you group the table before you call the function, and the calculation follows.</p>
+<p>Ungrouped, <a href="../reference/mtd.html"><code>mtd()</code></a> gives you one month-to-date series for the whole company:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mom</span>(contoso<span class="sc">::</span>sales,<span class="at">.date=</span>order_date,<span class="at">.value=</span>quantity,<span class="at">calendar_type=</span><span class="st">'standard'</span>,<span class="at">lag_n=</span><span class="dv">1</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Month over month ────────────────────────────────────────────────────────────</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Function: `mom` was executed</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Description: ──</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; This creates a full month `sum()` of the previous month quantity and compares</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; it with the full month `sum()` current month quantity from the start of the</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; standard calendar month to the end of the month</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Calendar: ──</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • The calendar aggregated order_date to the month time unit</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • A standard calendar is created with 0 groups</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • Calendar ranges from 2021-05-18 to 2024-04-20</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • 222 days were missing and replaced with 0</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • New date column date, year, quarter, month was created from order_date</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Actions: ──</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔Aggregate</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔Shift 1 month</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔Compare previous full month</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✖Proportion of Total</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✖Count Distinct</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Next Steps: ──</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • Use `calculate()` to return the results</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>contoso<span class="sc">::</span>sales <span class="sc">|&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mtd</span>(<span class="at">.date =</span> order_date, <span class="at">.value =</span> gross_margin, <span class="at">calendar_type =</span> <span class="st">"standard"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>() <span class="sc">|&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="sc">|&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date) <span class="sc">|&gt;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(date, gross_margin, mtd_gross_margin) <span class="sc">|&gt;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>)</span></code></pre></div>
 <button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
 </div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 3
+  date                gross_margin mtd_gross_margin
+  &lt;dttm&gt;                     &lt;dbl&gt;            &lt;dbl&gt;
+1 2021-05-18 00:00:00         407.             407.
+2 2021-05-19 00:00:00         711.            1118.
+3 2021-05-20 00:00:00        1424.            2542.
+4 2021-05-21 00:00:00       11339.           13881.
+5 2021-05-22 00:00:00        5359.           19240.</code></pre>
 </div>
-
-
-</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+</div>
+<p>Grouped by store, you get one independent series <strong>per store</strong>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>by_store <span class="ot">&lt;-</span> contoso<span class="sc">::</span>sales <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(store_key) <span class="sc">|&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mtd</span>(<span class="at">.date =</span> order_date, <span class="at">.value =</span> gross_margin, <span class="at">calendar_type =</span> <span class="st">"standard"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>by_store <span class="sc">|&gt;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(store_key, date) <span class="sc">|&gt;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(store_key, date, gross_margin, mtd_gross_margin) <span class="sc">|&gt;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>)</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+  store_key date                gross_margin mtd_gross_margin
+      &lt;dbl&gt; &lt;dttm&gt;                     &lt;dbl&gt;            &lt;dbl&gt;
+1        10 2021-09-16 00:00:00         747.             747.
+2        10 2021-09-17 00:00:00           0              747.
+3        10 2021-09-18 00:00:00           0              747.
+4        10 2021-09-19 00:00:00           0              747.
+5        10 2021-09-20 00:00:00           0              747.</code></pre>
+</div>
+</div>
+<p>The grouping columns are carried through into the result, so they are available to filter and join on afterwards.</p>
+</section><section id="the-cumulative-sum-resets-per-group" class="level2"><h2 class="anchored" data-anchor-id="the-cumulative-sum-resets-per-group">The cumulative sum resets per group</h2>
+<p>This is the behaviour that makes grouping worth doing. Each group’s running total is independent — store 10’s month-to-date figure never picks up store 20’s revenue.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>by_store <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2023</span>, month <span class="sc">==</span> <span class="dv">6</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(store_key, date) <span class="sc">|&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">month_total =</span> <span class="fu">max</span>(mtd_gross_margin),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> store_key</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(month_total)) <span class="sc">|&gt;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>)</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 2
+  store_key month_total
+      &lt;dbl&gt;       &lt;dbl&gt;
+1    999999     102900.
+2       540       8736.
+3       650       2134.
+4       660       1849.
+5       510       1548.</code></pre>
+</div>
+</div>
+</section><section id="multiple-grouping-levels" class="level2"><h2 class="anchored" data-anchor-id="multiple-grouping-levels">Multiple grouping levels</h2>
+<p>Group by as many columns as you need. The calculation is performed for every distinct combination:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>contoso<span class="sc">::</span>sales <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(store_key, product_key) <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mtd</span>(<span class="at">.date =</span> order_date, <span class="at">.value =</span> gross_margin, <span class="at">calendar_type =</span> <span class="st">"standard"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>() <span class="sc">|&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="sc">|&gt;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(store_key, product_key, date, mtd_gross_margin) <span class="sc">|&gt;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>)</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+  store_key product_key date                mtd_gross_margin
+      &lt;dbl&gt;       &lt;dbl&gt; &lt;dttm&gt;                         &lt;dbl&gt;
+1    999999        1809 2022-07-10 00:00:00                0
+2    999999        1809 2022-07-11 00:00:00                0
+3    999999        1809 2022-07-12 00:00:00                0
+4    999999        1809 2022-07-13 00:00:00                0
+5    999999        1809 2022-07-14 00:00:00                0</code></pre>
+</div>
+</div>
+<p>Be aware of the cost. Because <code>ti</code> completes the calendar for each group (see <a href="../articles/missing_dates.html">Calendar Completion and Missing Dates</a>), the row count is roughly <em>number of groups × number of days in that group’s active range</em>. Grouping by two high-cardinality columns can multiply your result set considerably — one reason to keep the pipeline lazy and filter in the database.</p>
+</section><section id="each-group-gets-its-own-calendar-range" class="level2"><h2 class="anchored" data-anchor-id="each-group-gets-its-own-calendar-range">Each group gets its own calendar range</h2>
+<p>A subtle and important point: <code>ti</code> does not force every group onto the same date range. Each group’s calendar is completed only within <strong>that group’s own</strong> first and last observed date.</p>
+<p>Consider two stores, where store B opens two months after store A:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>openings <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">store      =</span> <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"A"</span>, <span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"B"</span>),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">order_date =</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">"2024-01-01"</span>, <span class="st">"2024-01-03"</span>, <span class="st">"2024-03-01"</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"2024-03-01"</span>, <span class="st">"2024-03-05"</span>)),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">amount     =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>, <span class="dv">50</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>openings <span class="sc">|&gt;</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(store) <span class="sc">|&gt;</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ytd</span>(<span class="at">.date =</span> order_date, <span class="at">.value =</span> amount, <span class="at">calendar_type =</span> <span class="st">"standard"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>() <span class="sc">|&gt;</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="sc">|&gt;</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">first_date =</span> <span class="fu">min</span>(date),</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">last_date  =</span> <span class="fu">max</span>(date),</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_rows     =</span> <span class="fu">n</span>(),</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> store</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(store)</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 4
+  store first_date          last_date           n_rows
+  &lt;chr&gt; &lt;dttm&gt;              &lt;dttm&gt;               &lt;int&gt;
+1 A     2024-01-01 00:00:00 2024-03-01 00:00:00     61
+2 B     2024-03-01 00:00:00 2024-03-05 00:00:00      5</code></pre>
+</div>
+</div>
+<p>Store B’s series starts in March, not January. It is <strong>not</strong> back-filled with two months of zeroes just because store A had data then.</p>
+<p>This is the right default for retail and subscription analysis. A store that opened in March did not have a bad January — it had no January. Padding it with zeroes would drag down every average and make year-over-year comparisons meaningless.</p>
+</section><section id="checking-your-grouping-before-you-run" class="level2"><h2 class="anchored" data-anchor-id="checking-your-grouping-before-you-run">Checking your grouping before you run</h2>
+<p>Because a <code>ti</code> object is a blueprint, you can inspect what it is about to do. Printing it reports the group count:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>contoso<span class="sc">::</span>sales <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(store_key) <span class="sc">|&gt;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mtd</span>(<span class="at">.date =</span> order_date, <span class="at">.value =</span> gross_margin, <span class="at">calendar_type =</span> <span class="st">"standard"</span>)</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Month-to-date ───────────────────────────────────────────────────────────────</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Function: `mtd` was executed</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Description: ──</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>This creates a daily `cumsum()` of the current month gross_margin from the
+start of the standard calendar month to the end of the month</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Calendar: ──</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>• The calendar aggregated order_date to the day time unit
+• A standard calendar is created with 1 groups
+• Calendar ranges from 2021-05-18 to 2024-04-20
+• 222 days were missing and replaced with 0
+• New date column date, year, quarter, month was created from order_date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Actions: ──</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔Aggregate</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✖Shift</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✖Compare</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✖Proportion of Total</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✖Count Distinct</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>store_key groups are in the table</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Next Steps: ──</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Use `calculate()` to return the results</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>────────────────────────────────────────────────────────────────────────────────</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+</div>
+<p>If the group count is not what you expected, you have caught the mistake before running a query over the full table.</p>
+</section><section id="grouping-and-segmentation" class="level2"><h2 class="anchored" data-anchor-id="grouping-and-segmentation">Grouping and segmentation</h2>
+<p>The segmentation functions treat grouping differently: for <a href="../reference/abc.html"><code>abc()</code></a>, the grouping columns define <strong>what is being ranked</strong>. Grouping by store ranks stores against each other by their contribution to the total.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>contoso<span class="sc">::</span>sales <span class="sc">|&gt;</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(store_key) <span class="sc">|&gt;</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abc</span>(<span class="at">category_values =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="fl">0.96</span>, <span class="dv">1</span>), <span class="at">.value =</span> gross_margin) <span class="sc">|&gt;</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>() <span class="sc">|&gt;</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="sc">|&gt;</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(store_key, abc_gross_margin, prop_total, cum_prop_total, category_name) <span class="sc">|&gt;</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>)</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 5
+  store_key abc_gross_margin prop_total cum_prop_total category_name
+      &lt;dbl&gt;            &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt; &lt;chr&gt;        
+1    999999         2193234.     0.535           0.535 a            
+2       540           78124.     0.0191          0.554 a            
+3       610           74604.     0.0182          0.573 a            
+4       510           69455.     0.0169          0.589 a            
+5        80           67881.     0.0166          0.606 a            </code></pre>
+</div>
+</div>
+<p>Change the grouping column and you change the question: group by <code>product_key</code> and you are asking which products drive margin, not which stores.</p>
+</section><section id="key-points" class="level2"><h2 class="anchored" data-anchor-id="key-points">Key points</h2>
+<ul>
+<li>Group with <a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link"><code>dplyr::group_by()</code></a> before calling the function; there is no <code>.by</code> argument.</li>
+<li>Cumulative sums reset per group and never bleed across groups.</li>
+<li>Grouping columns are carried into the result.</li>
+<li>Each group’s calendar is completed within its own date range, so late-starting groups are not zero-padded backwards.</li>
+<li>Print the object to check the group count before executing.</li>
+<li>For <a href="../reference/abc.html"><code>abc()</code></a>, the grouping columns define the population being ranked.</li>
+</ul></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
     if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
