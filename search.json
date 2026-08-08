@@ -1554,6 +1554,55 @@
     "text": "Value\n\na dbi objection"
   },
   {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "ti",
+    "section": "",
+    "text": "Source Code\n\n\n\n\nMIT + file LICENSE\n\n\n\n\nAlejandro Hagan (author, maintainer)"
+  },
+  {
+    "objectID": "index.html#a-business-intelligence-toolkit-for-financial-planning-analysis-fpa",
+    "href": "index.html#a-business-intelligence-toolkit-for-financial-planning-analysis-fpa",
+    "title": "ti",
+    "section": "A Business Intelligence Toolkit for Financial Planning & Analysis (FP&A)",
+    "text": "A Business Intelligence Toolkit for Financial Planning & Analysis (FP&A)\nti package is a collection of business intelligence tools designed to simplify common financial planning and analysis (FP&A) tasks such as time intelligence calculations, group member segmentation and factor/variance analysis.\nThe package is inspired by best practices from a collection of blogs, books, industry research, and hands-on work experience, consolidating frequently performed business analyses into a fast, efficient, and reusable framework.\nIn particular, the time intelligence functions are heavily inspired by PowerBI DAX functions.\nUnder the hood, these functions are built upon the great foundations of:\n\ndbplyr\nduckdb\nlubridate\n\nAll functions are designed to work with either tibbles or modern databases (DuckDB, Snowflake, SQLite, etc) with a unified syntax.\nEven if you are working with tibbles, all functions are optimized to leverage DuckDB for increased speed and performance1\nBy default, all functions return a lazy DBI object which you can return as a tibble with dplyr::collect()"
+  },
+  {
+    "objectID": "index.html#key-features-benefits",
+    "href": "index.html#key-features-benefits",
+    "title": "ti",
+    "section": "Key features & benefits",
+    "text": "Key features & benefits\n\nUnified syntax regardless if your data is in a tibble or a database\nScale your data with duckdb to optimize your calculations\nInstant clarity as every function summarizes its transformation actions so that you can understand and validate the results"
+  },
+  {
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "ti",
+    "section": "Installation",
+    "text": "Installation\nInstall the development version from Codeberg:\n\n# Install using pak or remotes\n\nremotes::install_git(\"https://codeberg.org/usrbinr/ti\")\n\n# to install from CRAN\npak::pak(\"ti\")"
+  },
+  {
+    "objectID": "index.html#what-is-in-ti",
+    "href": "index.html#what-is-in-ti",
+    "title": "ti",
+    "section": "What is in ti?",
+    "text": "What is in ti?\n\nWe recommend using the Contoso package for any practice analysis. The contoso datasets are fictional business transactions of the Contoso toy company which are helpful for business intelligence related analysis\n\nThere are 2 main categories of functions:\n\nTime intelligence related functions (Table 1)\nCategorization strategies (Table 2)\n\n\nTime intelligence\nThis is a collection of the most commonly used time intelligence analysis such as Year-over-Year(yoy()), Month-to-Date(mtd()), and Current Year-to-Date over Previous Year-to-Date (ytdopy()) analysis.\nThese functions are designed to quickly answer questions in a consistent, fast and transparent way.\nKey benefits:\n\nAuto-fill missing dates: Ensures no missing periods in your datasets so that correct period comparisons are performed\nFlexible calendar options: Handle comparisons based on a standard or non-standard fiscal calendar to accommodate different reporting frameworks\nClear definition: Full transparency into the calculations that are performed, with visibility to any missing or incomplete date periods\n\nBelow is the full list of time intelligence functions:\n\n\n\n\nTable 1\n\n\n\n\n\n\n\n\n\nTime Intelligence Functions\n\n\nFunction\nDescription\nShift\nAggregate\nCompare\n\n\n\n\nYoY\nFull Year over Year\n\nX\nX\n\n\nYTD\nYear-to-Date\n\nX\n\n\n\nPYTD\nPrior Year-to-Date amount\nX\nX\n\n\n\nYoYTD\nCurrent Year-to-Date over Prior Year-to-Date\nX\nX\nX\n\n\nYTDOPY\nYear-to-Date over Full Previous Year\nX\nX\nX\n\n\nQoQ\nFull Quarter over Quarter\n\nX\nX\n\n\nQTD\nQuarter-to-Date\n\nX\n\n\n\nPQTD\nPrior Quarter-to-Date\nX\nX\n\n\n\nQOQTD\nQuarter-over-Quarter-to-Date\nX\nX\nX\n\n\nQTDOPQ\nQuarter-to-Date over Full Previous Quarter\nX\nX\nX\n\n\nMTD\nMonth-to-Date\n\nX\n\n\n\nMoM\nFull Month over Full Month\n\nX\nX\n\n\nMoMTD\nCurrent Month-to-Date over Prior Month-to-Date\nX\nX\nX\n\n\nPMTD\nPrior Month's MTD amount\nX\nX\n\n\n\nMTDOPM\nMonth-to-Date over Full Previous Month\nX\nX\nX\n\n\nWTD\nWeek-to-Date\n\nX\n\n\n\nWoW\nFull Week over Full Week\n\nX\nX\n\n\nWoWTD\nCurrent Week-to-Date over Prior Week-to-Date\nX\nX\nX\n\n\nPWTD\nPrior Week-to-Date\nX\nX\n\n\n\nATD\nCumulative total from inception to date\n\nX\n\n\n\nDoD\nFull Day over Full Day\n\nX\nX\n\n\n\n\n\n\n\n\n\n\n\n\n\nClassification Strategies\n\nABC Classification\nABC classification is a business analysis technique that categorizes items (like products, customers, or suppliers) based on their relative contribution of a value. It expands upon the Pareto Principle (the 80/20 rule), allowing the user to determine which percentage of items or group members contribute to the largest percentage of the total value.\nYou assign the break points for the categorization and the function will label each category with a letter value.\n\n\nCohort\nCohort analysis is a type of behavioral analytics that takes data from a given group of users (called a cohort) and tracks their activity over time. A cohort is typically defined by a shared starting characteristic, most commonly the time period in which the entities first interacted with the product or service.\nThis allows you to understand retention, turnover and other cohort attributes more clearly.\n\n\n\n\nTable 2\n\n\n\n\n\n\n\n\n\nClassification Functions\n\n\nFunction\nDescription\nCategorizes\nTime-Based\nTracks Over Time\n\n\n\n\nabc()\nABC Classification groups items by relative contribution (Pareto analysis).\nX\n\n\n\n\ncohort()\nCohort analysis groups entities by a shared start point and analyzes behavior over time.\n\nX\nX"
+  },
+  {
+    "objectID": "index.html#additional-references-and-inspirations",
+    "href": "index.html#additional-references-and-inspirations",
+    "title": "ti",
+    "section": "Additional references and inspirations",
+    "text": "Additional references and inspirations\n\nPeerChristensen’s Cohort Package"
+  },
+  {
+    "objectID": "index.html#footnotes",
+    "href": "index.html#footnotes",
+    "title": "ti",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nI plan to use duckplyr once it expands support for lubridate functions↩︎"
+  },
+  {
     "objectID": "reference/abc.html",
     "href": "reference/abc.html",
     "title": "ABC classification function",
@@ -1712,7 +1761,7 @@
     "href": "reference/calculate.html#examples",
     "title": "Execute time-intelligence or segments class objects to return the underlying transformed table",
     "section": "Examples",
-    "text": "Examples\n\nx &lt;- ytd(contoso::sales,.date=order_date,.value=quantity,calendar_type=\"standard\")\ncalculate(x)\n#&gt; # A query:    ?? x 9\n#&gt; # Database:   DuckDB 1.5.2 [hagan@Linux 7.0.11-76070011-generic:R 4.6.1/:memory:]\n#&gt; # Ordered by: date\n#&gt;    date                 year quarter month  week   day quantity ytd_quantity\n#&gt;    &lt;dttm&gt;              &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;        &lt;dbl&gt;\n#&gt;  1 2022-01-01 00:00:00  2022       1     1     1     1       47           47\n#&gt;  2 2022-01-02 00:00:00  2022       1     1     1     2        0           47\n#&gt;  3 2022-01-03 00:00:00  2022       1     1     1     3       24           71\n#&gt;  4 2022-01-04 00:00:00  2022       1     1     1     4       17           88\n#&gt;  5 2022-01-05 00:00:00  2022       1     1     1     5       42          130\n#&gt;  6 2022-01-06 00:00:00  2022       1     1     1     6       34          164\n#&gt;  7 2022-01-07 00:00:00  2022       1     1     1     7       43          207\n#&gt;  8 2022-01-08 00:00:00  2022       1     1     2     8       41          248\n#&gt;  9 2022-01-09 00:00:00  2022       1     1     2     9        0          248\n#&gt; 10 2022-01-10 00:00:00  2022       1     1     2    10        8          256\n#&gt; # ℹ more rows\n#&gt; # ℹ 1 more variable: missing_date_indicator &lt;dbl&gt;"
+    "text": "Examples\n\nx &lt;- ytd(contoso::sales,.date=order_date,.value=quantity,calendar_type=\"standard\")\ncalculate(x)\n#&gt; # A query:    ?? x 9\n#&gt; # Database:   DuckDB 1.5.2 [hagan@Linux 7.0.11-76070011-generic:R 4.6.1/:memory:]\n#&gt; # Ordered by: date\n#&gt;    date                 year quarter month  week   day quantity ytd_quantity\n#&gt;    &lt;dttm&gt;              &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;        &lt;dbl&gt;\n#&gt;  1 2024-01-01 00:00:00  2024       1     1     1     1       12           12\n#&gt;  2 2024-01-02 00:00:00  2024       1     1     1     2       29           41\n#&gt;  3 2024-01-03 00:00:00  2024       1     1     1     3       34           75\n#&gt;  4 2024-01-04 00:00:00  2024       1     1     1     4       38          113\n#&gt;  5 2024-01-05 00:00:00  2024       1     1     1     5       18          131\n#&gt;  6 2024-01-06 00:00:00  2024       1     1     1     6       29          160\n#&gt;  7 2024-01-07 00:00:00  2024       1     1     1     7        0          160\n#&gt;  8 2024-01-08 00:00:00  2024       1     1     2     8        6          166\n#&gt;  9 2024-01-09 00:00:00  2024       1     1     2     9       23          189\n#&gt; 10 2024-01-10 00:00:00  2024       1     1     2    10       17          206\n#&gt; # ℹ more rows\n#&gt; # ℹ 1 more variable: missing_date_indicator &lt;dbl&gt;"
   },
   {
     "objectID": "reference/cohort.html",
