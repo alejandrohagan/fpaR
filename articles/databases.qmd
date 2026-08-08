@@ -43,6 +43,59 @@ db_sales <- tbl(con, "sales")
 db_sales
 ```
 
+### Optional: let contoso build the database for you
+
+Loading tables by hand is fine for one table. If you want the whole Contoso model — sales, products, customers, stores, orders and the rest — `contoso` will build the DuckDB database for you in a single call:
+
+```{r}
+#| label: contoso-duckdb
+#| eval: false
+
+db <- contoso::create_contoso_duckdb(size = "small")
+
+names(db)
+#> [1] "sales"     "product"   "customer"  "store"     "orders"
+#> [6] "orderrows" "fx"        "calendar"  "con"
+```
+
+The return value is a named list of lazy `tbl_dbi` tables, plus the connection itself as `db$con`. Each element drops straight into a `ti` pipeline:
+
+```{r}
+#| label: contoso-duckdb-use
+#| eval: false
+
+db$sales |>
+  mtd(.date = order_date, .value = gross_margin, calendar_type = "standard") |>
+  calculate() |>
+  collect()
+```
+
+Remember to close it when you are done:
+
+```{r}
+#| label: contoso-duckdb-close
+#| eval: false
+
+DBI::dbDisconnect(db$con, shutdown = TRUE)
+```
+
+The `size` argument is the reason this is worth knowing about. It is how you test whether a pipeline actually scales:
+
+| `size` | Sales rows |
+|---|---|
+| `"small"` | 7,794 |
+| `"medium"` | 2,349,091 |
+| `"large"` | 23,719,935 |
+| `"mega"` | 237,245,485 |
+
+`"small"` serves the same data as the bundled `contoso::sales`. The larger sizes are where the lazy-pipeline advice in this article stops being theoretical — at 237 million rows, the difference between filtering before and after `collect()` is the difference between a query and an out-of-memory error.
+
+::: callout-note
+## This requires network access
+
+`create_contoso_duckdb()` streams Parquet files from cloud storage rather than reading a local dataset, so it needs an internet connection. The chunks in this section are not executed when this site is built, which is why they show static output — everything else in this article runs live against the local connection created above.
+:::
+
 The syntax from here is identical to the tibble syntax used everywhere else in these articles:
 
 ```{r}
