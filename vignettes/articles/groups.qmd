@@ -64,7 +64,7 @@ by_store |>
     month_total = max(mtd_gross_margin),
     .by = store_key
   ) |>
-  arrange(desc(month_total)) |>
+  arrange(desc(month_total), store_key) |>
   head(5)
 ```
 
@@ -80,9 +80,14 @@ contoso::sales |>
   mtd(.date = order_date, .value = gross_margin, calendar_type = "standard") |>
   calculate() |>
   collect() |>
-  select(store_key, product_key, date, mtd_gross_margin) |>
+  filter(missing_date_indicator == 0) |>                                  # <1>
+  arrange(desc(mtd_gross_margin), store_key, product_key, date) |>        # <2>
+  select(store_key, product_key, date, gross_margin, mtd_gross_margin) |>
   head(5)
 ```
+
+1. Drop the zero-filled calendar rows so we are looking at real trading days.
+2. Always sort before taking `head()`. A collected result has **no guaranteed row order** — the database returns rows in whatever order the query plan produced, so an unsorted `head()` gives you arbitrary rows that can change between runs.
 
 Be aware of the cost. Because `ti` completes the calendar for each group (see [Calendar Completion and Missing Dates](missing_dates.qmd)), the row count is roughly *number of groups × number of days in that group's active range*. Grouping by two high-cardinality columns can multiply your result set considerably — one reason to keep the pipeline lazy and filter in the database.
 
