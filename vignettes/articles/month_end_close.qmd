@@ -1,0 +1,201 @@
+---
+title: "A Month-End Close, End to End"
+subtitle: "Composing several time-intelligence functions into one reporting pack"
+author: "Alejandro Hagan"
+format: html
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(ti)
+library(dplyr)
+library(gt)
+```
+
+## The task
+
+Every other article in this package demonstrates one function at a time. Real reporting does not work that way. At month end you are asked for a single table that answers several questions at once:
+
+- How did each store perform this month to date?
+- How does that compare with the same point last month?
+- Where does the year stand, and how does that compare with last year?
+
+That is four metrics — `mtd`, `pmtd`, `ytd`, `pytd` — from three function calls, combined into one pack. This article builds it.
+
+We will close on **30 June 2023**, at store level, measuring gross margin.
+
+```{r}
+#| label: parameters
+
+close_date <- as.Date("2023-06-30")
+```
+
+## One metric at a time
+
+Each call follows the same shape: group, calculate, collect. Keep only the identifying columns and the metric, so the pieces join cleanly.
+
+Month to date, and the prior month at the same point:
+
+```{r}
+#| label: mtd-pieces
+
+mtd_tbl <- contoso::sales |>
+  group_by(store_key) |>
+  mtd(.date = order_date, .value = gross_margin, calendar_type = "standard") |>
+  calculate() |>
+  collect() |>
+  select(store_key, date, mtd = mtd_gross_margin)
+
+pmtd_tbl <- contoso::sales |>
+  group_by(store_key) |>
+  pmtd(.date = order_date, .value = gross_margin, calendar_type = "standard", lag_n = 1) |>
+  calculate() |>
+  collect() |>
+  select(store_key, date, pmtd = pmtd_gross_margin)
+```
+
+`yoytd()` is the efficient choice for the annual view, because it returns **both** the current year to date and the prior year to date in one pass:
+
+```{r}
+#| label: ytd-piece
+
+ytd_tbl <- contoso::sales |>
+  group_by(store_key) |>
+  yoytd(.date = order_date, .value = gross_margin, calendar_type = "standard", lag_n = 1) |>
+  calculate() |>
+  collect() |>
+  select(store_key, date, ytd = ytd_gross_margin, pytd = pytd_gross_margin)
+```
+
+::: callout-tip
+## Which annual function?
+
+`yoytd()` compares year to date against the *prior year to date* — the equivalent point last year. `ytdopy()` compares year to date against the *full prior year*. For a close pack you almost always want `yoytd()`; comparing six months of this year against twelve months of last year will always look like a collapse.
+:::
+
+## Joining the pieces
+
+Join on **both** `store_key` and `date`. This is the part worth getting right.
+
+```{r}
+#| label: join
+
+pack <- mtd_tbl |>
+  inner_join(pmtd_tbl, by = c("store_key", "date")) |>
+  inner_join(ytd_tbl,  by = c("store_key", "date"))
+
+nrow(pack)
+```
+
+Joining on `store_key` alone would silently produce a cross join of every date against every date. Joining on `date` alone would mix stores together. The pair is the grain of every result `ti` returns for a grouped calculation, so it is the correct join key.
+
+## Selecting the close date and deriving variances
+
+With the metrics aligned, the close pack is one `filter()` and a few `mutate()` calls:
+
+```{r}
+#| label: close-pack
+
+close_pack <- pack |>
+  filter(as.Date(date) == close_date) |>
+  mutate(
+    mtd_variance     = mtd - pmtd,
+    mtd_variance_pct = if_else(pmtd == 0, NA, (mtd - pmtd) / pmtd),
+    ytd_variance     = ytd - pytd,
+    ytd_variance_pct = if_else(pytd == 0, NA, (ytd - pytd) / pytd)
+  ) |>
+  arrange(desc(ytd))
+
+close_pack |>
+  select(store_key, mtd, pmtd, mtd_variance, ytd, pytd, ytd_variance_pct) |>
+  head(5)
+```
+
+Guard the percentage variances against a zero denominator. A store with no margin in the comparison period is a real and common case, and dividing by it produces `Inf` rather than an error — which will propagate quietly into a formatted table.
+
+## Formatting the pack
+
+```{r}
+#| label: tbl-close-pack
+#| tbl-cap: "Store performance as at 30 June 2023, ranked by year to date gross margin"
+
+close_pack |>
+  head(10) |>
+  select(store_key, mtd, pmtd, mtd_variance, ytd, pytd, ytd_variance_pct) |>
+  gt() |>
+  tab_header(
+    title    = md("**Month-End Close — Gross Margin**"),
+    subtitle = "Top 10 stores as at 30 June 2023"
+  ) |>
+  tab_spanner(label = "Month to date", columns = c(mtd, pmtd, mtd_variance)) |>
+  tab_spanner(label = "Year to date",  columns = c(ytd, pytd, ytd_variance_pct)) |>
+  cols_label(
+    store_key        = "Store",
+    mtd              = "Current",
+    pmtd             = "Prior",
+    mtd_variance     = "Variance",
+    ytd              = "Current",
+    pytd             = "Prior",
+    ytd_variance_pct = "Variance %"
+  ) |>
+  fmt_number(columns = c(mtd, pmtd, mtd_variance, ytd, pytd), decimals = 0, use_seps = TRUE) |>
+  fmt_percent(columns = ytd_variance_pct, decimals = 1) |>
+  sub_missing(missing_text = "—") |>
+  tab_style(
+    style     = cell_text(color = "#b8291f"),
+    locations = cells_body(columns = mtd_variance, rows = mtd_variance < 0)
+  ) |>
+  tab_style(
+    style     = cell_text(color = "#b8291f"),
+    locations = cells_body(columns = ytd_variance_pct, rows = ytd_variance_pct < 0)
+  )
+```
+
+## Reading the result
+
+The pack separates two different signals that are easy to conflate:
+
+- **Month-to-date variance** is a short-horizon operational signal. It is noisy — one large order lands or does not.
+- **Year-to-date variance** is the trend. A store can be down on the month and comfortably up on the year.
+
+Sorting by year to date and reading the month column across gives you the stores worth asking about: strong on the year, weak on the month.
+
+## Keeping it lazy for larger data
+
+This article collects each metric before joining, which is fine for the Contoso sample. On a warehouse table you would keep everything lazy and let the database perform the joins:
+
+```{r}
+#| label: lazy-pattern
+#| eval: false
+
+mtd_lazy <- db_sales |>
+  group_by(store_key) |>
+  mtd(order_date, gross_margin, "standard") |>
+  calculate()                                   # <1>
+
+pmtd_lazy <- db_sales |>
+  group_by(store_key) |>
+  pmtd(order_date, gross_margin, "standard", lag_n = 1) |>
+  calculate()
+
+mtd_lazy |>
+  inner_join(pmtd_lazy, by = c("store_key", "date")) |>   # <2>
+  filter(date == close_date) |>
+  collect()                                                # <3>
+```
+
+1. No `collect()` — this stays a lazy `tbl_dbi`.
+2. The join is compiled to SQL and executed by the database.
+3. One `collect()` at the very end, on the filtered result.
+
+See [Working with Databases](databases.qmd) for more on the lazy pipeline and inspecting the generated SQL.
+
+## Key points
+
+- Group, calculate, collect — then join. The join key for a grouped result is the grouping columns **plus** `date`.
+- `yoytd()` returns current and prior year to date together; prefer it over separate `ytd()` and `pytd()` calls.
+- Use `yoytd()` rather than `ytdopy()` for close packs; the latter compares against the full prior year.
+- Guard percentage variances against a zero comparison period.
+- On large data, join lazily and `collect()` once at the end.

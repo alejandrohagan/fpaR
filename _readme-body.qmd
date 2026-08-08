@@ -14,7 +14,7 @@ library(tidyverse)
 
 ## A Business Intelligence Toolkit for Financial Planning & Analysis (FP&A)
 
-`ti` package is a collection of business intelligence tools designed to simplify common **financial planning and analysis (FP&A)** tasks such as time intelligence calculations, group member segmentation and factor/variance analysis.
+`ti` package is a collection of business intelligence tools designed to simplify common **financial planning and analysis (FP&A)** tasks such as time intelligence calculations and group member segmentation.
 
 The package is inspired by best practices from a collection of blogs, books, industry research, and hands-on work experience, consolidating frequently performed business analyses into a fast, efficient, and reusable framework.
 
@@ -26,7 +26,7 @@ Under the hood, these functions are built upon the great foundations of:
 -   [duckdb](https://github.com/duckdb/duckdb-r)
 -   [lubridate](https://lubridate.tidyverse.org/)
 
-All functions are designed to work with either tibbles or modern databases (DuckDB, Snowflake, SQLite, etc) with a unified syntax.
+All functions are designed to work with either tibbles or a database backend with a unified syntax. Dialect-specific date arithmetic is generated for DuckDB, Snowflake and Postgres; other `dbplyr` backends fall back to the DuckDB dialect and may need testing.
 
 Even if you are working with tibbles, all functions are optimized to leverage [DuckDB](https://github.com/duckdb/duckdb-r) for increased speed and performance[^1]
 

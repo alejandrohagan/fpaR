@@ -1,0 +1,162 @@
+---
+title: "Working with Groups"
+subtitle: "How grouping changes every calculation in the package"
+author: "Alejandro Hagan"
+format: html
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(ti)
+library(dplyr)
+```
+
+## Grouping is the main dial
+
+Every time-intelligence and segmentation function in `ti` respects `dplyr::group_by()`. There is no `.by` argument and no `group` parameter — you group the table before you call the function, and the calculation follows.
+
+Ungrouped, `mtd()` gives you one month-to-date series for the whole company:
+
+```{r}
+#| label: ungrouped
+
+contoso::sales |>
+  mtd(.date = order_date, .value = gross_margin, calendar_type = "standard") |>
+  calculate() |>
+  collect() |>
+  arrange(date) |>
+  select(date, gross_margin, mtd_gross_margin) |>
+  head(5)
+```
+
+Grouped by store, you get one independent series **per store**:
+
+```{r}
+#| label: grouped
+
+by_store <- contoso::sales |>
+  group_by(store_key) |>
+  mtd(.date = order_date, .value = gross_margin, calendar_type = "standard") |>
+  calculate() |>
+  collect()
+
+by_store |>
+  arrange(store_key, date) |>
+  select(store_key, date, gross_margin, mtd_gross_margin) |>
+  head(5)
+```
+
+The grouping columns are carried through into the result, so they are available to filter and join on afterwards.
+
+## The cumulative sum resets per group
+
+This is the behaviour that makes grouping worth doing. Each group's running total is independent — store 10's month-to-date figure never picks up store 20's revenue.
+
+```{r}
+#| label: independent-series
+
+by_store |>
+  filter(year == 2023, month == 6) |>
+  arrange(store_key, date) |>
+  summarise(
+    month_total = max(mtd_gross_margin),
+    .by = store_key
+  ) |>
+  arrange(desc(month_total)) |>
+  head(5)
+```
+
+## Multiple grouping levels
+
+Group by as many columns as you need. The calculation is performed for every distinct combination:
+
+```{r}
+#| label: multi-level
+
+contoso::sales |>
+  group_by(store_key, product_key) |>
+  mtd(.date = order_date, .value = gross_margin, calendar_type = "standard") |>
+  calculate() |>
+  collect() |>
+  select(store_key, product_key, date, mtd_gross_margin) |>
+  head(5)
+```
+
+Be aware of the cost. Because `ti` completes the calendar for each group (see [Calendar Completion and Missing Dates](missing_dates.qmd)), the row count is roughly *number of groups × number of days in that group's active range*. Grouping by two high-cardinality columns can multiply your result set considerably — one reason to keep the pipeline lazy and filter in the database.
+
+## Each group gets its own calendar range
+
+A subtle and important point: `ti` does not force every group onto the same date range. Each group's calendar is completed only within **that group's own** first and last observed date.
+
+Consider two stores, where store B opens two months after store A:
+
+```{r}
+#| label: per-group-bounds
+
+openings <- tibble::tibble(
+  store      = c("A", "A", "A", "B", "B"),
+  order_date = as.Date(c("2024-01-01", "2024-01-03", "2024-03-01",
+                         "2024-03-01", "2024-03-05")),
+  amount     = c(10, 20, 30, 40, 50)
+)
+
+openings |>
+  group_by(store) |>
+  ytd(.date = order_date, .value = amount, calendar_type = "standard") |>
+  calculate() |>
+  collect() |>
+  summarise(
+    first_date = min(date),
+    last_date  = max(date),
+    n_rows     = n(),
+    .by = store
+  ) |>
+  arrange(store)
+```
+
+Store B's series starts in March, not January. It is **not** back-filled with two months of zeroes just because store A had data then.
+
+This is the right default for retail and subscription analysis. A store that opened in March did not have a bad January — it had no January. Padding it with zeroes would drag down every average and make year-over-year comparisons meaningless.
+
+## Checking your grouping before you run
+
+Because a `ti` object is a blueprint, you can inspect what it is about to do. Printing it reports the group count:
+
+```{r}
+#| label: print-groups
+
+contoso::sales |>
+  group_by(store_key) |>
+  mtd(.date = order_date, .value = gross_margin, calendar_type = "standard")
+```
+
+If the group count is not what you expected, you have caught the mistake before running a query over the full table.
+
+## Grouping and segmentation
+
+The segmentation functions treat grouping differently: for `abc()`, the grouping columns define **what is being ranked**. Grouping by store ranks stores against each other by their contribution to the total.
+
+```{r}
+#| label: abc-grouping
+
+contoso::sales |>
+  group_by(store_key) |>
+  abc(category_values = c(0.7, 0.96, 1), .value = gross_margin) |>
+  calculate() |>
+  collect() |>
+  select(store_key, abc_gross_margin, prop_total, cum_prop_total, category_name) |>
+  head(5)
+```
+
+Change the grouping column and you change the question: group by `product_key` and you are asking which products drive margin, not which stores.
+
+## Key points
+
+- Group with `dplyr::group_by()` before calling the function; there is no `.by` argument.
+- Cumulative sums reset per group and never bleed across groups.
+- Grouping columns are carried into the result.
+- Each group's calendar is completed within its own date range, so late-starting groups are not zero-padded backwards.
+- Print the object to check the group count before executing.
+- For `abc()`, the grouping columns define the population being ranked.

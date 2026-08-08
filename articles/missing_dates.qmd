@@ -1,0 +1,185 @@
+---
+title: "Calendar Completion and Missing Dates"
+subtitle: "Why ti fills your calendar, and what it refuses to fill"
+author: "Alejandro Hagan"
+format: html
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(ti)
+library(dplyr)
+```
+
+## The problem with gaps
+
+Transactional data has holes in it. Stores close on holidays, no one orders on a Sunday, a product sells nothing for a week. Your table has no row for those days — not a row with a zero, no row at all.
+
+That is fine until you compare periods. Consider a week of margin data with three days missing:
+
+```{r}
+#| label: gappy-data
+
+gappy <- tibble::tibble(
+  order_date = as.Date(c("2024-01-01", "2024-01-03", "2024-01-06",
+                         "2024-01-07", "2024-01-08", "2024-01-09",
+                         "2024-01-11")),
+  amount     = c(1200, 1100, 1300, 900, 1200, 850, 1450)
+)
+
+gappy
+```
+
+If you reach for `dplyr::lag()` to compute a day-over-day change, you get the wrong answer:
+
+```{r}
+#| label: lag-is-wrong
+
+gappy |>
+  mutate(
+    previous_row = lag(amount),
+    change       = amount - previous_row
+  )
+```
+
+The row labelled `2024-01-03` reports a change against `2024-01-01`. But those are not consecutive days — January 2nd is missing. `lag()` gives you the **previous row**, and you asked for the **previous day**. On a table with gaps those are different questions.
+
+The problem compounds as the gaps widen. `2024-01-06` is compared against `2024-01-03`, three days earlier.
+
+## What ti does instead
+
+Every `ti` calculation begins by building a complete calendar for the requested time unit, then joining your data onto it. Missing days appear as rows with a zero value:
+
+```{r}
+#| label: ti-fills
+
+filled <- gappy |>
+  dod(.date = order_date, .value = amount, calendar_type = "standard") |>
+  calculate() |>
+  collect() |>
+  arrange(date)
+
+filled |>
+  select(date, amount, dod_amount, missing_date_indicator)
+```
+
+Now January 2nd exists, holds a zero, and the day-over-day comparison lines up with the actual calendar.
+
+## The `missing_date_indicator` column
+
+Zero-filling is useful for arithmetic and dangerous for interpretation. A day with no sales and a day with genuinely zero margin look identical once both are zeroes.
+
+So `ti` labels them. Every completed calendar carries a `missing_date_indicator` column: `1` if the row was invented to fill a gap, `0` if it came from your data.
+
+```{r}
+#| label: indicator
+
+filled |>
+  count(missing_date_indicator)
+```
+
+Use it to keep the two cases apart. To count only trading days:
+
+```{r}
+#| label: trading-days
+
+filled |>
+  filter(missing_date_indicator == 0) |>
+  summarise(
+    trading_days = n(),
+    mean_amount  = mean(amount)
+  )
+```
+
+Compare that against the naive average over all rows, which is dragged toward zero by the padding:
+
+```{r}
+#| label: naive-average
+
+filled |>
+  summarise(
+    all_rows    = n(),
+    mean_amount = mean(amount)
+  )
+```
+
+Both numbers are legitimate; they answer different questions. Averaging over the calendar tells you daily run rate including closures. Averaging over trading days tells you how a trading day performs. The indicator lets you choose deliberately rather than by accident.
+
+## What ti refuses to fill
+
+Calendar completion is bounded. `ti` fills gaps *inside* the observed date range and does not extend beyond it. There is no back-filling to the start of the year and no padding forward to today.
+
+```{r}
+#| label: bounded
+
+filled |>
+  summarise(first_row = min(date), last_row = max(date))
+```
+
+The series runs from the first observed date to the last, and no further. Data you never had does not get invented.
+
+This bounding is applied **per group**. Each group's calendar is completed within that group's own first and last observation, which matters whenever groups enter or leave at different times:
+
+```{r}
+#| label: per-group
+
+openings <- tibble::tibble(
+  store      = c("A", "A", "A", "B", "B"),
+  order_date = as.Date(c("2024-01-01", "2024-01-03", "2024-03-01",
+                         "2024-03-01", "2024-03-05")),
+  amount     = c(10, 20, 30, 40, 50)
+)
+
+openings |>
+  group_by(store) |>
+  ytd(.date = order_date, .value = amount, calendar_type = "standard") |>
+  calculate() |>
+  collect() |>
+  summarise(first_date = min(date), last_date = max(date), n_rows = n(), .by = store) |>
+  arrange(store)
+```
+
+Store B opens in March and its series starts in March. It is not given two months of zeroes to match store A. A store that opened in March did not have a bad January — it had no January, and padding it would corrupt every average and year-over-year comparison that touches it.
+
+## Inspecting gaps before you calculate
+
+A `ti` object reports what it found before you run anything. Printing one summarises the calendar it intends to build, including how many dates were missing:
+
+```{r}
+#| label: print-object
+
+gappy |>
+  dod(.date = order_date, .value = amount, calendar_type = "standard")
+```
+
+If the missing-date count is far higher than you expect, that is usually a signal about the data rather than the calculation — a wrong grouping column, a filter applied too early, or a date column that is not the one you meant.
+
+## A related tool: calendar attributes
+
+`augment_standard_calendar()` solves a different problem and is worth knowing about. It does **not** fill gaps — it annotates the rows you already have with calendar context: period boundaries, day counts, and how far through each period a date sits.
+
+```{r}
+#| label: augment
+
+augmented <- gappy |>
+  augment_standard_calendar(.date = order_date) |>
+  collect()
+
+augmented |>
+  select(order_date, month_end_date, days_complete_in_month,
+         days_remaining_in_month, weekend_indicator) |>
+  head(5)
+```
+
+These columns are what you need for pacing and run-rate work — projecting a partial month to a full month, or explaining a shortfall by weekend placement rather than performance. The full set covers year, quarter, month and week boundaries, day-of-week and month labels, and complete/remaining day counts for each period.
+
+## Key points
+
+- `dplyr::lag()` gives you the previous **row**; period comparisons need the previous **date**. On gappy data these differ.
+- `ti` completes the calendar before calculating, so comparisons align to real dates.
+- `missing_date_indicator` marks invented rows — filter on it to separate closures from genuine zeroes.
+- Completion is bounded by the observed range and never extends past it.
+- Bounds are per group, so late-starting groups are not zero-padded backwards.
+- Print the object to see the missing-date count before running the query.

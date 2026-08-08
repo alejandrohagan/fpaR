@@ -4,6 +4,10 @@ articles:
   abc: abc.html
   calendar_types: calendar_types.html
   cohort: cohort.html
+  databases: databases.html
+  groups: groups.html
+  missing_dates: missing_dates.html
+  month_end_close: month_end_close.html
   ti: ti.html
 urls:
   reference: https://codeberg.org/usrbinr/ti/reference

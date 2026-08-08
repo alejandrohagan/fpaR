@@ -1,0 +1,143 @@
+---
+title: "Working with Databases"
+subtitle: "How ti builds SQL, and why you should collect() last"
+author: "Alejandro Hagan"
+format: html
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(ti)
+library(dplyr)
+library(DBI)
+```
+
+## Everything is lazy
+
+`ti` never touches your data when you call a time-intelligence function. `ytd()`, `mtd()`, `yoy()` and the rest all return a **blueprint** — an object describing the calculation to run. Nothing executes until you ask for it.
+
+There are three distinct stages:
+
+| Stage | Call | What happens |
+|---|---|---|
+| **Describe** | `mtd(...)` | Returns a `ti` object. No query, no data movement. |
+| **Compile** | `calculate()` | Builds the query. Still lazy — a `tbl_dbi`, not a tibble. |
+| **Execute** | `dplyr::collect()` | Runs the query and pulls the result into R. |
+
+This matters because the expensive part — the windowed aggregation — happens **in the database**, not in R.
+
+## Connecting to a database
+
+`ti` works on any `dbplyr`-backed table. Here is a DuckDB connection with the Contoso sales data loaded into it:
+
+```{r}
+#| label: connect
+
+con <- dbConnect(duckdb::duckdb())
+dbWriteTable(con, "sales", contoso::sales)
+
+db_sales <- tbl(con, "sales")
+
+db_sales
+```
+
+The syntax from here is identical to the tibble syntax used everywhere else in these articles:
+
+```{r}
+#| label: db-mtd
+
+result <- db_sales |>
+  mtd(.date = order_date, .value = gross_margin, calendar_type = "standard")
+
+class(result)
+```
+
+Still no query. `calculate()` compiles it:
+
+```{r}
+#| label: db-calculate
+
+compiled <- calculate(result)
+
+class(compiled)
+```
+
+Note that `compiled` is a `tbl_dbi` — a lazy database table. The data is still in DuckDB.
+
+## Seeing the generated SQL
+
+Because the result is a lazy `dbplyr` table, `dplyr::show_query()` will show you exactly what `ti` wrote:
+
+```{r}
+#| label: show-query
+
+compiled |> show_query()
+```
+
+The period-to-date calculation compiles down to a **SQL window function** partitioned by the period columns. `ti` is not looping in R and it is not pulling your table into memory — it is writing the query you would have written by hand.
+
+## Collect last, not first
+
+The single most important habit: **keep the pipeline lazy for as long as possible and call `collect()` at the very end.**
+
+```{r}
+#| label: collect-last
+
+compiled |>
+  filter(year == 2023, month == 6) |>   # <1>
+  arrange(date) |>
+  collect() |>                          # <2>
+  head(5)
+```
+
+1. Filtering happens *in the database*, on the full result set.
+2. Only the filtered rows cross the boundary into R.
+
+If you had called `collect()` before the `filter()`, DuckDB would have handed R every row and then R would have thrown most of them away.
+
+## Tibbles get a database too
+
+You do not need to set up a connection to benefit from this. When you pass a plain `data.frame` or tibble, `ti` registers it into a temporary in-memory DuckDB instance with `make_db_tbl()`:
+
+```{r}
+#| label: auto-duckdb
+
+contoso::sales |>
+  mtd(order_date, gross_margin, "standard") |>
+  calculate() |>
+  class()
+```
+
+The result is a `tbl_duckdb_connection`, not a tibble — even though the input was a tibble. Registration uses DuckDB's `duckdb_register()`, which is a virtual registration rather than a physical copy, so it is fast and does not duplicate your data.
+
+This is why every example in these articles ends with `dplyr::collect()`.
+
+## Dialect support
+
+Date arithmetic differs across SQL engines, so `ti` detects the backend from the connection and generates the appropriate expression. Three dialects are recognised explicitly:
+
+| Backend | Status |
+|---|---|
+| DuckDB | Recognised |
+| Snowflake | Recognised |
+| Postgres | Recognised |
+| Anything else | Falls back to the DuckDB dialect |
+
+The fallback is often fine, since many engines accept DuckDB-compatible date arithmetic. But it is a fallback, not a guarantee — if you are running `ti` against a backend not in the list above, verify the output of `show_query()` before trusting the numbers.
+
+```{r}
+#| label: disconnect
+#| include: false
+
+dbDisconnect(con, shutdown = TRUE)
+```
+
+## Key points
+
+- Time-intelligence functions describe work; `calculate()` compiles it; `collect()` runs it.
+- Use `show_query()` to inspect the SQL — period-to-date becomes a window function.
+- Filter, join and arrange *before* `collect()` so the database does the work.
+- Tibbles are transparently promoted to DuckDB, so the return value is always a lazy table.
+- DuckDB, Snowflake and Postgres get dialect-specific date arithmetic; other backends fall back to DuckDB's.

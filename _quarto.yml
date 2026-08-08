@@ -47,6 +47,12 @@ website:
         href: articles/calendar_types.qmd
       - text: Cohort
         href: articles/cohort.qmd
+      - text: Working with Databases
+        href: articles/databases.qmd
+      - text: Working with Groups
+        href: articles/groups.qmd
+      - text: More articles... (2 more)
+        href: articles/index.qmd
     - text: Reference
       href: reference/index.qmd
     - text: Changelog

@@ -1,3 +1,1 @@
-# ti
-
 {{< include _readme-body.qmd >}}
