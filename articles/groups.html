@@ -461,11 +461,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 5 × 4
   store_key product_key date                mtd_gross_margin
       &lt;dbl&gt;       &lt;dbl&gt; &lt;dttm&gt;                         &lt;dbl&gt;
-1    999999        1809 2022-07-10 00:00:00                0
-2    999999        1809 2022-07-11 00:00:00                0
-3    999999        1809 2022-07-12 00:00:00                0
-4    999999        1809 2022-07-13 00:00:00                0
-5    999999        1809 2022-07-14 00:00:00                0</code></pre>
+1    999999         440 2022-10-26 00:00:00             323.
+2    999999         440 2022-10-27 00:00:00             323.
+3    999999         440 2022-10-28 00:00:00             323.
+4    999999         440 2022-10-29 00:00:00             323.
+5    999999         440 2022-10-30 00:00:00             323.</code></pre>
 </div>
 </div>
 <p>Be aware of the cost. Because <code>ti</code> completes the calendar for each group (see <a href="../articles/missing_dates.html">Calendar Completion and Missing Dates</a>), the row count is roughly <em>number of groups × number of days in that group’s active range</em>. Grouping by two high-cardinality columns can multiply your result set considerably — one reason to keep the pipeline lazy and filter in the database.</p>
